@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Colaboradores</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --accent: #8b5cf6;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 2rem; color: var(--gray-800);
+        }
+        .container {
+            max-width: 1600px; margin: 0 auto;
+            background: rgba(255,255,255,0.96); backdrop-filter: blur(10px);
+            border-radius: var(--radius); box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; padding: 1.5rem 2rem;
+        }
+        .header h1 { font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .header .subtitle { opacity: 0.85; font-weight: 300; margin-top: 0.2rem; }
+        .header .author { font-size: 0.8rem; font-weight: 500; opacity: 0.7; margin-top: 0.3rem; }
+
+        .tabs-nav {
+            display: flex; background: var(--gray-100); border-bottom: 1px solid var(--gray-200);
+            padding: 0 2rem; overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 0.75rem 1.25rem; background: none; border: none;
+            font-weight: 600; font-size: 0.9rem; color: var(--gray-600);
+            cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: white; }
+        .tab-content { display: none; flex-direction: column; }
+        .tab-content.active { display: flex; }
+
+        .upload-section {
+            padding: 1.5rem 2rem; border-bottom: 1px solid var(--gray-200); background: var(--gray-50);
+        }
+        .file-upload-wrapper { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .file-input-label {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.6rem 1.2rem; background: white; border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; transition: 0.2s;
+        }
+        .file-input-label:hover { border-color: var(--primary); background: var(--gray-50); }
+        #fileInput, #suricatoFileInput { display: none; }
+
+        .stats-bar {
+            display: flex; gap: 1rem; padding: 0.75rem 2rem;
+            background: white; border-bottom: 1px solid var(--gray-200); flex-wrap: wrap;
+        }
+        .stat-item {
+            display: flex; align-items: center; gap: 0.5rem;
+            background: var(--gray-50); padding: 0.4rem 1rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 500;
+        }
+        .stat-value {
+            font-weight: 700; color: var(--primary);
+            background: rgba(79,70,229,0.1); padding: 0.1rem 0.5rem; border-radius: 12px;
+        }
+
+        /* Filtros */
+        .filters-section {
+            padding: 1rem 2rem; background: white; border-bottom: 1px solid var(--gray-200);
+        }
+        .slicers-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 0.75rem; margin-bottom: 0.75rem;
+        }
+        .slicer-item {
+            background: var(--gray-50); border-radius: var(--radius-sm);
+            padding: 0.75rem; border: 1px solid var(--gray-200);
+            transition: box-shadow 0.2s; text-align: center;
+        }
+        .slicer-item:hover { box-shadow: var(--shadow); }
+        .slicer-item label {
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.03em; color: var(--gray-500);
+            display: block; margin-bottom: 0.3rem;
+        }
+        .slicer-item input[type="date"],
+        .slicer-item input[type="text"],
+        .slicer-item select {
+            width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300);
+            border-radius: 6px; font-size: 0.85rem; text-align: center;
+        }
+        .colaborador-slicer {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(79,70,229,0.03), rgba(139,92,246,0.03));
+        }
+        .suggestions-list {
+            position: absolute; z-index: 200; background: white;
+            border: 1px solid var(--gray-300); border-radius: 6px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); max-height: 180px;
+            overflow-y: auto; width: calc(100% - 2rem); margin-top: 0.2rem;
+            display: none; left: 1rem; right: 1rem;
+        }
+        .suggestions-list.active { display: block; }
+        .suggestion-item {
+            padding: 0.5rem 0.8rem; cursor: pointer; font-size: 0.85rem;
+        }
+        .suggestion-item:hover { background: var(--primary); color: white; }
+
+        .custom-multiselect { position: relative; width: 100%; }
+        .multiselect-trigger {
+            width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300);
+            border-radius: 6px; font-size: 0.85rem; background: white;
+            text-align: center; cursor: pointer; display: flex;
+            justify-content: center; align-items: center; gap: 0.3rem;
+        }
+        .multiselect-trigger::after { content: '▾'; font-size: 0.7rem; color: var(--gray-500); }
+        .multiselect-dropdown {
+            position: absolute; top: 100%; left: 0; width: 100%;
+            background: white; border: 1px solid var(--gray-300); border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 150;
+            display: none; flex-direction: column;
+        }
+        .multiselect-dropdown.open { display: flex; }
+        .multiselect-options-container {
+            overflow-y: auto; max-height: 200px; flex: 1;
+        }
+        .multiselect-option {
+            padding: 0.4rem 0.8rem; display: flex; align-items: center;
+            gap: 0.5rem; font-size: 0.85rem; cursor: pointer;
+        }
+        .multiselect-option:hover { background: var(--gray-100); }
+        .multiselect-actions {
+            display: flex; border-top: 1px solid var(--gray-200);
+            background: white; position: sticky; bottom: 0; z-index: 2;
+        }
+        .multiselect-actions button {
+            flex: 1; padding: 0.5rem; border: none; font-weight: 600;
+            font-size: 0.8rem; cursor: pointer; background: white;
+        }
+        .multiselect-apply { color: var(--primary); border-right: 1px solid var(--gray-200); }
+        .multiselect-cancel { color: var(--gray-600); }
+        .multiselect-apply:hover { background: var(--primary); color: white; }
+        .multiselect-cancel:hover { background: var(--gray-100); }
+
+        .active-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+        .filter-tag {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.2rem 0.7rem; background: var(--primary); color: white;
+            border-radius: 20px; font-size: 0.75rem; font-weight: 500;
+        }
+        .filter-tag .remove-tag { cursor: pointer; font-weight: 700; }
+        .clear-filters-btn {
+            background: transparent; border: 1px solid var(--gray-300);
+            color: var(--gray-600); padding: 0.3rem 0.8rem; border-radius: 20px;
+            cursor: pointer; font-size: 0.75rem; font-weight: 500; white-space: nowrap;
+        }
+
+        .table-wrapper { background: white; padding: 0 2rem 2rem; overflow-x: hidden; }
+        .scroll-sync-top { overflow-x: auto; height: 16px; margin-bottom: 4px; }
+        .scroll-sync-top div { height: 1px; }
+        .table-inner { overflow-x: auto; width: 100%; }
+        table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.8rem; white-space: nowrap; }
+        thead { position: sticky; top: 0; background: var(--gray-50); z-index: 5; }
+        thead th {
+            padding: 0.75rem 0.6rem; text-align: center; font-weight: 600;
+            color: var(--gray-600); border-bottom: 2px solid var(--gray-200);
+            font-size: 0.7rem; text-transform: uppercase; background: var(--gray-50);
+        }
+        tbody td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); text-align: center; }
+        tbody tr:hover { background: var(--gray-50); }
+        .empty-state { text-align: center; padding: 3rem; color: var(--gray-400); }
+        .relative { position: relative; }
+
+        .charts-container { display: flex; flex-wrap: wrap; gap: 2rem; padding: 1rem 2rem; }
+        .chart-box { flex: 1; min-width: 350px; background: white; border-radius: var(--radius-sm); padding: 1rem; box-shadow: var(--shadow); }
+        canvas { max-height: 300px; }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .slicers-grid { grid-template-columns: 1fr; }
+            .charts-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 Gestão de Colaboradores</h1>
+        <p class="subtitle">Sistema inteligente de segmentação e análise de dados</p>
+        <p class="author">Desenvolvido por Pablo Martins Lopes</p>
+    </div>
+
+    <div class="tabs-nav" id="tabsNav">
+        <button class="tab-btn active" data-tab="quadro">Quadro</button>
+        <button class="tab-btn" data-tab="suricato">Suricato</button>
+        <button class="tab-btn" data-tab="visao-cargos">Visão Cargos</button>
+        <button class="tab-btn" data-tab="ferias">Férias</button>
+        <button class="tab-btn" data-tab="abs">ABS</button>
+        <button class="tab-btn" data-tab="afastamentos">Afastamentos</button>
+    </div>
+
+    <!-- Aba Quadro -->
+    <div class="tab-content active" id="tab-quadro">
+        <div class="upload-section">
+            <div class="file-upload-wrapper">
+                <label class="file-input-label" for="fileInput"><span>📁</span> Carregar CSV Colaboradores</label>
+                <input type="file" id="fileInput" accept=".csv">
+                <span id="fileName" style="color: var(--gray-500); font-size: 0.9rem;">Nenhum arquivo selecionado</span>
+            </div>
+        </div>
+        <div class="stats-bar" id="statsBar" style="display: none;">
+            <div class="stat-item">👥 Total: <span class="stat-value" id="totalCount">0</span></div>
+            <div class="stat-item">🔍 Filtrados: <span class="stat-value" id="filteredCount">0</span></div>
+        </div>
+        <div class="filters-section" id="filtersSection" style="display: none;">
+            <div style="font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">🎯 Segmentação de Dados</div>
+            <div class="slicers-grid">
+                <div class="slicer-item colaborador-slicer relative">
+                    <label>👤 Colaborador (Matrícula ou Nome)</label>
+                    <input type="text" id="colaboradorFilter" placeholder="Digite matrícula ou nome..." autocomplete="off">
+                    <div class="suggestions-list" id="suggestionsList"></div>
+                </div>
+                <div class="slicer-item"><label>📅 Data de Admissão</label><input type="date" id="dataAdmissaoFilter"></div>
+                <div class="slicer-item"><label>💼 Cargo</label><div class="custom-multiselect" id="ms-cargo"></div></div>
+                <div class="slicer-item"><label>🏢 Estabelecimento</label><div class="custom-multiselect" id="ms-estabelecimento"></div></div>
+                <div class="slicer-item"><label>🔢 Cód. Centro Custo</label><div class="custom-multiselect" id="ms-codCentroCusto"></div></div>
+                <div class="slicer-item"><label>📋 Desc. Centro Custo</label><div class="custom-multiselect" id="ms-descCentroCusto"></div></div>
+                <div class="slicer-item"><label>🎂 Data Nascimento</label><input type="date" id="dataNascimentoFilter"></div>
+                <div class="slicer-item"><label>📌 Situação</label><div class="custom-multiselect" id="ms-situacao"></div></div>
+                <div class="slicer-item"><label>🔄 Data Retorno</label><input type="date" id="dataRetornoFilter"></div>
+                <div class="slicer-item"><label>⚠️ Motivo Afastamento</label><div class="custom-multiselect" id="ms-motivoAfastamento"></div></div>
+                <div class="slicer-item"><label>🚪 Data Desligamento</label><input type="date" id="dataDesligamentoFilter"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="active-filters" id="activeFilters"></div>
+                <button class="clear-filters-btn" id="clearFiltersBtn">✨ Limpar todos os filtros</button>
+            </div>
+        </div>
+        <div class="table-wrapper" id="tableWrapper">
+            <div class="empty-state" id="emptyState"><span>📂</span><p>Carregue um arquivo CSV para visualizar os dados</p></div>
+            <div id="scrollTopContainer" class="scroll-sync-top" style="display: none;"><div></div></div>
+            <div class="table-inner" id="tableInner">
+                <table id="dataTable" style="display: none;">
+                    <thead><tr><th>Matrícula</th><th>Nome</th><th>Data Admissão</th><th>Tempo Admissão</th><th>Cargo</th><th>Estabelecimento</th><th>Cód. Centro Custo</th><th>Desc. Centro Custo</th><th>Turno</th><th>Data Nascimento</th><th>Idade</th><th>Situação</th><th>Data Retorno</th><th>Motivo Afastamento</th><th>Data Desligamento</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aba Suricato -->
+    <div class="tab-content" id="tab-suricato">
+        <div class="upload-section">
+            <div class="file-upload-wrapper">
+                <label class="file-input-label" for="suricatoFileInput"><span>📁</span> Carregar CSV Suricato</label>
+                <input type="file" id="suricatoFileInput" accept=".csv">
+                <span id="suricatoFileName" style="color: var(--gray-500); font-size: 0.9rem;">Nenhum arquivo selecionado</span>
+            </div>
+        </div>
+        <div class="stats-bar" id="suricatoStatsBar" style="display: none;">
+            <div class="stat-item">📋 Registros: <span class="stat-value" id="suricatoTotal">0</span></div>
+        </div>
+        <div class="filters-section" id="suricatoFiltersSection" style="display: none;">
+            <div style="font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">🔎 Filtros Suricato</div>
+            <div class="slicers-grid">
+                <div class="slicer-item colaborador-slicer relative">
+                    <label>👤 Buscar (Matrícula ou Nome)</label>
+                    <input type="text" id="suricatoSearch" placeholder="Digite matrícula ou nome..." autocomplete="off">
+                    <div class="suggestions-list" id="suricatoSuggestions"></div>
+                </div>
+                <div class="slicer-item"><label>📅 Data</label><input type="date" id="suricatoDataFilter"></div>
+                <div class="slicer-item"><label>⏰ Hora</label><select id="suricatoHoraFilter"><option value="">Todas</option></select></div>
+                <div class="slicer-item"><label>🏷️ Tipo</label><div class="custom-multiselect" id="ms-suricatoTipo"></div></div>
+                <div class="slicer-item"><label>🚪 Catraca</label><div class="custom-multiselect" id="ms-suricatoCatraca"></div></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="active-filters" id="suricatoActiveFilters"></div>
+                <button class="clear-filters-btn" id="clearSuricatoFiltersBtn">✨ Limpar filtros</button>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <div class="empty-state" id="suricatoEmptyState"><span>📂</span><p>Carregue o arquivo CSV do Suricato</p></div>
+            <div id="suricatoScrollTop" class="scroll-sync-top" style="display: none;"><div></div></div>
+            <div class="table-inner" id="suricatoTableInner">
+                <table id="suricatoTable" style="display: none;">
+                    <thead><tr><th>Data</th><th>Hora</th><th>CD</th><th>Matrícula</th><th>Colaborador</th><th>CPF</th><th>Tipo</th><th>Catraca</th></tr></thead>
+                    <tbody id="suricatoTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aba Visão Cargos -->
+    <div class="tab-content" id="tab-visao-cargos">
+        <div class="filters-section" id="cargosFiltersSection" style="display: none;">
+            <div style="font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">🎯 Segmentação de Dados</div>
+            <div class="slicers-grid">
+                <div class="slicer-item colaborador-slicer relative">
+                    <label>👤 Colaborador</label>
+                    <input type="text" id="cargosColaboradorFilter" placeholder="Digite matrícula ou nome..." autocomplete="off">
+                    <div class="suggestions-list" id="cargosSuggestions"></div>
+                </div>
+                <div class="slicer-item"><label>📅 Data Admissão</label><input type="date" id="cargosDataAdmissaoFilter"></div>
+                <div class="slicer-item"><label>💼 Cargo</label><div class="custom-multiselect" id="ms-cargosCargo"></div></div>
+                <div class="slicer-item"><label>🏢 Estabelecimento</label><div class="custom-multiselect" id="ms-cargosEstabelecimento"></div></div>
+                <div class="slicer-item"><label>🔢 Cód. Centro Custo</label><div class="custom-multiselect" id="ms-cargosCodCentroCusto"></div></div>
+                <div class="slicer-item"><label>📋 Desc. Centro Custo</label><div class="custom-multiselect" id="ms-cargosDescCentroCusto"></div></div>
+                <div class="slicer-item"><label>🎂 Data Nascimento</label><input type="date" id="cargosDataNascimentoFilter"></div>
+                <div class="slicer-item"><label>📌 Situação</label><div class="custom-multiselect" id="ms-cargosSituacao"></div></div>
+                <div class="slicer-item"><label>🔄 Data Retorno</label><input type="date" id="cargosDataRetornoFilter"></div>
+                <div class="slicer-item"><label>⚠️ Motivo Afastamento</label><div class="custom-multiselect" id="ms-cargosMotivoAfastamento"></div></div>
+                <div class="slicer-item"><label>🚪 Data Desligamento</label><input type="date" id="cargosDataDesligamentoFilter"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="active-filters" id="cargosActiveFilters"></div>
+                <button class="clear-filters-btn" id="clearCargosFiltersBtn">✨ Limpar filtros</button>
+            </div>
+        </div>
+        <div class="charts-container" id="cargosChartsContainer" style="display: none;">
+            <div class="chart-box"><canvas id="cargosChart"></canvas></div>
+            <div class="chart-box"><table id="cargosSummaryTable"></table></div>
+        </div>
+    </div>
+
+    <!-- Aba Férias -->
+    <div class="tab-content" id="tab-ferias">
+        <div class="filters-section" id="feriasFiltersSection" style="display: none;">
+            <div style="font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">🎯 Filtros (Situação = Férias)</div>
+            <div class="slicers-grid">
+                <div class="slicer-item colaborador-slicer relative">
+                    <label>👤 Colaborador</label>
+                    <input type="text" id="feriasColaboradorFilter" placeholder="Digite matrícula ou nome..." autocomplete="off">
+                    <div class="suggestions-list" id="feriasSuggestions"></div>
+                </div>
+                <div class="slicer-item"><label>📅 Data Admissão</label><input type="date" id="feriasDataAdmissaoFilter"></div>
+                <div class="slicer-item"><label>💼 Cargo</label><div class="custom-multiselect" id="ms-feriasCargo"></div></div>
+                <div class="slicer-item"><label>🏢 Estabelecimento</label><div class="custom-multiselect" id="ms-feriasEstabelecimento"></div></div>
+                <div class="slicer-item"><label>🔢 Cód. Centro Custo</label><div class="custom-multiselect" id="ms-feriasCodCentroCusto"></div></div>
+                <div class="slicer-item"><label>📋 Desc. Centro Custo</label><div class="custom-multiselect" id="ms-feriasDescCentroCusto"></div></div>
+                <div class="slicer-item"><label>🎂 Data Nascimento</label><input type="date" id="feriasDataNascimentoFilter"></div>
+                <div class="slicer-item"><label>🔄 Data Retorno</label><input type="date" id="feriasDataRetornoFilter"></div>
+                <div class="slicer-item"><label>⚠️ Motivo Afastamento</label><div class="custom-multiselect" id="ms-feriasMotivoAfastamento"></div></div>
+                <div class="slicer-item"><label>🚪 Data Desligamento</label><input type="date" id="feriasDataDesligamentoFilter"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="active-filters" id="feriasActiveFilters"></div>
+                <button class="clear-filters-btn" id="clearFeriasFiltersBtn">✨ Limpar filtros</button>
+            </div>
+        </div>
+        <div class="charts-container" id="feriasChartsContainer" style="display: none;">
+            <div class="chart-box"><canvas id="feriasChart"></canvas></div>
+            <div class="chart-box"><table id="feriasSummaryTable"></table></div>
+        </div>
+        <div class="table-wrapper" id="feriasTableWrapper" style="display: none;">
+            <div id="feriasScrollTop" class="scroll-sync-top"><div></div></div>
+            <div class="table-inner" id="feriasTableInner">
+                <table id="feriasTable">
+                    <thead><tr><th>Matrícula</th><th>Nome</th><th>Data Admissão</th><th>Cargo</th><th>Estabelecimento</th><th>Centro Custo</th><th>Turno</th><th>Data Nascimento</th><th>Idade</th></tr></thead>
+                    <tbody id="feriasTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aba ABS (PRESENÇA) -->
+    <div class="tab-content" id="tab-abs">
+        <div class="filters-section" id="absFiltersSection" style="display: none;">
+            <div style="font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">🎯 Filtro de Data</div>
+            <div class="slicers-grid">
+                <div class="slicer-item">
+                    <label>📅 Data</label>
+                    <input type="date" id="absDataFilter">
+                </div>
+            </div>
+            <button class="clear-filters-btn" id="applyAbsFilterBtn">🔍 Verificar Presença</button>
+        </div>
+        <div class="table-wrapper" id="absTableWrapper" style="display: none;">
+            <div id="absScrollTop" class="scroll-sync-top"><div></div></div>
+            <div class="table-inner" id="absTableInner">
+                <table id="absTable">
+                    <thead><tr><th>Matrícula</th><th>Nome</th><th>Turno</th><th>Presença</th></tr></thead>
+                    <tbody id="absTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aba Afastamentos -->
+    <div class="tab-content" id="tab-afastamentos">
+        <div class="filters-section" id="afastFiltersSection" style="display: none;">
+            <div style="font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">🎯 Filtros (Situação = Afastamento)</div>
+            <div class="slicers-grid">
+                <div class="slicer-item colaborador-slicer relative">
+                    <label>👤 Colaborador</label>
+                    <input type="text" id="afastColaboradorFilter" placeholder="Digite matrícula ou nome..." autocomplete="off">
+                    <div class="suggestions-list" id="afastSuggestions"></div>
+                </div>
+                <div class="slicer-item"><label>📅 Data Admissão</label><input type="date" id="afastDataAdmissaoFilter"></div>
+                <div class="slicer-item"><label>💼 Cargo</label><div class="custom-multiselect" id="ms-afastCargo"></div></div>
+                <div class="slicer-item"><label>🏢 Estabelecimento</label><div class="custom-multiselect" id="ms-afastEstabelecimento"></div></div>
+                <div class="slicer-item"><label>🔢 Cód. Centro Custo</label><div class="custom-multiselect" id="ms-afastCodCentroCusto"></div></div>
+                <div class="slicer-item"><label>📋 Desc. Centro Custo</label><div class="custom-multiselect" id="ms-afastDescCentroCusto"></div></div>
+                <div class="slicer-item"><label>🎂 Data Nascimento</label><input type="date" id="afastDataNascimentoFilter"></div>
+                <div class="slicer-item"><label>🔄 Data Retorno</label><input type="date" id="afastDataRetornoFilter"></div>
+                <div class="slicer-item"><label>⚠️ Motivo Afastamento</label><div class="custom-multiselect" id="ms-afastMotivoAfastamento"></div></div>
+                <div class="slicer-item"><label>🚪 Data Desligamento</label><input type="date" id="afastDataDesligamentoFilter"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="active-filters" id="afastActiveFilters"></div>
+                <button class="clear-filters-btn" id="clearAfastFiltersBtn">✨ Limpar filtros</button>
+            </div>
+        </div>
+        <div class="charts-container" id="afastChartsContainer" style="display: none;">
+            <div class="chart-box"><canvas id="afastChart"></canvas></div>
+            <div class="chart-box"><table id="afastSummaryTable"></table></div>
+        </div>
+        <div class="table-wrapper" id="afastTableWrapper" style="display: none;">
+            <div id="afastScrollTop" class="scroll-sync-top"><div></div></div>
+            <div class="table-inner" id="afastTableInner">
+                <table id="afastTable">
+                    <thead><tr><th>Matrícula</th><th>Nome</th><th>Data Admissão</th><th>Cargo</th><th>Estabelecimento</th><th>Centro Custo</th><th>Turno</th><th>Data Nascimento</th><th>Idade</th><th>Data Retorno</th><th>Motivo Afastamento</th></tr></thead>
+                    <tbody id="afastTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+    (function() {
+        // Dados globais
+        let allData = [];
+        let suricatoData = [];
+
+        // Utilidades
+        const sanitize = str => str ? str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').replace(/\uFEFF/g, '') : '';
+        const detectSep = text => text.split('\n')[0].includes(';') ? ';' : ',';
+        function parseCSVLine(line, sep) {
+            const res = []; let cur = '', quoted = false;
+            for (let i=0; i<line.length; i++) {
+                const c = line[i];
+                if (c === '"') { if (quoted && line[i+1]==='"') { cur+='"'; i++; } else quoted=!quoted; }
+                else if (c === sep && !quoted) { res.push(cur); cur=''; }
+                else cur+=c;
+            }
+            res.push(cur); return res;
+        }
+        const getColName = idx => {
+            const m = {0:'matricula',1:'nome',2:'dataAdmissao',4:'cargo',6:'estabelecimento',7:'codCentroCusto',8:'descCentroCusto',9:'dataNascimento',15:'situacao',16:'dataRetorno',17:'motivoAfastamento',18:'dataDesligamento'};
+            return m[idx] || `col_${idx}`;
+        };
+        const formatDateISO = str => { if(!str) return ''; const m=str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:str; };
+        const parseDate = str => { if(!str) return null; const p=str.split('/'); return p.length===3?new Date(+p[2],+p[1]-1,+p[0]):new Date(str); };
+        const calcTempo = d => { if(!d) return ''; const dt=parseDate(d); if(!dt||isNaN(dt)) return ''; const hoje=new Date(); let a=hoje.getFullYear()-dt.getFullYear(), m=hoje.getMonth()-dt.getMonth(), dia=hoje.getDate()-dt.getDate(); if(dia<0){ m--; dia+=new Date(hoje.getFullYear(),hoje.getMonth(),0).getDate(); } if(m<0){ a--; m+=12; } return `${a}a ${m}m ${dia}d`; };
+        const syncScroll = (topDiv, innerDiv) => {
+            if (!topDiv || !innerDiv) return;
+            topDiv.querySelector('div').style.width = innerDiv.scrollWidth + 'px';
+            topDiv.onscroll = () => innerDiv.scrollLeft = topDiv.scrollLeft;
+            innerDiv.onscroll = () => topDiv.scrollLeft = innerDiv.scrollLeft;
+        };
+
+        // Determina turno pela descrição do centro de custo
+        function getTurno(desc) {
+            if (!desc) return '';
+            const d = desc.toUpperCase();
+            if (d.includes('OPERACOES II') || d.includes('OPERAÇÕES II')) return '2 TURNO';
+            if (d.includes('OPERACOES I') || d.includes('OPERAÇÕES I')) return '1 TURNO';
+            if (d.includes('OPERACOES III') || d.includes('OPERAÇÕES III')) return '3 TURNO';
+            return '';
+        }
+
+        // Intervalos de turno (hora inicial e final)
+        const turnoIntervals = {
+            '1 TURNO': { start: '05:55', end: '14:25' },
+            '2 TURNO': { start: '13:30', end: '22:05' },
+            '3 TURNO': { start: '21:55', end: '05:35' }
+        };
+
+        function isWithinInterval(hora, turno) {
+            if (!hora || !turno || !turnoIntervals[turno]) return false;
+            const [h, m] = hora.split(':').map(Number);
+            const [sh, sm] = turnoIntervals[turno].start.split(':').map(Number);
+            const [eh, em] = turnoIntervals[turno].end.split(':').map(Number);
+            const mins = h*60 + m;
+            const startMins = sh*60 + sm;
+            const endMins = eh*60 + em;
+            if (startMins <= endMins) {
+                return mins >= startMins && mins <= endMins;
+            } else { // cruza meia-noite (3º turno)
+                return mins >= startMins || mins <= endMins;
+            }
+        }
+
+        // Leitura de arquivo com suporte a Windows-1252
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const bytes = new Uint8Array(reader.result);
+                    let text;
+                    try {
+                        text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+                    } catch (e) {
+                        text = new TextDecoder('windows-1252').decode(bytes);
+                    }
+                    resolve(text);
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Factory de multiselect
+        function createMultiSelect(container, options, onChange) {
+            let selected = [], tempSelected = [];
+            container.innerHTML = '';
+            const trigger = document.createElement('button'); trigger.className='multiselect-trigger'; trigger.type='button'; trigger.innerHTML='Todos ▾';
+            const dropdown = document.createElement('div'); dropdown.className='multiselect-dropdown';
+            const optsCont = document.createElement('div'); optsCont.className='multiselect-options-container';
+            const cbs = [];
+            options.forEach(opt => {
+                const label = document.createElement('label'); label.className='multiselect-option';
+                const cb = document.createElement('input'); cb.type='checkbox'; cb.value=opt;
+                cb.addEventListener('change', ()=>{
+                    if (cb.checked) tempSelected.push(opt); else tempSelected = tempSelected.filter(v=>v!==opt);
+                });
+                label.appendChild(cb); label.appendChild(document.createTextNode(opt));
+                optsCont.appendChild(label); cbs.push({cb,opt});
+            });
+            const actions = document.createElement('div'); actions.className='multiselect-actions';
+            const applyBtn = document.createElement('button'); applyBtn.className='multiselect-apply'; applyBtn.textContent='APLICAR';
+            applyBtn.addEventListener('click', e=>{ e.stopPropagation(); selected=[...tempSelected]; onChange(selected); dropdown.classList.remove('open'); updateTrigger(); });
+            const cancelBtn = document.createElement('button'); cancelBtn.className='multiselect-cancel'; cancelBtn.textContent='CANCELAR';
+            cancelBtn.addEventListener('click', e=>{ e.stopPropagation(); tempSelected=[...selected]; cbs.forEach(({cb,opt})=>cb.checked=selected.includes(opt)); dropdown.classList.remove('open'); });
+            actions.appendChild(applyBtn); actions.appendChild(cancelBtn);
+            dropdown.appendChild(optsCont); dropdown.appendChild(actions);
+            trigger.addEventListener('click', e=>{ e.stopPropagation(); if(dropdown.classList.contains('open')) dropdown.classList.remove('open'); else { tempSelected=[...selected]; cbs.forEach(({cb,opt})=>cb.checked=tempSelected.includes(opt)); dropdown.classList.add('open'); } });
+            document.addEventListener('click', e=>{ if(!container.contains(e.target)) dropdown.classList.remove('open'); });
+            function updateTrigger(){ trigger.innerHTML = (selected.length===0 ? 'Todos ▾' : (selected.length<=2 ? selected.join(', ')+' ▾' : `${selected.length} selecionados ▾`)); }
+            container.appendChild(trigger); container.appendChild(dropdown);
+            return { setSelected: vals => { selected=vals; tempSelected=[...vals]; cbs.forEach(({cb,opt})=>cb.checked=vals.includes(opt)); updateTrigger(); }, getSelected: ()=>[...selected], destroy: ()=>container.innerHTML='' };
+        }
+
+        // Gerenciamento de abas
+        const tabsNav = document.getElementById('tabsNav');
+        tabsNav.addEventListener('click', e => {
+            const btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+            if (btn.dataset.tab === 'visao-cargos' && allData.length) initCargosTab();
+            if (btn.dataset.tab === 'ferias' && allData.length) initFeriasTab();
+            if (btn.dataset.tab === 'afastamentos' && allData.length) initAfastTab();
+            if (btn.dataset.tab === 'abs' && allData.length && suricatoData.length) initAbsTab();
+        });
+
+        // ========== QUADRO ==========
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const statsBar = document.getElementById('statsBar');
+        const filtersSection = document.getElementById('filtersSection');
+        const dataTable = document.getElementById('dataTable');
+        const tableBody = document.getElementById('tableBody');
+        const emptyState = document.getElementById('emptyState');
+        const totalCount = document.getElementById('totalCount');
+        const filteredCount = document.getElementById('filteredCount');
+        const colaboradorFilter = document.getElementById('colaboradorFilter');
+        const suggestionsList = document.getElementById('suggestionsList');
+        const scrollTopContainer = document.getElementById('scrollTopContainer');
+        const tableInner = document.getElementById('tableInner');
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        const activeFiltersDiv = document.getElementById('activeFilters');
+
+        const filtersState = {
+            colaborador: '',
+            dataAdmissao: document.getElementById('dataAdmissaoFilter'),
+            cargo: [], estabelecimento: [], codCentroCusto: [], descCentroCusto: [],
+            dataNascimento: document.getElementById('dataNascimentoFilter'),
+            situacao: [], dataRetorno: document.getElementById('dataRetornoFilter'),
+            motivoAfastamento: [], dataDesligamento: document.getElementById('dataDesligamentoFilter')
+        };
+        const multiselects = {};
+
+        async function loadQuadroCSV(file) {
+            try {
+                const text = await readFileAsText(file);
+                const sep = detectSep(text);
+                const lines = text.split(/\r?\n/).filter(l=>l.trim());
+                if (lines.length<2) return;
+                const headers = parseCSVLine(lines[0], sep);
+                const exclude = [3,5,10,11,12,13,14];
+                const keep = headers.map((_,i)=>i).filter(i=>!exclude.includes(i));
+                allData = [];
+                for (let i=1; i<lines.length; i++) {
+                    const vals = parseCSVLine(lines[i], sep);
+                    if (vals.length < headers.length) continue;
+                    const row = {};
+                    keep.forEach(idx => { row[getColName(idx)] = sanitize(vals[idx]||''); });
+                    if (row.matricula || row.nome) allData.push(row);
+                }
+                rebuildQuadroMultiselects();
+                applyQuadroFilters();
+                showQuadroInterface();
+            } catch (err) {
+                alert('Erro ao ler arquivo: ' + err.message);
+            }
+        }
+
+        function rebuildQuadroMultiselects() {
+            const keys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','situacao','motivoAfastamento'];
+            keys.forEach(key => {
+                const cont = document.getElementById(`ms-${key}`);
+                if (!cont) return;
+                const unique = [...new Set(allData.map(r=>r[key]).filter(v=>v))].sort();
+                if (multiselects[key]) multiselects[key].destroy();
+                multiselects[key] = createMultiSelect(cont, unique, sel => { filtersState[key]=sel; applyQuadroFilters(); });
+            });
+        }
+
+        function applyQuadroFilters() {
+            const filtered = allData.filter(row => {
+                if (filtersState.colaborador) {
+                    const t = filtersState.colaborador.toLowerCase();
+                    if (!(row.matricula||'').toLowerCase().includes(t) && !(row.nome||'').toLowerCase().includes(t)) return false;
+                }
+                const dateFilters = [
+                    {el:filtersState.dataAdmissao,key:'dataAdmissao'},{el:filtersState.dataNascimento,key:'dataNascimento'},
+                    {el:filtersState.dataRetorno,key:'dataRetorno'},{el:filtersState.dataDesligamento,key:'dataDesligamento'}
+                ];
+                for (const {el,key} of dateFilters) if (el.value && formatDateISO(row[key])!==el.value) return false;
+                const multiKeys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','situacao','motivoAfastamento'];
+                for (const key of multiKeys) if (filtersState[key].length && !filtersState[key].includes(row[key])) return false;
+                return true;
+            });
+            renderQuadroTable(filtered);
+            updateQuadroStats(filtered);
+            updateActiveFilters(activeFiltersDiv, filtersState, multiselects, colaboradorFilter, applyQuadroFilters);
+        }
+
+        function renderQuadroTable(data) {
+            tableBody.innerHTML = '';
+            if (!data.length) {
+                dataTable.style.display='none'; emptyState.style.display='block';
+                scrollTopContainer.style.display='none'; return;
+            }
+            dataTable.style.display='table'; emptyState.style.display='none';
+            scrollTopContainer.style.display='block';
+            const fragment = document.createDocumentFragment();
+            data.forEach(row => {
+                const turno = getTurno(row.descCentroCusto);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${row.matricula||''}</td><td><strong>${row.nome||''}</strong></td><td>${row.dataAdmissao||''}</td><td>${calcTempo(row.dataAdmissao)}</td><td>${row.cargo||''}</td><td>${row.estabelecimento||''}</td><td>${row.codCentroCusto||''}</td><td>${row.descCentroCusto||''}</td><td>${turno}</td><td>${row.dataNascimento||''}</td><td>${calcTempo(row.dataNascimento)}</td><td>${row.situacao||''}</td><td>${row.dataRetorno||''}</td><td>${row.motivoAfastamento||''}</td><td>${row.dataDesligamento||''}</td>`;
+                fragment.appendChild(tr);
+            });
+            tableBody.appendChild(fragment);
+            syncScroll(scrollTopContainer, tableInner);
+        }
+
+        function updateQuadroStats(filtered) {
+            totalCount.textContent = allData.length;
+            filteredCount.textContent = filtered.length;
+        }
+
+        function updateActiveFilters(div, state, multis, searchInput, applyFn) {
+            div.innerHTML = '';
+            const tags = [];
+            if (state.colaborador) tags.push({l:'Colaborador',v:state.colaborador,c:()=>{searchInput.value='';state.colaborador='';}});
+            ['dataAdmissao','dataNascimento','dataRetorno','dataDesligamento'].forEach(k=>{
+                const el=state[k]; if(el.value) tags.push({l:k,v:el.value.split('-').reverse().join('/'),c:()=>el.value=''});
+            });
+            ['cargo','estabelecimento','codCentroCusto','descCentroCusto','situacao','motivoAfastamento'].forEach(k=>{
+                if(state[k].length) tags.push({l:k,v:state[k].join(', '),c:()=>{state[k]=[];multis[k]?.setSelected([]);}});
+            });
+            tags.forEach(t=>{ const span=document.createElement('span'); span.className='filter-tag'; span.innerHTML=`${t.l}: ${t.v} <span class="remove-tag">×</span>`; span.querySelector('.remove-tag').addEventListener('click',()=>{t.c();applyFn();}); div.appendChild(span); });
+        }
+
+        function showQuadroInterface() {
+            statsBar.style.display='flex'; filtersSection.style.display='block';
+            dataTable.style.display='table'; emptyState.style.display='none';
+        }
+
+        document.querySelector('#tab-quadro .file-input-label').addEventListener('click', ()=>fileInput.click());
+        fileInput.addEventListener('change', e => { if(e.target.files[0]){ fileName.textContent = `📄 ${e.target.files[0].name}`; loadQuadroCSV(e.target.files[0]); } });
+        colaboradorFilter.addEventListener('input', function(){
+            filtersState.colaborador = this.value.toLowerCase();
+            const term = filtersState.colaborador;
+            suggestionsList.innerHTML = '';
+            if(term.length){
+                const sug=new Set(); allData.forEach(r=>{ if((r.matricula||'').toLowerCase().includes(term)) sug.add(r.matricula); if((r.nome||'').toLowerCase().includes(term)) sug.add(r.nome); });
+                const arr=[...sug].slice(0,10);
+                if(arr.length){ arr.forEach(s=>{ const div=document.createElement('div'); div.className='suggestion-item'; div.textContent=s; div.addEventListener('click',()=>{colaboradorFilter.value=s; filtersState.colaborador=s; suggestionsList.classList.remove('active'); applyQuadroFilters();}); suggestionsList.appendChild(div); }); suggestionsList.classList.add('active'); }
+                else suggestionsList.classList.remove('active');
+            } else suggestionsList.classList.remove('active');
+            applyQuadroFilters();
+        });
+        document.addEventListener('click', e=>{ if(!colaboradorFilter.contains(e.target) && !suggestionsList.contains(e.target)) suggestionsList.classList.remove('active'); });
+        ['dataAdmissaoFilter','dataNascimentoFilter','dataRetornoFilter','dataDesligamentoFilter'].forEach(id=>document.getElementById(id).addEventListener('change', applyQuadroFilters));
+        clearFiltersBtn.addEventListener('click', ()=>{
+            colaboradorFilter.value=''; filtersState.colaborador='';
+            ['dataAdmissaoFilter','dataNascimentoFilter','dataRetornoFilter','dataDesligamentoFilter'].forEach(id=>document.getElementById(id).value='');
+            ['cargo','estabelecimento','codCentroCusto','descCentroCusto','situacao','motivoAfastamento'].forEach(k=>{ filtersState[k]=[]; multiselects[k]?.setSelected([]); });
+            applyQuadroFilters();
+        });
+
+        // ========== SURICATO ==========
+        const suricatoFileInput = document.getElementById('suricatoFileInput');
+        const suricatoFileName = document.getElementById('suricatoFileName');
+        const suricatoStatsBar = document.getElementById('suricatoStatsBar');
+        const suricatoTotal = document.getElementById('suricatoTotal');
+        const suricatoTable = document.getElementById('suricatoTable');
+        const suricatoTableBody = document.getElementById('suricatoTableBody');
+        const suricatoEmptyState = document.getElementById('suricatoEmptyState');
+        const suricatoScrollTop = document.getElementById('suricatoScrollTop');
+        const suricatoTableInner = document.getElementById('suricatoTableInner');
+        const suricatoFiltersSection = document.getElementById('suricatoFiltersSection');
+        const suricatoSearch = document.getElementById('suricatoSearch');
+        const suricatoSuggestions = document.getElementById('suricatoSuggestions');
+        const suricatoActiveFiltersDiv = document.getElementById('suricatoActiveFilters');
+        const suricatoDataFilter = document.getElementById('suricatoDataFilter');
+        const suricatoHoraFilter = document.getElementById('suricatoHoraFilter');
+        const clearSuricatoBtn = document.getElementById('clearSuricatoFiltersBtn');
+
+        const suricatoFilters = { search: '', data: suricatoDataFilter, hora: suricatoHoraFilter, tipo: [], catraca: [] };
+        const suricatoMultiselects = {};
+
+        function formatCPF(cpf) {
+            const nums = cpf.replace(/\D/g, '');
+            if (nums.length === 11) return nums.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            return cpf;
+        }
+
+        async function loadSuricatoCSV(file) {
+            try {
+                const text = await readFileAsText(file);
+                const sep = detectSep(text);
+                const lines = text.split(/\r?\n/).filter(l=>l.trim());
+                if (lines.length<2) { alert('Arquivo Suricato vazio.'); return; }
+                const headers = parseCSVLine(lines[0], sep);
+                suricatoData = [];
+                for (let i=1; i<lines.length; i++) {
+                    const vals = parseCSVLine(lines[i], sep);
+                    if (vals.length < headers.length) continue;
+                    const raw = sanitize(vals[0]||'');
+                    let data='', hora='';
+                    const match = raw.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})/);
+                    if (match) { data=match[1]; hora=match[2]; }
+                    else data = raw;
+                    suricatoData.push({
+                        data, hora,
+                        cd: sanitize(vals[1]||''),
+                        matricula: sanitize(vals[4]||'').replace(/\D/g, ''),
+                        colaborador: sanitize(vals[6]||''),
+                        cpf: formatCPF(sanitize(vals[7]||'')),
+                        tipo: sanitize(vals[12]||''),
+                        catraca: sanitize(vals[14]||'')
+                    });
+                }
+                if (!suricatoData.length) { alert('Nenhum registro.'); return; }
+                const horasUnicas = [...new Set(suricatoData.map(r=>r.hora).filter(h=>h))].sort();
+                suricatoHoraFilter.innerHTML = '<option value="">Todas</option>';
+                horasUnicas.forEach(h => suricatoHoraFilter.innerHTML += `<option value="${h}">${h}</option>`);
+                rebuildSuricatoMultiselects();
+                applySuricatoFilters();
+                suricatoStatsBar.style.display='flex';
+                suricatoFiltersSection.style.display='block';
+                suricatoEmptyState.style.display='none';
+            } catch (err) {
+                alert('Erro ao ler arquivo Suricato: ' + err.message);
+            }
+        }
+
+        function rebuildSuricatoMultiselects() {
+            ['tipo','catraca'].forEach(key => {
+                const cont = document.getElementById(`ms-suricato${key.charAt(0).toUpperCase()+key.slice(1)}`);
+                if (!cont) return;
+                const unique = [...new Set(suricatoData.map(r=>r[key]).filter(v=>v))].sort();
+                if (suricatoMultiselects[key]) suricatoMultiselects[key].destroy();
+                suricatoMultiselects[key] = createMultiSelect(cont, unique, sel => { suricatoFilters[key] = sel; applySuricatoFilters(); });
+            });
+        }
+
+        function applySuricatoFilters() {
+            const filtered = suricatoData.filter(row => {
+                if (suricatoFilters.search) {
+                    const term = suricatoFilters.search.toLowerCase();
+                    if (!row.matricula.includes(term) && !row.colaborador.toLowerCase().includes(term)) return false;
+                }
+                if (suricatoFilters.data.value && row.data !== suricatoFilters.data.value.split('-').reverse().join('/')) return false;
+                if (suricatoFilters.hora.value && !row.hora.startsWith(suricatoFilters.hora.value.substring(0,2))) return false;
+                if (suricatoFilters.tipo.length && !suricatoFilters.tipo.includes(row.tipo)) return false;
+                if (suricatoFilters.catraca.length && !suricatoFilters.catraca.includes(row.catraca)) return false;
+                return true;
+            });
+            renderSuricatoTable(filtered);
+            updateActiveFilters(suricatoActiveFiltersDiv, suricatoFilters, suricatoMultiselects, suricatoSearch, applySuricatoFilters);
+            suricatoTotal.textContent = filtered.length;
+        }
+
+        function renderSuricatoTable(data) {
+            suricatoTableBody.innerHTML = '';
+            if (!data.length) { suricatoTable.style.display='none'; suricatoEmptyState.style.display='block'; suricatoScrollTop.style.display='none'; return; }
+            suricatoTable.style.display='table'; suricatoEmptyState.style.display='none'; suricatoScrollTop.style.display='block';
+            const fragment = document.createDocumentFragment();
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${row.data}</td><td>${row.hora}</td><td>${row.cd}</td><td>${row.matricula}</td><td>${row.colaborador}</td><td>${row.cpf}</td><td>${row.tipo}</td><td>${row.catraca}</td>`;
+                fragment.appendChild(tr);
+            });
+            suricatoTableBody.appendChild(fragment);
+            syncScroll(suricatoScrollTop, suricatoTableInner);
+        }
+
+        document.querySelector('#tab-suricato .file-input-label').addEventListener('click', ()=>suricatoFileInput.click());
+        suricatoFileInput.addEventListener('change', e => { if(e.target.files[0]){ suricatoFileName.textContent = `📄 ${e.target.files[0].name}`; loadSuricatoCSV(e.target.files[0]); } });
+        suricatoSearch.addEventListener('input', function(){
+            suricatoFilters.search = this.value.toLowerCase();
+            suricatoSuggestions.innerHTML = '';
+            if(this.value.length){
+                const sug=new Set(); suricatoData.forEach(r=>{ if(r.matricula.includes(this.value)) sug.add(r.matricula); if(r.colaborador.toLowerCase().includes(this.value.toLowerCase())) sug.add(r.colaborador); });
+                const arr=[...sug].slice(0,10);
+                if(arr.length){ arr.forEach(s=>{ const div=document.createElement('div'); div.className='suggestion-item'; div.textContent=s; div.addEventListener('click',()=>{suricatoSearch.value=s; suricatoFilters.search=s; suricatoSuggestions.classList.remove('active'); applySuricatoFilters();}); suricatoSuggestions.appendChild(div); }); suricatoSuggestions.classList.add('active'); }
+                else suricatoSuggestions.classList.remove('active');
+            } else suricatoSuggestions.classList.remove('active');
+            applySuricatoFilters();
+        });
+        document.addEventListener('click', e=>{ if(!suricatoSearch.contains(e.target) && !suricatoSuggestions.contains(e.target)) suricatoSuggestions.classList.remove('active'); });
+        suricatoDataFilter.addEventListener('change', applySuricatoFilters);
+        suricatoHoraFilter.addEventListener('change', applySuricatoFilters);
+        clearSuricatoBtn.addEventListener('click', ()=>{
+            suricatoSearch.value=''; suricatoFilters.search='';
+            suricatoDataFilter.value=''; suricatoHoraFilter.value='';
+            suricatoFilters.tipo=[]; suricatoMultiselects.tipo?.setSelected([]);
+            suricatoFilters.catraca=[]; suricatoMultiselects.catraca?.setSelected([]);
+            applySuricatoFilters();
+        });
+
+        // ========== VISÃO CARGOS ==========
+        let cargosChartInstance = null;
+        const cargosFilters = {
+            colaborador: '', dataAdmissao: document.getElementById('cargosDataAdmissaoFilter'),
+            cargo: [], estabelecimento: [], codCentroCusto: [], descCentroCusto: [],
+            dataNascimento: document.getElementById('cargosDataNascimentoFilter'),
+            situacao: [], dataRetorno: document.getElementById('cargosDataRetornoFilter'),
+            motivoAfastamento: [], dataDesligamento: document.getElementById('cargosDataDesligamentoFilter')
+        };
+        const cargosMultiselects = {};
+
+        function initCargosTab() {
+            document.getElementById('cargosFiltersSection').style.display = 'block';
+            document.getElementById('cargosChartsContainer').style.display = 'flex';
+            rebuildCargosMultiselects();
+            applyCargosFilters();
+        }
+
+        function rebuildCargosMultiselects() {
+            const keys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','situacao','motivoAfastamento'];
+            keys.forEach(key => {
+                const cont = document.getElementById(`ms-cargos${key.charAt(0).toUpperCase()+key.slice(1)}`);
+                if (!cont) return;
+                const unique = [...new Set(allData.map(r=>r[key]).filter(v=>v))].sort();
+                if (cargosMultiselects[key]) cargosMultiselects[key].destroy();
+                cargosMultiselects[key] = createMultiSelect(cont, unique, sel => { cargosFilters[key] = sel; applyCargosFilters(); });
+            });
+        }
+
+        function applyCargosFilters() {
+            const filtered = allData.filter(row => {
+                if (cargosFilters.colaborador) {
+                    const t = cargosFilters.colaborador.toLowerCase();
+                    if (!(row.matricula||'').toLowerCase().includes(t) && !(row.nome||'').toLowerCase().includes(t)) return false;
+                }
+                const dateFilters = [
+                    {el:cargosFilters.dataAdmissao,key:'dataAdmissao'},{el:cargosFilters.dataNascimento,key:'dataNascimento'},
+                    {el:cargosFilters.dataRetorno,key:'dataRetorno'},{el:cargosFilters.dataDesligamento,key:'dataDesligamento'}
+                ];
+                for (const {el,key} of dateFilters) if (el.value && formatDateISO(row[key])!==el.value) return false;
+                const multiKeys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','situacao','motivoAfastamento'];
+                for (const key of multiKeys) if (cargosFilters[key].length && !cargosFilters[key].includes(row[key])) return false;
+                return true;
+            });
+            const counts = {};
+            filtered.forEach(r => { const c = r.cargo || 'Não informado'; counts[c] = (counts[c]||0)+1; });
+            // Ordenar do maior para o menor
+            const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+            renderCargosChart(sorted);
+            renderCargosSummary(sorted);
+            updateActiveFilters(document.getElementById('cargosActiveFilters'), cargosFilters, cargosMultiselects, document.getElementById('cargosColaboradorFilter'), applyCargosFilters);
+        }
+
+        function renderCargosChart(sortedEntries) {
+            const ctx = document.getElementById('cargosChart').getContext('2d');
+            if (cargosChartInstance) cargosChartInstance.destroy();
+            cargosChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedEntries.map(e => e[0]),
+                    datasets: [{ label: 'Quantidade', data: sortedEntries.map(e => e[1]), backgroundColor: '#4f46e5' }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        datalabels: { anchor: 'end', align: 'top', formatter: v => v, font: { weight: 'bold' } }
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function renderCargosSummary(sortedEntries) {
+            const table = document.getElementById('cargosSummaryTable');
+            table.innerHTML = '<thead><tr><th>Cargo</th><th>Qtd</th></tr></thead><tbody>';
+            sortedEntries.forEach(([cargo, qtd]) => table.innerHTML += `<tr><td>${cargo}</td><td>${qtd}</td></tr>`);
+            table.innerHTML += '</tbody>';
+        }
+
+        document.getElementById('clearCargosFiltersBtn').addEventListener('click', ()=>{
+            document.getElementById('cargosColaboradorFilter').value=''; cargosFilters.colaborador='';
+            ['dataAdmissao','dataNascimento','dataRetorno','dataDesligamento'].forEach(k=>document.getElementById(`cargosData${k.charAt(0).toUpperCase()+k.slice(1)}Filter`).value='');
+            ['cargo','estabelecimento','codCentroCusto','descCentroCusto','situacao','motivoAfastamento'].forEach(k=>{ cargosFilters[k]=[]; cargosMultiselects[k]?.setSelected([]); });
+            applyCargosFilters();
+        });
+
+        // ========== FÉRIAS ==========
+        let feriasChartInstance = null;
+        const feriasFilters = {
+            colaborador: '', dataAdmissao: document.getElementById('feriasDataAdmissaoFilter'),
+            cargo: [], estabelecimento: [], codCentroCusto: [], descCentroCusto: [],
+            dataNascimento: document.getElementById('feriasDataNascimentoFilter'),
+            dataRetorno: document.getElementById('feriasDataRetornoFilter'),
+            motivoAfastamento: [], dataDesligamento: document.getElementById('feriasDataDesligamentoFilter')
+        };
+        const feriasMultiselects = {};
+
+        function initFeriasTab() {
+            document.getElementById('feriasFiltersSection').style.display = 'block';
+            document.getElementById('feriasChartsContainer').style.display = 'flex';
+            document.getElementById('feriasTableWrapper').style.display = 'block';
+            rebuildFeriasMultiselects();
+            applyFeriasFilters();
+        }
+
+        function rebuildFeriasMultiselects() {
+            const keys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','motivoAfastamento'];
+            keys.forEach(key => {
+                const cont = document.getElementById(`ms-ferias${key.charAt(0).toUpperCase()+key.slice(1)}`);
+                if (!cont) return;
+                const base = allData.filter(r => r.situacao === 'Férias' || r.situacao === 'FÃ©rias' || r.situacao === 'Férias');
+                const unique = [...new Set(base.map(r=>r[key]).filter(v=>v))].sort();
+                if (feriasMultiselects[key]) feriasMultiselects[key].destroy();
+                feriasMultiselects[key] = createMultiSelect(cont, unique, sel => { feriasFilters[key] = sel; applyFeriasFilters(); });
+            });
+        }
+
+        function applyFeriasFilters() {
+            const base = allData.filter(r => {
+                const sit = r.situacao || '';
+                return sit === 'Férias' || sit === 'FÃ©rias' || sit === 'Férias';
+            });
+            const filtered = base.filter(row => {
+                if (feriasFilters.colaborador) {
+                    const t = feriasFilters.colaborador.toLowerCase();
+                    if (!(row.matricula||'').toLowerCase().includes(t) && !(row.nome||'').toLowerCase().includes(t)) return false;
+                }
+                const dateFilters = [
+                    {el:feriasFilters.dataAdmissao,key:'dataAdmissao'},{el:feriasFilters.dataNascimento,key:'dataNascimento'},
+                    {el:feriasFilters.dataRetorno,key:'dataRetorno'},{el:feriasFilters.dataDesligamento,key:'dataDesligamento'}
+                ];
+                for (const {el,key} of dateFilters) if (el.value && formatDateISO(row[key])!==el.value) return false;
+                const multiKeys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','motivoAfastamento'];
+                for (const key of multiKeys) if (feriasFilters[key].length && !feriasFilters[key].includes(row[key])) return false;
+                return true;
+            });
+            const counts = {};
+            filtered.forEach(r => { const c = r.cargo || 'Não informado'; counts[c] = (counts[c]||0)+1; });
+            const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+            renderFeriasChart(sorted);
+            renderFeriasSummary(sorted);
+            renderFeriasTable(filtered);
+            updateActiveFilters(document.getElementById('feriasActiveFilters'), feriasFilters, feriasMultiselects, document.getElementById('feriasColaboradorFilter'), applyFeriasFilters);
+        }
+
+        function renderFeriasChart(sortedEntries) {
+            const ctx = document.getElementById('feriasChart').getContext('2d');
+            if (feriasChartInstance) feriasChartInstance.destroy();
+            feriasChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedEntries.map(e => e[0]),
+                    datasets: [{ label: 'Quantidade', data: sortedEntries.map(e => e[1]), backgroundColor: '#8b5cf6' }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        datalabels: { anchor: 'end', align: 'top', formatter: v => v, font: { weight: 'bold' } }
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function renderFeriasSummary(sortedEntries) {
+            const table = document.getElementById('feriasSummaryTable');
+            table.innerHTML = '<thead><tr><th>Cargo</th><th>Qtd</th></tr></thead><tbody>';
+            sortedEntries.forEach(([cargo, qtd]) => table.innerHTML += `<tr><td>${cargo}</td><td>${qtd}</td></tr>`);
+            table.innerHTML += '</tbody>';
+        }
+
+        function renderFeriasTable(data) {
+            const tbody = document.getElementById('feriasTableBody');
+            tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            data.forEach(row => {
+                const turno = getTurno(row.descCentroCusto);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${row.matricula}</td><td>${row.nome}</td><td>${row.dataAdmissao}</td><td>${row.cargo}</td><td>${row.estabelecimento}</td><td>${row.descCentroCusto}</td><td>${turno}</td><td>${row.dataNascimento}</td><td>${calcTempo(row.dataNascimento)}</td>`;
+                fragment.appendChild(tr);
+            });
+            tbody.appendChild(fragment);
+            syncScroll(document.getElementById('feriasScrollTop'), document.getElementById('feriasTableInner'));
+        }
+
+        document.getElementById('clearFeriasFiltersBtn').addEventListener('click', ()=>{
+            document.getElementById('feriasColaboradorFilter').value=''; feriasFilters.colaborador='';
+            ['dataAdmissao','dataNascimento','dataRetorno','dataDesligamento'].forEach(k=>document.getElementById(`feriasData${k.charAt(0).toUpperCase()+k.slice(1)}Filter`).value='');
+            ['cargo','estabelecimento','codCentroCusto','descCentroCusto','motivoAfastamento'].forEach(k=>{ feriasFilters[k]=[]; feriasMultiselects[k]?.setSelected([]); });
+            applyFeriasFilters();
+        });
+
+        // ========== ABS ==========
+        function initAbsTab() {
+            document.getElementById('absFiltersSection').style.display = 'block';
+            document.getElementById('absTableWrapper').style.display = 'block';
+        }
+
+        document.getElementById('applyAbsFilterBtn').addEventListener('click', () => {
+            const dataFiltro = document.getElementById('absDataFilter').value;
+            if (!dataFiltro) { alert('Selecione uma data.'); return; }
+            const dataFormatada = dataFiltro.split('-').reverse().join('/'); // dd/mm/aaaa
+            const tbody = document.getElementById('absTableBody');
+            tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            allData.forEach(colab => {
+                const turno = getTurno(colab.descCentroCusto);
+                const registros = suricatoData.filter(r => {
+                    return r.matricula === colab.matricula &&
+                           r.data === dataFormatada &&
+                           isWithinInterval(r.hora, turno);
+                });
+                const presenca = registros.length > 0 ? 'Presente' : 'Falta';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${colab.matricula}</td><td>${colab.nome}</td><td>${turno}</td><td style="font-weight:bold;color:${presenca==='Presente'?'#10b981':'#ef4444'}">${presenca}</td>`;
+                fragment.appendChild(tr);
+            });
+            tbody.appendChild(fragment);
+            syncScroll(document.getElementById('absScrollTop'), document.getElementById('absTableInner'));
+        });
+
+        // ========== AFASTAMENTOS ==========
+        let afastChartInstance = null;
+        const afastFilters = {
+            colaborador: '', dataAdmissao: document.getElementById('afastDataAdmissaoFilter'),
+            cargo: [], estabelecimento: [], codCentroCusto: [], descCentroCusto: [],
+            dataNascimento: document.getElementById('afastDataNascimentoFilter'),
+            dataRetorno: document.getElementById('afastDataRetornoFilter'),
+            motivoAfastamento: [], dataDesligamento: document.getElementById('afastDataDesligamentoFilter')
+        };
+        const afastMultiselects = {};
+
+        function initAfastTab() {
+            document.getElementById('afastFiltersSection').style.display = 'block';
+            document.getElementById('afastChartsContainer').style.display = 'flex';
+            document.getElementById('afastTableWrapper').style.display = 'block';
+            rebuildAfastMultiselects();
+            applyAfastFilters();
+        }
+
+        function rebuildAfastMultiselects() {
+            const keys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','motivoAfastamento'];
+            keys.forEach(key => {
+                const cont = document.getElementById(`ms-afast${key.charAt(0).toUpperCase()+key.slice(1)}`);
+                if (!cont) return;
+                const base = allData.filter(r => r.situacao === 'Afastamento' || r.situacao === 'Afastamento');
+                const unique = [...new Set(base.map(r=>r[key]).filter(v=>v))].sort();
+                if (afastMultiselects[key]) afastMultiselects[key].destroy();
+                afastMultiselects[key] = createMultiSelect(cont, unique, sel => { afastFilters[key] = sel; applyAfastFilters(); });
+            });
+        }
+
+        function applyAfastFilters() {
+            const base = allData.filter(r => r.situacao === 'Afastamento' || r.situacao === 'Afastamento');
+            const filtered = base.filter(row => {
+                if (afastFilters.colaborador) {
+                    const t = afastFilters.colaborador.toLowerCase();
+                    if (!(row.matricula||'').toLowerCase().includes(t) && !(row.nome||'').toLowerCase().includes(t)) return false;
+                }
+                const dateFilters = [
+                    {el:afastFilters.dataAdmissao,key:'dataAdmissao'},{el:afastFilters.dataNascimento,key:'dataNascimento'},
+                    {el:afastFilters.dataRetorno,key:'dataRetorno'},{el:afastFilters.dataDesligamento,key:'dataDesligamento'}
+                ];
+                for (const {el,key} of dateFilters) if (el.value && formatDateISO(row[key])!==el.value) return false;
+                const multiKeys = ['cargo','estabelecimento','codCentroCusto','descCentroCusto','motivoAfastamento'];
+                for (const key of multiKeys) if (afastFilters[key].length && !afastFilters[key].includes(row[key])) return false;
+                return true;
+            });
+            const counts = {};
+            filtered.forEach(r => { const c = r.cargo || 'Não informado'; counts[c] = (counts[c]||0)+1; });
+            const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+            renderAfastChart(sorted);
+            renderAfastSummary(sorted);
+            renderAfastTable(filtered);
+            updateActiveFilters(document.getElementById('afastActiveFilters'), afastFilters, afastMultiselects, document.getElementById('afastColaboradorFilter'), applyAfastFilters);
+        }
+
+        function renderAfastChart(sortedEntries) {
+            const ctx = document.getElementById('afastChart').getContext('2d');
+            if (afastChartInstance) afastChartInstance.destroy();
+            afastChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedEntries.map(e => e[0]),
+                    datasets: [{ label: 'Quantidade', data: sortedEntries.map(e => e[1]), backgroundColor: '#ef4444' }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        datalabels: { anchor: 'end', align: 'top', formatter: v => v, font: { weight: 'bold' } }
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function renderAfastSummary(sortedEntries) {
+            const table = document.getElementById('afastSummaryTable');
+            table.innerHTML = '<thead><tr><th>Cargo</th><th>Qtd</th></tr></thead><tbody>';
+            sortedEntries.forEach(([cargo, qtd]) => table.innerHTML += `<tr><td>${cargo}</td><td>${qtd}</td></tr>`);
+            table.innerHTML += '</tbody>';
+        }
+
+        function renderAfastTable(data) {
+            const tbody = document.getElementById('afastTableBody');
+            tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            data.forEach(row => {
+                const turno = getTurno(row.descCentroCusto);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${row.matricula}</td><td>${row.nome}</td><td>${row.dataAdmissao}</td><td>${row.cargo}</td><td>${row.estabelecimento}</td><td>${row.descCentroCusto}</td><td>${turno}</td><td>${row.dataNascimento}</td><td>${calcTempo(row.dataNascimento)}</td><td>${row.dataRetorno||''}</td><td>${row.motivoAfastamento||''}</td>`;
+                fragment.appendChild(tr);
+            });
+            tbody.appendChild(fragment);
+            syncScroll(document.getElementById('afastScrollTop'), document.getElementById('afastTableInner'));
+        }
+
+        document.getElementById('clearAfastFiltersBtn').addEventListener('click', ()=>{
+            document.getElementById('afastColaboradorFilter').value=''; afastFilters.colaborador='';
+            ['dataAdmissao','dataNascimento','dataRetorno','dataDesligamento'].forEach(k=>document.getElementById(`afastData${k.charAt(0).toUpperCase()+k.slice(1)}Filter`).value='');
+            ['cargo','estabelecimento','codCentroCusto','descCentroCusto','motivoAfastamento'].forEach(k=>{ afastFilters[k]=[]; afastMultiselects[k]?.setSelected([]); });
+            applyAfastFilters();
+        });
+
+        // Inicialização
+        statsBar.style.display='none'; filtersSection.style.display='none'; dataTable.style.display='none';
+        suricatoStatsBar.style.display='none'; suricatoFiltersSection.style.display='none'; suricatoTable.style.display='none';
+    })();
+</script>
+</body>
+</html>
