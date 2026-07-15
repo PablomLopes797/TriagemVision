@@ -332,6 +332,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
     <div class="menu-label">Gestão</div>
     <a href="#" data-view="exportar"><span class="ic">⭳</span><span class="label">Exportar</span></a>
     <a href="#" data-view="relatorios"><span class="ic">▤</span><span class="label">Relatórios</span></a>
+    <a href="#" data-view="usuarios"><span class="ic">👤</span><span class="label">USERS</span></a>
     <a href="#" data-view="config"><span class="ic">⚙</span><span class="label">Configurações</span></a>
   </div>
   <div class="footer">
@@ -476,6 +477,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
                 <option value="BD_LANC">Lançamentos (BD_LANC)</option>
                 <option value="BD_RETRABALHO">Retrabalho (BD_RETRABALHO)</option>
                 <option value="BD_GAIOLA">Gaiola (BD_GAIOLA)</option>
+                <option value="GAIOLAS_LANC">Gaiolas Lançadas (GAIOLAS_LANC)</option>
                 <option value="BD_DESCARTE">Descarte (BD_DESCARTE)</option>
               </select>
             </div>
@@ -503,6 +505,28 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
       </div>
     </div>
 
+    <!-- USERS -->
+    <div class="view" id="view-usuarios">
+      <div class="cfg-restricted" id="usersRestricted" style="display:none">
+        <div class="big">🔒</div>
+        <p><b>Acesso restrito.</b><br>O gerenciamento de usuários só fica disponível para usuários nível 1 (MASTER CLASS).</p>
+      </div>
+      <div id="usersPanel">
+        <div class="panel">
+          <div class="panel-head">
+            <h4>Usuários cadastrados</h4>
+            <button class="btn" onclick="openUserModal()">＋ Novo usuário</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Usuário</th><th>Nome</th><th>Nível</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody id="usersTable"><tr><td colspan="5" class="empty">Carregando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- CONFIGURAÇÕES -->
     <div class="view" id="view-config">
       <div class="cfg-restricted" id="cfgRestricted" style="display:none">
@@ -516,7 +540,6 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
             <div class="settings-grid">
               <div class="field full"><label>URL do projeto</label><input type="text" id="cfgUrl"></div>
               <div class="field full"><label>Chave anon (public)</label><input type="text" id="cfgKey"></div>
-              <div class="field full"><label>URL do Apps Script (Gaiola / Google Sheets)</label><input type="text" id="cfgGaiolaUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec"></div>
             </div>
             <div style="margin-top:16px;display:flex;gap:10px">
               <button class="btn" onclick="saveConfig()">Salvar e reconectar</button>
@@ -528,7 +551,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="panel">
           <div class="panel-head"><h4>Sobre</h4></div>
           <div class="panel-body">
-            <p class="hint">Triagem Pro v1.0 — sistema 100% client-side (HTML/CSS/JS), sem instalação, integrado ao Supabase (tabelas <b>BD_LANC</b>, <b>BD_CADASTRO</b>, <b>BD_RETRABALHO</b>, <b>BD_DESCARTE</b>, <b>BD_USER</b>) e ao Google Sheets (Gaiola).</p>
+            <p class="hint">Triagem Pro v1.0 — sistema 100% client-side (HTML/CSS/JS), sem instalação, integrado ao Supabase (tabelas <b>BD_LANC</b>, <b>BD_CADASTRO</b>, <b>BD_RETRABALHO</b>, <b>BD_DESCARTE</b>, <b>BD_USER</b>, <b>BD_GAIOLA</b>, <b>GAIOLAS_LANC</b>) e à planilha pública do Google Sheets (consulta de lojas por EAN).</p>
           </div>
         </div>
       </div>
@@ -699,7 +722,6 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="field"><label>Produto</label><input type="text" id="ds_produto" readonly></div>
         <div class="field"><label>Apanha</label><input type="text" id="ds_apanha" readonly></div>
         <div class="field"><label>Categoria</label><input type="text" id="ds_categoria" readonly></div>
-        <div class="field"><label>Validade</label><input type="date" id="ds_validade"></div>
         <div class="field">
           <label>Motivo</label>
           <select id="ds_motivo">
@@ -726,13 +748,19 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
     <div class="modal-body">
       <div class="grid">
         <div class="field"><label>Gaiola Nº</label><input type="text" id="gl_gaiola" readonly></div>
-        <div class="field"><label>Loja</label><input type="text" id="gl_loja" placeholder="Ex: 001"></div>
+        <div class="field">
+          <label>Loja</label>
+          <select id="gl_loja" disabled>
+            <option value="">Escaneie o EAN do 1º item</option>
+          </select>
+          <p class="hint" id="glLojaHint">Escaneie o primeiro item para carregar as lojas disponíveis.</p>
+        </div>
       </div>
       <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
       <div class="grid">
         <div class="field full ean-wrap">
           <label>EAN</label>
-          <input type="text" id="gl_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+          <input type="text" id="gl_ean" placeholder="Escaneie ou digite o EAN (ENTER ou TAB)" autocomplete="off">
           <span class="ean-status" id="glEanStatus"></span>
         </div>
         <div class="field"><label>PLU</label><input type="text" id="gl_plu" readonly></div>
@@ -740,8 +768,10 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="field"><label>Categoria</label><input type="text" id="gl_categoria" readonly></div>
         <div class="field"><label>Qtd. Unidade</label><input type="text" id="gl_qtd_unidade" inputmode="numeric" placeholder="Somente números"></div>
       </div>
-      <div style="margin-top:12px">
+      <p class="hint" id="glBlockedMsg" style="color:var(--red);font-weight:600;display:none"></p>
+      <div style="margin-top:12px;display:flex;gap:10px">
         <button class="btn ghost" onclick="adicionarItemGaiola()">＋ Adicionar item à lista</button>
+        <button class="btn danger" onclick="reiniciarGaiola()">↺ Reiniciar Gaiola</button>
       </div>
 
       <div class="staged-table-wrap">
@@ -768,6 +798,41 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
     <div class="modal-footer">
       <button class="btn danger" onclick="apagarGaiolaPendente()">Apagar lançamentos pendentes</button>
       <button class="btn" onclick="continuarGaiolaPendente()">Continuar lançando</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL USUÁRIO -->
+<div class="overlay" id="overlayUser">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="userModalTitle">Novo Usuário</h3>
+      <button onclick="closeUserModal()" class="close-x">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid">
+        <div class="field"><label>Usuário</label><input type="text" id="us_user" placeholder="login do usuário" autocomplete="off"></div>
+        <div class="field"><label>Senha</label><input type="text" id="us_password" placeholder="senha" autocomplete="off"></div>
+        <div class="field full"><label>Nome completo</label><input type="text" id="us_name" placeholder="Nome do usuário"></div>
+        <div class="field">
+          <label>Nível</label>
+          <select id="us_level">
+            <option value="0">0 - Padrão</option>
+            <option value="1">1 - MASTER CLASS</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="us_state">
+            <option value="1">Ativo</option>
+            <option value="0">Inativo</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" onclick="closeUserModal()">Cancelar</button>
+      <button class="btn" id="btnSalvarUser" onclick="salvarUsuario()">Salvar</button>
     </div>
   </div>
 </div>
@@ -903,6 +968,8 @@ function applyUserUI(){
   }
   const cfgLink = document.querySelector('.menu a[data-view="config"]');
   if(cfgLink) cfgLink.style.display = currentUser.level===1 ? "" : "none";
+  const usersLink = document.querySelector('.menu a[data-view="usuarios"]');
+  if(usersLink) usersLink.style.display = currentUser.level===1 ? "" : "none";
   refreshActiveView();
   checkPendingGaiola();
 }
@@ -930,6 +997,7 @@ const titles = {
   pendentes:["Pendentes","Lançamentos com produto não identificado em BD_CADASTRO"],
   exportar:["Exportar","Baixe os dados em CSV ou Excel"],
   relatorios:["Relatórios","Indicadores por motivo e origem"],
+  usuarios:["Usuários","Gerenciamento de usuários (BD_USER)"],
   config:["Configurações","Conexão com o Supabase"]
 };
 
@@ -952,6 +1020,12 @@ function switchView(name){
   if(name==="historico") loadHistorico();
   if(name==="pendentes") loadPendentes();
   if(name==="relatorios") loadRelatorios();
+  if(name==="usuarios"){
+    const allowed = !!(currentUser && currentUser.level === 1);
+    document.getElementById("usersPanel").style.display = allowed ? "" : "none";
+    document.getElementById("usersRestricted").style.display = allowed ? "none" : "block";
+    if(allowed) loadUsuarios();
+  }
   if(name==="config"){
     const allowed = !!(currentUser && currentUser.level === 1);
     document.getElementById("cfgPanel").style.display = allowed ? "" : "none";
@@ -1578,7 +1652,7 @@ const MOTIVOS_LIST = ["Choque Mecânico","Dejetos de Animais","Degustação","Em
 
 function openDescarteModal(){
   document.getElementById("overlayDescarte").classList.add("show");
-  ["ds_ean","ds_plu","ds_produto","ds_apanha","ds_categoria","ds_validade","ds_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
+  ["ds_ean","ds_plu","ds_produto","ds_apanha","ds_categoria","ds_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("ds_motivo").value="";
   document.getElementById("dsEanStatus").textContent="";
   setTimeout(()=>document.getElementById("ds_ean").focus(),80);
@@ -1632,7 +1706,6 @@ async function salvarDescarte(){
     PLU: document.getElementById("ds_plu").value || null,
     PRODUTO: document.getElementById("ds_produto").value || null,
     APANHA: document.getElementById("ds_apanha").value || null,
-    VALIDADE: document.getElementById("ds_validade").value || null,
     CATEGORIA: document.getElementById("ds_categoria").value || null,
     QTD_UNIDADE: qtd === "" ? null : Number(qtd),
     USER: currentUser.user,
@@ -1840,6 +1913,117 @@ async function salvarGaiola(){
     showToast("Erro ao enviar gaiola: "+err.message, true);
   }finally{
     btn.disabled = false; btn.textContent = "Salvar Gaiola (enviar tudo)";
+  }
+}
+
+/* ============ USUÁRIOS (BD_USER) — apenas MASTER CLASS ============ */
+let usersCache = [];
+let editingOriginalUser = null;
+
+async function loadUsuarios(){
+  const tbody = document.getElementById("usersTable");
+  tbody.innerHTML = '<tr><td colspan="5" class="empty">Carregando…</td></tr>';
+  try{
+    const { data, error } = await sb.from("BD_USER").select("*").order("USER",{ascending:true});
+    if(error) throw error;
+    usersCache = data || [];
+    if(!usersCache.length){
+      tbody.innerHTML = '<tr><td colspan="5" class="empty"><div class="big">👤</div>Nenhum usuário cadastrado</td></tr>';
+      return;
+    }
+    tbody.innerHTML = usersCache.map((u,idx)=>{
+      const isMaster = Number(u.LEVEL)===1;
+      const isAtivo = String(u.STATE ?? "1")==="1";
+      return `
+      <tr>
+        <td class="code">${u.USER||""}</td>
+        <td>${u.NAME_USER||"—"}</td>
+        <td><span class="tag ${isMaster?'ok':''}">${isMaster?'MASTER CLASS':'Nível 0'}</span></td>
+        <td><span class="tag ${isAtivo?'ok':'warn'}">${isAtivo?'Ativo':'Inativo'}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" title="Editar" onclick="editarUsuario(${idx})">✎</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join("");
+  }catch(err){
+    tbody.innerHTML = `<tr><td colspan="5" class="empty">Erro: ${err.message}</td></tr>`;
+  }
+}
+
+function openUserModal(){
+  if(!canEditDelete()){ showToast("Apenas usuários MASTER CLASS (nível 1) podem gerenciar usuários.", true); return; }
+  editingOriginalUser = null;
+  document.getElementById("userModalTitle").textContent = "Novo Usuário";
+  document.getElementById("btnSalvarUser").textContent = "Salvar";
+  ["us_user","us_password","us_name"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("us_level").value = "0";
+  document.getElementById("us_state").value = "1";
+  document.getElementById("overlayUser").classList.add("show");
+  setTimeout(()=>document.getElementById("us_user").focus(),80);
+}
+function closeUserModal(){
+  document.getElementById("overlayUser").classList.remove("show");
+  editingOriginalUser = null;
+}
+document.getElementById("overlayUser").addEventListener("click", e=>{ if(e.target.id==="overlayUser") closeUserModal(); });
+
+function editarUsuario(idx){
+  if(!canEditDelete()){ showToast("Apenas usuários MASTER CLASS (nível 1) podem gerenciar usuários.", true); return; }
+  const u = usersCache[idx];
+  if(!u){ showToast("Usuário não encontrado.", true); return; }
+
+  editingOriginalUser = u.USER;
+  document.getElementById("us_user").value = u.USER || "";
+  document.getElementById("us_password").value = u.PASSWORD || "";
+  document.getElementById("us_name").value = u.NAME_USER || "";
+  document.getElementById("us_level").value = Number(u.LEVEL)===1 ? "1" : "0";
+  document.getElementById("us_state").value = String(u.STATE ?? "1")==="1" ? "1" : "0";
+
+  document.getElementById("userModalTitle").textContent = "Editar Usuário";
+  document.getElementById("btnSalvarUser").textContent = "Atualizar";
+  document.getElementById("overlayUser").classList.add("show");
+}
+
+async function salvarUsuario(){
+  if(!canEditDelete()){ showToast("Apenas usuários MASTER CLASS (nível 1) podem gerenciar usuários.", true); return; }
+
+  const usuario = document.getElementById("us_user").value.trim();
+  const senha = document.getElementById("us_password").value.trim();
+  const nome = document.getElementById("us_name").value.trim();
+  const level = document.getElementById("us_level").value;
+  const state = document.getElementById("us_state").value;
+
+  if(!usuario){ showToast("Informe o Usuário.", true); return; }
+  if(!senha){ showToast("Informe a Senha.", true); return; }
+
+  const payload = {
+    USER: usuario,
+    PASSWORD: senha,
+    NAME_USER: nome || null,
+    LEVEL: Number(level),
+    STATE: state
+  };
+
+  const btn = document.getElementById("btnSalvarUser");
+  const isEditing = !!editingOriginalUser;
+  btn.disabled = true; btn.textContent = isEditing ? "Atualizando…" : "Salvando…";
+  try{
+    let error;
+    if(isEditing){
+      ({ error } = await sb.from("BD_USER").update(payload).eq("USER", editingOriginalUser));
+    }else{
+      ({ error } = await sb.from("BD_USER").insert(payload));
+    }
+    if(error) throw error;
+    showToast(isEditing ? "Usuário atualizado com sucesso" : "Usuário criado com sucesso");
+    closeUserModal();
+    loadUsuarios();
+  }catch(err){
+    showToast("Erro ao salvar usuário: "+err.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = isEditing ? "Atualizar" : "Salvar";
   }
 }
 
