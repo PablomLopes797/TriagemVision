@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Triagem Pro</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSI2NCIgeTI9IjY0Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0YzFkOTUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0yMCA0NlYxOGgxMWM1IDAgOSAzLjggOSA4LjhzLTQgOC44LTkgOC44aC02LjVWNDZ6IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNDYiIGN5PSIyMCIgcj0iNCIgZmlsbD0iI2M0YjVmZCIvPjwvc3ZnPg==">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -255,6 +256,33 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
 .badge-level.master{background:#2a1b06;color:#ffcf7a;border:1px solid rgba(255,207,122,.3)}
 .badge-level.basic{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
 
+/* LAUNCHER (5 botões) */
+.launcher-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
+.launcher-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 12px;
+  text-align:center;cursor:pointer;transition:.15s;
+}
+.launcher-card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(15,23,55,.09);border-color:var(--blue-500)}
+.launcher-icon{width:52px;height:52px;border-radius:14px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
+.launcher-icon svg{width:25px;height:25px}
+.launcher-icon.t-consulta{background:#e7edff;color:var(--blue-600)}
+.launcher-icon.t-lanc{background:#e5f6ec;color:var(--green)}
+.launcher-icon.t-retrabalho{background:#fdf1de;color:var(--amber)}
+.launcher-icon.t-gaiola{background:#f1e9fd;color:#7c3aed}
+.launcher-icon.t-descarte{background:#fdecec;color:var(--red)}
+.launcher-label{font-size:13px;font-weight:700;color:var(--ink)}
+@media(max-width:900px){.launcher-grid{grid-template-columns:repeat(2,1fr)}}
+
+.readonly-note{font-size:11.5px;color:var(--ink-faint);margin-top:5px}
+.staged-table-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:16px}
+.staged-empty{padding:22px;text-align:center;color:var(--ink-faint);font-size:13px}
+.cfg-restricted{padding:34px 20px;text-align:center;color:var(--ink-faint)}
+.cfg-restricted .big{font-size:30px;margin-bottom:10px}
+.pending-banner{
+  background:#f1e9fd;border:1px solid #ddc8fb;color:#5b21b6;border-radius:10px;
+  padding:12px 14px;font-size:12.5px;font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+
 @media(max-width:900px){
   .sidebar{width:70px}
   .sidebar .logo span,.menu a span.label,.menu-label,.footer{display:none}
@@ -327,7 +355,6 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
       <h3 id="viewTitle">Dashboard</h3>
       <div class="sub" id="viewSub">Visão geral da triagem</div>
     </div>
-    <button class="btn" onclick="openModal()">＋ Novo Lançamento</button>
   </div>
 
   <div class="content">
@@ -354,6 +381,44 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
 
     <!-- LANÇAMENTOS -->
     <div class="view" id="view-lancamentos">
+
+      <div class="launcher-grid">
+        <div class="launcher-card" onclick="openConsultaModal()">
+          <div class="launcher-icon t-consulta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.8" y2="15.8"/></svg>
+          </div>
+          <div class="launcher-label">Consulta</div>
+        </div>
+
+        <div class="launcher-card" onclick="openModal()">
+          <div class="launcher-icon t-lanc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"/><line x1="6.5" y1="14" x2="17.5" y2="14"/></svg>
+          </div>
+          <div class="launcher-label">Lançamento</div>
+        </div>
+
+        <div class="launcher-card" onclick="openRetrabalhoModal()">
+          <div class="launcher-icon t-retrabalho">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"/><rect x="8.3" y="13.4" width="7.4" height="4.2" rx=".6" transform="rotate(-18 12 15.5)"/><line x1="9.6" y1="14.6" x2="14.4" y2="16.4"/></svg>
+          </div>
+          <div class="launcher-label">Retrabalho</div>
+        </div>
+
+        <div class="launcher-card" onclick="openGaiolaModal()">
+          <div class="launcher-icon t-gaiola">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 5 4h14l2 6"/><path d="M3 10v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 20v-5a3 3 0 0 1 6 0v5"/></svg>
+          </div>
+          <div class="launcher-label">Gaiola</div>
+        </div>
+
+        <div class="launcher-card" onclick="openDescarteModal()">
+          <div class="launcher-icon t-descarte">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L8.6 9"/><path d="M9 12.5 6.4 15c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3L14 8"/><line x1="8.6" y1="9" x2="14" y2="8"/><line x1="9" y1="12.5" x2="14.5" y2="12"/></svg>
+          </div>
+          <div class="launcher-label">Descarte</div>
+        </div>
+      </div>
+
       <div class="panel">
         <div class="panel-head"><h4>Lançamentos recentes</h4><span class="sub" style="font-size:12px;color:var(--ink-faint)">Últimos 50 registros</span></div>
         <div style="overflow-x:auto">
@@ -405,6 +470,15 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="panel-head"><h4>Exportar dados</h4></div>
         <div class="panel-body">
           <div class="grid" style="margin-bottom:16px">
+            <div class="field full">
+              <label>Banco de dados</label>
+              <select id="expTable">
+                <option value="BD_LANC">Lançamentos (BD_LANC)</option>
+                <option value="BD_RETRABALHO">Retrabalho (BD_RETRABALHO)</option>
+                <option value="BD_GAIOLA">Gaiola (BD_GAIOLA)</option>
+                <option value="BD_DESCARTE">Descarte (BD_DESCARTE)</option>
+              </select>
+            </div>
             <div class="field"><label>Data inicial</label><input type="date" id="expFrom"></div>
             <div class="field"><label>Data final</label><input type="date" id="expTo"></div>
           </div>
@@ -431,24 +505,31 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
 
     <!-- CONFIGURAÇÕES -->
     <div class="view" id="view-config">
-      <div class="panel">
-        <div class="panel-head"><h4>Conexão Supabase</h4></div>
-        <div class="panel-body">
-          <div class="settings-grid">
-            <div class="field full"><label>URL do projeto</label><input type="text" id="cfgUrl"></div>
-            <div class="field full"><label>Chave anon (public)</label><input type="text" id="cfgKey"></div>
-          </div>
-          <div style="margin-top:16px;display:flex;gap:10px">
-            <button class="btn" onclick="saveConfig()">Salvar e reconectar</button>
-            <button class="btn ghost" onclick="resetConfig()">Restaurar padrão</button>
-          </div>
-          <p class="hint" style="margin-top:12px">As credenciais ficam salvas apenas neste navegador (localStorage). A chave anon é pública por design — a segurança real é feita pelas Row Level Security Policies configuradas no Supabase.</p>
-        </div>
+      <div class="cfg-restricted" id="cfgRestricted" style="display:none">
+        <div class="big">🔒</div>
+        <p><b>Acesso restrito.</b><br>As credenciais de conexão só ficam visíveis para usuários nível 1 (MASTER CLASS).</p>
       </div>
-      <div class="panel">
-        <div class="panel-head"><h4>Sobre</h4></div>
-        <div class="panel-body">
-          <p class="hint">Triagem Pro v1.0 — sistema 100% client-side (HTML/CSS/JS), sem instalação, integrado ao Supabase (tabelas <b>BD_LANC</b> e <b>BD_CADASTRO</b>).</p>
+      <div id="cfgPanel">
+        <div class="panel">
+          <div class="panel-head"><h4>Conexão Supabase</h4></div>
+          <div class="panel-body">
+            <div class="settings-grid">
+              <div class="field full"><label>URL do projeto</label><input type="text" id="cfgUrl"></div>
+              <div class="field full"><label>Chave anon (public)</label><input type="text" id="cfgKey"></div>
+              <div class="field full"><label>URL do Apps Script (Gaiola / Google Sheets)</label><input type="text" id="cfgGaiolaUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec"></div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px">
+              <button class="btn" onclick="saveConfig()">Salvar e reconectar</button>
+              <button class="btn ghost" onclick="resetConfig()">Restaurar padrão</button>
+            </div>
+            <p class="hint" style="margin-top:12px">As credenciais ficam salvas apenas neste navegador (localStorage). A chave anon é pública por design — a segurança real é feita pelas Row Level Security Policies configuradas no Supabase.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h4>Sobre</h4></div>
+          <div class="panel-body">
+            <p class="hint">Triagem Pro v1.0 — sistema 100% client-side (HTML/CSS/JS), sem instalação, integrado ao Supabase (tabelas <b>BD_LANC</b>, <b>BD_CADASTRO</b>, <b>BD_RETRABALHO</b>, <b>BD_DESCARTE</b>, <b>BD_USER</b>) e ao Google Sheets (Gaiola).</p>
+          </div>
         </div>
       </div>
     </div>
@@ -526,6 +607,167 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
     <div class="modal-footer">
       <button class="btn ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn" id="btnSalvar" onclick="salvarLancamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONSULTA -->
+<div class="overlay" id="overlayConsulta">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Consulta de Produto</h3>
+      <button onclick="closeConsultaModal()" class="close-x">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid">
+        <div class="field full ean-wrap">
+          <label>EAN</label>
+          <input type="text" id="cs_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+          <span class="ean-status" id="csEanStatus"></span>
+        </div>
+        <div class="field"><label>PLU</label><input type="text" id="cs_plu" readonly></div>
+        <div class="field"><label>Produto</label><input type="text" id="cs_produto" readonly></div>
+        <div class="field"><label>Apanha</label><input type="text" id="cs_apanha" readonly></div>
+        <div class="field"><label>Categoria</label><input type="text" id="cs_categoria" readonly></div>
+        <div class="field"><label>Rua</label><input type="text" id="cs_rua" readonly></div>
+        <div class="field"><label>Dono</label><input type="text" id="cs_dono" readonly></div>
+        <div class="field"><label>Qtd. Embalagem</label><input type="text" id="cs_qtd_embalagem" readonly></div>
+      </div>
+      <p class="readonly-note">Todos os campos aqui são apenas consulta — para lançar, use um dos botões abaixo.</p>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost" onclick="goToPanel('lancamento')">📦 Lançamento</button>
+        <button class="btn ghost" onclick="goToPanel('retrabalho')">🩹 Retrabalho</button>
+        <button class="btn ghost" onclick="goToPanel('gaiola')">🏬 Gaiola</button>
+        <button class="btn ghost" onclick="goToPanel('descarte')">💥 Descarte</button>
+      </div>
+      <button class="btn" onclick="closeConsultaModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RETRABALHO -->
+<div class="overlay" id="overlayRetrabalho">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Retrabalho</h3>
+      <button onclick="closeRetrabalhoModal()" class="close-x">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid">
+        <div class="field full ean-wrap">
+          <label>EAN</label>
+          <input type="text" id="rt_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+          <span class="ean-status" id="rtEanStatus"></span>
+        </div>
+        <div class="field"><label>PLU</label><input type="text" id="rt_plu" readonly></div>
+        <div class="field"><label>Produto</label><input type="text" id="rt_produto" readonly></div>
+        <div class="field"><label>Apanha</label><input type="text" id="rt_apanha" readonly></div>
+        <div class="field"><label>Categoria</label><input type="text" id="rt_categoria" readonly></div>
+        <div class="field"><label>Validade</label><input type="date" id="rt_validade"></div>
+        <div class="field"><label>Qtd. Embalagem</label><input type="text" id="rt_qtd_embalagem" readonly></div>
+        <div class="field">
+          <label>Qtd. Unidade</label>
+          <input type="text" id="rt_qtd_unidade" inputmode="numeric" placeholder="Somente números">
+          <p class="hint" id="rtQtdWarn" style="color:var(--red);font-weight:600;display:none">Quantidade não fecha caixas inteiras da embalagem. Verifique o valor.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" onclick="closeRetrabalhoModal()">Cancelar</button>
+      <button class="btn" id="btnSalvarRetrabalho" onclick="salvarRetrabalho()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DESCARTE -->
+<div class="overlay" id="overlayDescarte">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Descarte</h3>
+      <button onclick="closeDescarteModal()" class="close-x">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid">
+        <div class="field full ean-wrap">
+          <label>EAN</label>
+          <input type="text" id="ds_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+          <span class="ean-status" id="dsEanStatus"></span>
+        </div>
+        <div class="field"><label>PLU</label><input type="text" id="ds_plu" readonly></div>
+        <div class="field"><label>Produto</label><input type="text" id="ds_produto" readonly></div>
+        <div class="field"><label>Apanha</label><input type="text" id="ds_apanha" readonly></div>
+        <div class="field"><label>Categoria</label><input type="text" id="ds_categoria" readonly></div>
+        <div class="field"><label>Validade</label><input type="date" id="ds_validade"></div>
+        <div class="field">
+          <label>Motivo</label>
+          <select id="ds_motivo">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+        <div class="field"><label>Qtd. Unidade</label><input type="text" id="ds_qtd_unidade" inputmode="numeric" placeholder="Somente números"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" onclick="closeDescarteModal()">Cancelar</button>
+      <button class="btn" id="btnSalvarDescarte" onclick="salvarDescarte()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GAIOLA -->
+<div class="overlay" id="overlayGaiola">
+  <div class="modal" style="width:960px">
+    <div class="modal-header">
+      <h3>Gaiola</h3>
+      <button onclick="closeGaiolaModal()" class="close-x">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid">
+        <div class="field"><label>Gaiola Nº</label><input type="text" id="gl_gaiola" readonly></div>
+        <div class="field"><label>Loja</label><input type="text" id="gl_loja" placeholder="Ex: 001"></div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
+      <div class="grid">
+        <div class="field full ean-wrap">
+          <label>EAN</label>
+          <input type="text" id="gl_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+          <span class="ean-status" id="glEanStatus"></span>
+        </div>
+        <div class="field"><label>PLU</label><input type="text" id="gl_plu" readonly></div>
+        <div class="field"><label>Produto</label><input type="text" id="gl_produto" readonly></div>
+        <div class="field"><label>Categoria</label><input type="text" id="gl_categoria" readonly></div>
+        <div class="field"><label>Qtd. Unidade</label><input type="text" id="gl_qtd_unidade" inputmode="numeric" placeholder="Somente números"></div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn ghost" onclick="adicionarItemGaiola()">＋ Adicionar item à lista</button>
+      </div>
+
+      <div class="staged-table-wrap">
+        <table>
+          <thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Categoria</th><th>Qtd</th><th></th></tr></thead>
+          <tbody id="glStagedTable"><tr><td colspan="6" class="staged-empty">Nenhum item adicionado ainda</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" onclick="closeGaiolaModal()">Fechar sem enviar</button>
+      <button class="btn" id="btnSalvarGaiola" onclick="salvarGaiola()">Salvar Gaiola (enviar tudo)</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GAIOLA PENDENTE -->
+<div class="overlay" id="overlayGaiolaPendente">
+  <div class="modal" style="width:440px">
+    <div class="modal-header"><h3>Gaiola pendente encontrada</h3></div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--ink-soft)" id="pendGaiolaMsg">Você tem itens não enviados de uma gaiola anterior.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn danger" onclick="apagarGaiolaPendente()">Apagar lançamentos pendentes</button>
+      <button class="btn" onclick="continuarGaiolaPendente()">Continuar lançando</button>
     </div>
   </div>
 </div>
@@ -609,7 +851,19 @@ async function doLogin(){
     }
 
     const level = Number(String(data[0].LEVEL ?? "0").trim()) || 0;
-    currentUser = { user: data[0].USER, level };
+    const state = String(data[0].STATE ?? "1").trim();
+
+    if(state !== "1"){
+      errText.textContent = "Usuário inativo. Fale com o administrador do sistema.";
+      errBox.classList.add("show");
+      card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+      passField.value = "";
+      return;
+    }
+
+    const nomeCompleto = String(data[0].NAME_USER ?? data[0].USER ?? "").trim();
+    const primeiroNome = nomeCompleto.split(" ")[0] || data[0].USER;
+    currentUser = { user: data[0].USER, level, name: primeiroNome, fullName: nomeCompleto };
 
     document.getElementById("loginOverlay").style.display = "none";
     applyUserUI();
@@ -637,8 +891,8 @@ async function doLogin(){
 function applyUserUI(){
   if(!currentUser) return;
   document.getElementById("userBox").style.display = "flex";
-  document.getElementById("userName").textContent = currentUser.user;
-  document.getElementById("userAvatar").textContent = currentUser.user.slice(0,2).toUpperCase();
+  document.getElementById("userName").textContent = currentUser.name || currentUser.user;
+  document.getElementById("userAvatar").textContent = (currentUser.name || currentUser.user).slice(0,2).toUpperCase();
   const badge = document.getElementById("userBadge");
   if(currentUser.level===1){
     badge.textContent = "MASTER CLASS";
@@ -647,7 +901,10 @@ function applyUserUI(){
     badge.textContent = "Nível 0";
     badge.className = "badge-level basic";
   }
+  const cfgLink = document.querySelector('.menu a[data-view="config"]');
+  if(cfgLink) cfgLink.style.display = currentUser.level===1 ? "" : "none";
   refreshActiveView();
+  checkPendingGaiola();
 }
 
 function logout(){
@@ -695,6 +952,11 @@ function switchView(name){
   if(name==="historico") loadHistorico();
   if(name==="pendentes") loadPendentes();
   if(name==="relatorios") loadRelatorios();
+  if(name==="config"){
+    const allowed = !!(currentUser && currentUser.level === 1);
+    document.getElementById("cfgPanel").style.display = allowed ? "" : "none";
+    document.getElementById("cfgRestricted").style.display = allowed ? "none" : "block";
+  }
 }
 
 /* ============ TOAST ============ */
@@ -810,6 +1072,8 @@ async function salvarLancamento(){
     return;
   }
 
+  if(!currentUser){ showToast("Sessão expirada, faça login novamente.", true); return; }
+
   const payload = {
     DTA_HORA: new Date().toISOString(),
     EAN: ean,
@@ -822,7 +1086,8 @@ async function salvarLancamento(){
     CATEGORIA: document.getElementById("f_categoria").value || null,
     RUA: document.getElementById("f_rua").value || null,
     DONO: document.getElementById("f_dono").value || null,
-    QTD_UNIDADE: qtdUnidade === "" ? null : Number(qtdUnidade)
+    QTD_UNIDADE: qtdUnidade === "" ? null : Number(qtdUnidade),
+    USER: currentUser.user
   };
   if(editingId) delete payload.DTA_HORA;
 
@@ -1097,8 +1362,9 @@ function renderReport(elId, rows, field){
 /* ============ EXPORTAR ============ */
 async function exportData(type){
   const info = document.getElementById("expInfo");
+  const table = document.getElementById("expTable").value;
   try{
-    let q = sb.from("BD_LANC").select("*").order("DTA_HORA",{ascending:false});
+    let q = sb.from(table).select("*").order("DTA_HORA",{ascending:false}).limit(5000);
     const from = document.getElementById("expFrom").value;
     const to = document.getElementById("expTo").value;
     if(from) q = q.gte("DTA_HORA", new Date(from+"T00:00:00").toISOString());
@@ -1108,23 +1374,26 @@ async function exportData(type){
     if(error) throw error;
     if(!data || !data.length){ showToast("Nenhum dado para exportar", true); return; }
 
-    const cols = ["DTA_HORA","EAN","PLU","PRODUTO","APANHA","MOTIVO","ORIGEM","VALIDADE","CATEGORIA","RUA","DONO"];
+    // monta as colunas dinamicamente a partir dos campos existentes nos registros retornados
+    const cols = [];
+    data.forEach(r=>Object.keys(r).forEach(k=>{ if(!cols.includes(k)) cols.push(k); }));
     const rows = data.map(r=>cols.map(c=>r[c] ?? ""));
 
+    const fileBase = table.toLowerCase();
     if(type==="csv"){
       let csv = cols.join(";")+"\n";
       csv += rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(";")).join("\n");
       const blob = new Blob(["\ufeff"+csv], {type:"text/csv;charset=utf-8;"});
-      downloadBlob(blob, `triagem_${Date.now()}.csv`);
+      downloadBlob(blob, `${fileBase}_${Date.now()}.csv`);
     }else{
       const ws = XLSX.utils.aoa_to_sheet([cols, ...rows]);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Lançamentos");
-      XLSX.writeFile(wb, `triagem_${Date.now()}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, ws, table.substring(0,31));
+      XLSX.writeFile(wb, `${fileBase}_${Date.now()}.xlsx`);
     }
-    info.textContent = `${data.length} registro(s) exportado(s).`;
+    info.textContent = `${data.length} registro(s) exportado(s) de ${table}.`;
   }catch(err){
-    showToast("Erro ao exportar: "+err.message, true);
+    showToast("Erro ao exportar de "+table+": "+err.message, true);
   }
 }
 
@@ -1136,15 +1405,457 @@ function downloadBlob(blob, filename){
   URL.revokeObjectURL(url);
 }
 
+/* ============ CADASTRO COMPARTILHADO (BD_CADASTRO) ============ */
+async function buscarCadastro(ean){
+  const { data, error } = await sb.from("BD_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
+  if(error) throw error;
+  return (data && data.length) ? data[0] : null;
+}
+function dispatchEnter(fieldId){
+  setTimeout(()=>{
+    const el = document.getElementById(fieldId);
+    if(el) el.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));
+  },150);
+}
+
+/* ============ CONSULTA ============ */
+function openConsultaModal(){
+  document.getElementById("overlayConsulta").classList.add("show");
+  ["cs_ean","cs_plu","cs_produto","cs_apanha","cs_categoria","cs_rua","cs_dono","cs_qtd_embalagem"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("csEanStatus").textContent="";
+  setTimeout(()=>document.getElementById("cs_ean").focus(),80);
+}
+function closeConsultaModal(){
+  document.getElementById("overlayConsulta").classList.remove("show");
+}
+document.getElementById("overlayConsulta").addEventListener("click", e=>{ if(e.target.id==="overlayConsulta") closeConsultaModal(); });
+
+document.getElementById("cs_ean").addEventListener("keydown", async e=>{
+  if(e.key!=="Enter") return;
+  e.preventDefault();
+  const ean = e.target.value.trim();
+  const status = document.getElementById("csEanStatus");
+  if(!ean) return;
+  status.textContent = "Buscando…"; status.className = "ean-status";
+  try{
+    const p = await buscarCadastro(ean);
+    if(p){
+      document.getElementById("cs_plu").value = p.SEQPRODUTO || "";
+      document.getElementById("cs_produto").value = p.DESCCOMPLETA || "";
+      document.getElementById("cs_apanha").value = p.ENDERECO || "";
+      document.getElementById("cs_rua").value = p.RUA || "";
+      document.getElementById("cs_dono").value = p.DONO || "";
+      document.getElementById("cs_categoria").value = p.NM_MERC_N1 || "";
+      document.getElementById("cs_qtd_embalagem").value = p.PADRAOEMBCOMPRA || "";
+      status.textContent = "✓ encontrado"; status.className = "ean-status found";
+    }else{
+      ["cs_plu","cs_produto","cs_apanha","cs_rua","cs_dono","cs_categoria","cs_qtd_embalagem"].forEach(id=>document.getElementById(id).value="");
+      status.textContent = "não encontrado"; status.className = "ean-status notfound";
+    }
+  }catch(err){
+    status.textContent = "erro"; status.className = "ean-status notfound";
+    showToast("Erro ao buscar EAN: "+err.message, true);
+  }
+});
+
+function goToPanel(type){
+  const ean = document.getElementById("cs_ean").value.trim();
+  closeConsultaModal();
+  if(type==="lancamento"){ openModal(); if(ean){ document.getElementById("f_ean").value = ean; dispatchEnter("f_ean"); } }
+  if(type==="retrabalho"){ openRetrabalhoModal(); if(ean){ document.getElementById("rt_ean").value = ean; dispatchEnter("rt_ean"); } }
+  if(type==="gaiola"){ openGaiolaModal(); if(ean){ document.getElementById("gl_ean").value = ean; dispatchEnter("gl_ean"); } }
+  if(type==="descarte"){ openDescarteModal(); if(ean){ document.getElementById("ds_ean").value = ean; dispatchEnter("ds_ean"); } }
+}
+
+/* ============ RETRABALHO (BD_RETRABALHO) ============ */
+function openRetrabalhoModal(){
+  document.getElementById("overlayRetrabalho").classList.add("show");
+  ["rt_ean","rt_plu","rt_produto","rt_apanha","rt_categoria","rt_validade","rt_qtd_embalagem","rt_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("rtEanStatus").textContent="";
+  document.getElementById("rtQtdWarn").style.display="none";
+  setTimeout(()=>document.getElementById("rt_ean").focus(),80);
+}
+function closeRetrabalhoModal(){
+  document.getElementById("overlayRetrabalho").classList.remove("show");
+}
+document.getElementById("overlayRetrabalho").addEventListener("click", e=>{ if(e.target.id==="overlayRetrabalho") closeRetrabalhoModal(); });
+
+document.getElementById("rt_ean").addEventListener("keydown", async e=>{
+  if(e.key!=="Enter") return;
+  e.preventDefault();
+  const ean = e.target.value.trim();
+  const status = document.getElementById("rtEanStatus");
+  if(!ean) return;
+  status.textContent = "Buscando…"; status.className = "ean-status";
+  try{
+    const p = await buscarCadastro(ean);
+    if(p){
+      document.getElementById("rt_plu").value = p.SEQPRODUTO || "";
+      document.getElementById("rt_produto").value = p.DESCCOMPLETA || "";
+      document.getElementById("rt_apanha").value = p.ENDERECO || "";
+      document.getElementById("rt_categoria").value = p.NM_MERC_N1 || "";
+      document.getElementById("rt_qtd_embalagem").value = p.PADRAOEMBCOMPRA || "";
+      status.textContent = "✓ encontrado"; status.className = "ean-status found";
+      document.getElementById("rt_validade").focus();
+    }else{
+      ["rt_plu","rt_produto","rt_apanha","rt_categoria","rt_qtd_embalagem"].forEach(id=>document.getElementById(id).value="");
+      status.textContent = "não encontrado"; status.className = "ean-status notfound";
+    }
+    checkQtdMultiploRetrabalho();
+  }catch(err){
+    status.textContent = "erro"; status.className = "ean-status notfound";
+    showToast("Erro ao buscar EAN: "+err.message, true);
+  }
+});
+
+document.getElementById("rt_qtd_unidade").addEventListener("input", e=>{
+  e.target.value = e.target.value.replace(/[^0-9]/g,"");
+  checkQtdMultiploRetrabalho();
+});
+
+function checkQtdMultiploRetrabalho(){
+  const warn = document.getElementById("rtQtdWarn");
+  const unidadeRaw = document.getElementById("rt_qtd_unidade").value.trim();
+  const embalagemRaw = document.getElementById("rt_qtd_embalagem").value.trim();
+  const unidade = unidadeRaw === "" ? null : parseFloat(unidadeRaw);
+  const embalagem = embalagemRaw === "" ? null : parseFloat(embalagemRaw);
+
+  if(embalagem !== null && embalagem > 1 && unidade !== null && unidade > 0 && (unidade % embalagem !== 0)){
+    warn.style.display = "block";
+    return false;
+  }
+  warn.style.display = "none";
+  return true;
+}
+
+async function salvarRetrabalho(){
+  const ean = document.getElementById("rt_ean").value.trim();
+  const qtd = document.getElementById("rt_qtd_unidade").value.trim();
+  if(!ean){ showToast("Informe o EAN.", true); return; }
+  if(!qtd){ showToast("Informe a Qtd. Unidade.", true); return; }
+  if(!checkQtdMultiploRetrabalho()){
+    showToast("Quantidade não fecha caixas inteiras da embalagem. Verifique o valor.", true);
+    return;
+  }
+  if(!currentUser){ showToast("Sessão expirada, faça login novamente.", true); return; }
+
+  const payload = {
+    DTA_HORA: new Date().toISOString(),
+    EAN: ean,
+    PLU: document.getElementById("rt_plu").value || null,
+    PRODUTO: document.getElementById("rt_produto").value || null,
+    APANHA: document.getElementById("rt_apanha").value || null,
+    VALIDADE: document.getElementById("rt_validade").value || null,
+    CATEGORIA: document.getElementById("rt_categoria").value || null,
+    QTD_UNIDADE: Number(qtd),
+    USER: currentUser.user
+  };
+
+  const btn = document.getElementById("btnSalvarRetrabalho");
+  btn.disabled = true; btn.textContent = "Salvando…";
+  try{
+    const { error } = await sb.from("BD_RETRABALHO").insert(payload);
+    if(error) throw error;
+    showToast("Retrabalho salvo com sucesso");
+    openRetrabalhoModal();
+  }catch(err){
+    showToast("Erro ao salvar retrabalho: "+err.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = "Salvar";
+  }
+}
+
+/* ============ DESCARTE (BD_DESCARTE) ============ */
+const MOTIVOS_LIST = ["Choque Mecânico","Dejetos de Animais","Degustação","Embalagem com Vazamento","Embalagem Rasgada","Falta de Produto","Furto","Queda de Produto","Tombamento","Vencimento"];
+(function populateDescarteMotivo(){
+  const sel = document.getElementById("ds_motivo");
+  MOTIVOS_LIST.forEach(m=>{
+    const o = document.createElement("option");
+    o.value = m; o.textContent = m;
+    sel.appendChild(o);
+  });
+})();
+
+function openDescarteModal(){
+  document.getElementById("overlayDescarte").classList.add("show");
+  ["ds_ean","ds_plu","ds_produto","ds_apanha","ds_categoria","ds_validade","ds_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("ds_motivo").value="";
+  document.getElementById("dsEanStatus").textContent="";
+  setTimeout(()=>document.getElementById("ds_ean").focus(),80);
+}
+function closeDescarteModal(){
+  document.getElementById("overlayDescarte").classList.remove("show");
+}
+document.getElementById("overlayDescarte").addEventListener("click", e=>{ if(e.target.id==="overlayDescarte") closeDescarteModal(); });
+
+document.getElementById("ds_ean").addEventListener("keydown", async e=>{
+  if(e.key!=="Enter") return;
+  e.preventDefault();
+  const ean = e.target.value.trim();
+  const status = document.getElementById("dsEanStatus");
+  if(!ean) return;
+  status.textContent = "Buscando…"; status.className = "ean-status";
+  try{
+    const p = await buscarCadastro(ean);
+    if(p){
+      document.getElementById("ds_plu").value = p.SEQPRODUTO || "";
+      document.getElementById("ds_produto").value = p.DESCCOMPLETA || "";
+      document.getElementById("ds_apanha").value = p.ENDERECO || "";
+      document.getElementById("ds_categoria").value = p.NM_MERC_N1 || "";
+      status.textContent = "✓ encontrado"; status.className = "ean-status found";
+      document.getElementById("ds_motivo").focus();
+    }else{
+      ["ds_plu","ds_produto","ds_apanha","ds_categoria"].forEach(id=>document.getElementById(id).value="");
+      status.textContent = "não encontrado"; status.className = "ean-status notfound";
+    }
+  }catch(err){
+    status.textContent = "erro"; status.className = "ean-status notfound";
+    showToast("Erro ao buscar EAN: "+err.message, true);
+  }
+});
+
+document.getElementById("ds_qtd_unidade").addEventListener("input", e=>{
+  e.target.value = e.target.value.replace(/[^0-9]/g,"");
+});
+
+async function salvarDescarte(){
+  const ean = document.getElementById("ds_ean").value.trim();
+  const motivo = document.getElementById("ds_motivo").value;
+  const qtd = document.getElementById("ds_qtd_unidade").value.trim();
+  if(!ean){ showToast("Informe o EAN.", true); return; }
+  if(!motivo){ showToast("Selecione o Motivo.", true); return; }
+  if(!currentUser){ showToast("Sessão expirada, faça login novamente.", true); return; }
+
+  const payload = {
+    DTA_HORA: new Date().toISOString(),
+    EAN: ean,
+    PLU: document.getElementById("ds_plu").value || null,
+    PRODUTO: document.getElementById("ds_produto").value || null,
+    APANHA: document.getElementById("ds_apanha").value || null,
+    VALIDADE: document.getElementById("ds_validade").value || null,
+    CATEGORIA: document.getElementById("ds_categoria").value || null,
+    QTD_UNIDADE: qtd === "" ? null : Number(qtd),
+    USER: currentUser.user,
+    MOTIVO: motivo
+  };
+
+  const btn = document.getElementById("btnSalvarDescarte");
+  btn.disabled = true; btn.textContent = "Salvando…";
+  try{
+    const { error } = await sb.from("BD_DESCARTE").insert(payload);
+    if(error) throw error;
+    showToast("Descarte salvo com sucesso");
+    openDescarteModal();
+  }catch(err){
+    showToast("Erro ao salvar descarte: "+err.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = "Salvar";
+  }
+}
+
+/* ============ GAIOLA (Google Sheets via Apps Script) ============ */
+let gaiolaStaged = [];
+let gaiolaAtual = { gaiola:"", loja:"" };
+
+function gaiolaStorageKey(){
+  return "tp_gaiola_pending_" + (currentUser ? currentUser.user : "anon");
+}
+function saveGaiolaLocal(){
+  localStorage.setItem(gaiolaStorageKey(), JSON.stringify({ gaiola: gaiolaAtual.gaiola, loja: gaiolaAtual.loja, items: gaiolaStaged }));
+}
+function loadGaiolaLocal(){
+  try{
+    const raw = localStorage.getItem(gaiolaStorageKey());
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function clearGaiolaLocal(){
+  localStorage.removeItem(gaiolaStorageKey());
+}
+
+function checkPendingGaiola(){
+  const pending = loadGaiolaLocal();
+  if(pending && pending.items && pending.items.length){
+    document.getElementById("pendGaiolaMsg").textContent =
+      `Gaiola nº ${pending.gaiola} — Loja ${pending.loja} — ${pending.items.length} item(ns) ainda não enviados. Deseja continuar de onde parou?`;
+    document.getElementById("overlayGaiolaPendente").classList.add("show");
+  }
+}
+function continuarGaiolaPendente(){
+  const pending = loadGaiolaLocal();
+  if(pending){
+    gaiolaAtual = { gaiola: pending.gaiola, loja: pending.loja };
+    gaiolaStaged = pending.items || [];
+  }
+  document.getElementById("overlayGaiolaPendente").classList.remove("show");
+  openGaiolaModal(true);
+}
+function apagarGaiolaPendente(){
+  clearGaiolaLocal();
+  gaiolaStaged = [];
+  gaiolaAtual = { gaiola:"", loja:"" };
+  document.getElementById("overlayGaiolaPendente").classList.remove("show");
+  showToast("Lançamentos pendentes da gaiola apagados");
+}
+
+async function openGaiolaModal(keepBatch){
+  document.getElementById("overlayGaiola").classList.add("show");
+  ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("glEanStatus").textContent="";
+
+  if(!keepBatch && !gaiolaAtual.gaiola){
+    document.getElementById("gl_gaiola").value = "Buscando…";
+    try{
+      const next = await fetchNextGaiolaNumber();
+      gaiolaAtual.gaiola = String(next);
+    }catch(err){
+      gaiolaAtual.gaiola = "";
+      showToast("Erro ao buscar número da gaiola: "+err.message, true);
+    }
+  }
+  document.getElementById("gl_gaiola").value = gaiolaAtual.gaiola;
+  document.getElementById("gl_loja").value = gaiolaAtual.loja;
+  renderGaiolaStagedTable();
+  setTimeout(()=>document.getElementById("gl_ean").focus(),80);
+}
+function closeGaiolaModal(){
+  gaiolaAtual.loja = document.getElementById("gl_loja").value.trim();
+  saveGaiolaLocal();
+  document.getElementById("overlayGaiola").classList.remove("show");
+}
+document.getElementById("overlayGaiola").addEventListener("click", e=>{ if(e.target.id==="overlayGaiola") closeGaiolaModal(); });
+
+document.getElementById("gl_ean").addEventListener("keydown", async e=>{
+  if(e.key!=="Enter") return;
+  e.preventDefault();
+  const ean = e.target.value.trim();
+  const status = document.getElementById("glEanStatus");
+  if(!ean) return;
+  status.textContent = "Buscando…"; status.className = "ean-status";
+  try{
+    const p = await buscarCadastro(ean);
+    if(p){
+      document.getElementById("gl_plu").value = p.SEQPRODUTO || "";
+      document.getElementById("gl_produto").value = p.DESCCOMPLETA || "";
+      document.getElementById("gl_categoria").value = p.NM_MERC_N1 || "";
+      status.textContent = "✓ encontrado"; status.className = "ean-status found";
+      document.getElementById("gl_qtd_unidade").focus();
+    }else{
+      ["gl_plu","gl_produto","gl_categoria"].forEach(id=>document.getElementById(id).value="");
+      status.textContent = "não encontrado"; status.className = "ean-status notfound";
+    }
+  }catch(err){
+    status.textContent = "erro"; status.className = "ean-status notfound";
+    showToast("Erro ao buscar EAN: "+err.message, true);
+  }
+});
+
+document.getElementById("gl_qtd_unidade").addEventListener("input", e=>{
+  e.target.value = e.target.value.replace(/[^0-9]/g,"");
+});
+
+function adicionarItemGaiola(){
+  const ean = document.getElementById("gl_ean").value.trim();
+  const plu = document.getElementById("gl_plu").value.trim();
+  const produto = document.getElementById("gl_produto").value.trim();
+  const categoria = document.getElementById("gl_categoria").value.trim();
+  const qtd = document.getElementById("gl_qtd_unidade").value.trim();
+  const loja = document.getElementById("gl_loja").value.trim();
+
+  if(!ean){ showToast("Informe o EAN.", true); return; }
+  if(!qtd){ showToast("Informe a Qtd. Unidade.", true); return; }
+  if(!loja){ showToast("Informe a Loja.", true); return; }
+
+  gaiolaAtual.loja = loja;
+  gaiolaStaged.push({ ean, plu, produto, categoria, qtd: Number(qtd) });
+  saveGaiolaLocal();
+  renderGaiolaStagedTable();
+
+  ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("glEanStatus").textContent="";
+  document.getElementById("gl_ean").focus();
+}
+function removerItemGaiola(idx){
+  gaiolaStaged.splice(idx,1);
+  saveGaiolaLocal();
+  renderGaiolaStagedTable();
+}
+function renderGaiolaStagedTable(){
+  const tbody = document.getElementById("glStagedTable");
+  if(!gaiolaStaged.length){
+    tbody.innerHTML = '<tr><td colspan="6" class="staged-empty">Nenhum item adicionado ainda</td></tr>';
+    return;
+  }
+  tbody.innerHTML = gaiolaStaged.map((it,idx)=>`
+    <tr>
+      <td class="code">${it.ean}</td>
+      <td>${it.plu||"—"}</td>
+      <td>${it.produto||"—"}</td>
+      <td>${it.categoria||"—"}</td>
+      <td>${it.qtd}</td>
+      <td><button class="icon-btn" title="Remover" onclick="removerItemGaiola(${idx})">🗑</button></td>
+    </tr>`).join("");
+}
+
+async function fetchNextGaiolaNumber(){
+  if(!GAIOLA_SCRIPT_URL){ throw new Error("Configure a URL do Apps Script em Configurações."); }
+  const res = await fetch(GAIOLA_SCRIPT_URL + "?action=nextGaiola");
+  const data = await res.json();
+  if(!data || typeof data.next === "undefined") throw new Error("Resposta inesperada do Apps Script.");
+  return data.next;
+}
+
+async function salvarGaiola(){
+  if(!gaiolaStaged.length){ showToast("Adicione pelo menos um item antes de salvar.", true); return; }
+  if(!GAIOLA_SCRIPT_URL){ showToast("Configure a URL do Apps Script em Configurações (nível 1).", true); return; }
+
+  const loja = document.getElementById("gl_loja").value.trim();
+  if(!loja){ showToast("Informe a Loja.", true); return; }
+  gaiolaAtual.loja = loja;
+
+  const btn = document.getElementById("btnSalvarGaiola");
+  btn.disabled = true; btn.textContent = "Enviando…";
+  try{
+    const payload = {
+      action: "saveGaiola",
+      gaiola: gaiolaAtual.gaiola,
+      loja: gaiolaAtual.loja,
+      usuario: currentUser ? currentUser.user : "",
+      items: gaiolaStaged
+    };
+    const res = await fetch(GAIOLA_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if(!result || !result.success) throw new Error(result && result.error ? result.error : "Falha ao gravar na planilha.");
+
+    showToast(`Gaiola ${gaiolaAtual.gaiola} enviada com sucesso (${gaiolaStaged.length} item(ns))`);
+    gaiolaStaged = [];
+    gaiolaAtual = { gaiola:"", loja:"" };
+    clearGaiolaLocal();
+    closeGaiolaModal();
+  }catch(err){
+    showToast("Erro ao enviar gaiola: "+err.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = "Salvar Gaiola (enviar tudo)";
+  }
+}
+
 /* ============ CONFIGURAÇÕES ============ */
+let GAIOLA_SCRIPT_URL = localStorage.getItem("tp_gaiola_script_url") || "";
 document.getElementById("cfgUrl").value = SUPA_URL;
 document.getElementById("cfgKey").value = SUPA_KEY;
+document.getElementById("cfgGaiolaUrl").value = GAIOLA_SCRIPT_URL;
 
 function saveConfig(){
   SUPA_URL = document.getElementById("cfgUrl").value.trim() || DEFAULT_URL;
   SUPA_KEY = document.getElementById("cfgKey").value.trim() || DEFAULT_KEY;
+  GAIOLA_SCRIPT_URL = document.getElementById("cfgGaiolaUrl").value.trim();
   localStorage.setItem("tp_url", SUPA_URL);
   localStorage.setItem("tp_key", SUPA_KEY);
+  localStorage.setItem("tp_gaiola_script_url", GAIOLA_SCRIPT_URL);
   connect();
   showToast("Configuração salva e reconectado");
   refreshActiveView();
