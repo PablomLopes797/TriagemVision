@@ -11,6 +11,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 
 <style>
 :root{
@@ -28,6 +30,7 @@
   --green:#0f9d58;
   --amber:#e5972a;
   --red:#d64545;
+  --purple:#7c3aed;
   --radius:12px;
   --mono:'JetBrains Mono',monospace;
 }
@@ -47,7 +50,7 @@ body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
   width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--blue-500),#5ec6ff);
   display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;
 }
-.menu{padding:14px 10px;flex:1}
+.menu{padding:14px 10px;flex:1;overflow-y:auto}
 .menu-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);padding:10px 12px 6px}
 .menu a{
   padding:11px 12px;color:rgba(255,255,255,.82);text-decoration:none;display:flex;align-items:center;gap:10px;
@@ -92,7 +95,7 @@ body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 .card .v.green{color:var(--green)}
 .card .v.amber{color:var(--amber)}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
-.panel-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.panel-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
 .panel-head h4{font-size:14px;font-weight:700}
 .panel-body{padding:18px 20px}
 .filters{display:flex;flex-wrap:wrap;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);background:#fafbfe}
@@ -149,7 +152,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
 .toast{
   position:fixed;bottom:26px;right:26px;background:var(--navy-800);color:#fff;padding:14px 20px;border-radius:10px;
   font-size:13.5px;font-weight:600;box-shadow:0 10px 30px rgba(5,19,57,.35);z-index:200;display:flex;align-items:center;gap:10px;
-  transform:translateY(20px);opacity:0;transition:.25s;
+  transform:translateY(20px);opacity:0;transition:.25s;max-width:420px;
 }
 .toast.show{transform:translateY(0);opacity:1}
 .toast.err{background:var(--red)}
@@ -252,6 +255,8 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
 .staged-empty{padding:22px;text-align:center;color:var(--ink-faint);font-size:13px}
 .cfg-restricted{padding:34px 20px;text-align:center;color:var(--ink-faint)}
 .cfg-restricted .big{font-size:30px;margin-bottom:10px}
+.chart-panel-body{height:320px;position:relative}
+.sync-log{margin-top:16px;font-family:var(--mono);font-size:12px;background:#0b1330;color:#c9d6ff;border-radius:10px;padding:14px;max-height:340px;overflow-y:auto;white-space:pre-wrap;line-height:1.5}
 @media(max-width:900px){
   .sidebar{width:70px}
   .sidebar .logo span,.menu a span.label,.menu-label,.footer{display:none}
@@ -297,6 +302,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
     <div class="menu-label">Gestão</div>
     <a href="#" data-view="exportar"><span class="ic">⭳</span><span class="label">Exportar</span></a>
     <a href="#" data-view="relatorios"><span class="ic">▤</span><span class="label">Relatórios</span></a>
+    <a href="#" data-view="lojas"><span class="ic">🏬</span><span class="label">Atualizar Lojas</span></a>
     <a href="#" data-view="usuarios"><span class="ic">👤</span><span class="label">USERS</span></a>
     <a href="#" data-view="config"><span class="ic">⚙</span><span class="label">Configurações</span></a>
   </div>
@@ -327,12 +333,49 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
 
     <!-- DASHBOARD -->
     <div class="view active" id="view-dashboard">
+      <div class="panel">
+        <div class="panel-head">
+          <h4>Filtros do Dashboard</h4>
+          <button class="btn ghost" onclick="toggleDashFiltros()"><span id="dashFiltroToggleLabel">Mostrar filtros</span></button>
+        </div>
+        <div class="panel-body" id="dashFiltrosBody" style="display:none">
+          <div class="filters" style="border:0;padding:0;background:transparent">
+            <select id="dfCd"><option value="">Todos os CDs</option></select>
+            <select id="dfTurno">
+              <option value="">Todos os turnos</option>
+              <option value="1">1 Turno</option>
+              <option value="2">2 Turno</option>
+              <option value="3">3 Turno</option>
+            </select>
+            <select id="dfTipo">
+              <option value="">Todos os tipos</option>
+              <option value="Lançamento">Lançamento</option>
+              <option value="Retrabalho">Retrabalho</option>
+              <option value="Descarte">Descarte</option>
+              <option value="Gaiola">Gaiola</option>
+            </select>
+            <input type="date" id="dfDataIni" title="Data inicial">
+            <input type="date" id="dfDataFim" title="Data final">
+            <input type="text" id="dfUsuario" placeholder="Usuário">
+            <input type="text" id="dfCategoria" placeholder="Categoria">
+            <input type="text" id="dfMotivo" placeholder="Motivo">
+            <input type="text" id="dfOrigem" placeholder="Origem">
+            <input type="text" id="dfRua" placeholder="Rua">
+            <input type="text" id="dfDono" placeholder="Dono">
+            <button class="btn" onclick="aplicarFiltrosDashboard()">Aplicar Filtros</button>
+            <button class="btn ghost" onclick="limparFiltrosDashboard()">Limpar</button>
+          </div>
+          <p class="hint" style="margin-top:10px">O filtro de CD é ilustrativo (afeta apenas o gráfico "Projeto Futuro" — não existe coluna de CD nos lançamentos atuais).</p>
+        </div>
+      </div>
+
       <div class="cards">
-        <div class="card"><div class="k">Total de Lançamentos</div><div class="v blue" id="statTotal">–</div></div>
-        <div class="card"><div class="k">Lançamentos Hoje</div><div class="v green" id="statHoje">–</div></div>
+        <div class="card"><div class="k">Total de Lançamentos (un.)</div><div class="v blue" id="statTotal">–</div></div>
+        <div class="card"><div class="k">Lançamentos Hoje (un.)</div><div class="v green" id="statHoje">–</div></div>
         <div class="card"><div class="k">Pendentes de Cadastro</div><div class="v amber" id="statPend">–</div></div>
         <div class="card"><div class="k">Categorias Distintas</div><div class="v" id="statCat">–</div></div>
       </div>
+
       <div class="panel">
         <div class="panel-head"><h4>Últimos lançamentos</h4><a href="#" onclick="switchView('historico');return false" style="font-size:12px;color:var(--blue-600);font-weight:600;text-decoration:none">Ver todos →</a></div>
         <div style="overflow-x:auto">
@@ -342,36 +385,38 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
           </table>
         </div>
       </div>
+
+      <div id="chartsGrid"></div>
     </div>
 
     <!-- LANÇAMENTOS -->
     <div class="view" id="view-lancamentos">
-      <div class="launcher-grid">
+      <div class="launcher-grid" id="launcherGrid">
         <div class="launcher-card" onclick="openConsultaModal()">
           <div class="launcher-icon t-consulta">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.8" y2="15.8"/></svg>
           </div>
           <div class="launcher-label">Consulta</div>
         </div>
-        <div class="launcher-card" onclick="openModal()">
+        <div class="launcher-card lancar-only" onclick="openModal()">
           <div class="launcher-icon t-lanc">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"/><line x1="6.5" y1="14" x2="17.5" y2="14"/></svg>
           </div>
           <div class="launcher-label">Lançamento</div>
         </div>
-        <div class="launcher-card" onclick="openRetrabalhoModal()">
+        <div class="launcher-card lancar-only" onclick="openRetrabalhoModal()">
           <div class="launcher-icon t-retrabalho">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"/><rect x="8.3" y="13.4" width="7.4" height="4.2" rx=".6" transform="rotate(-18 12 15.5)"/><line x1="9.6" y1="14.6" x2="14.4" y2="16.4"/></svg>
           </div>
           <div class="launcher-label">Retrabalho</div>
         </div>
-        <div class="launcher-card" onclick="openGaiolaModal()">
+        <div class="launcher-card lancar-only" onclick="openGaiolaModal()">
           <div class="launcher-icon t-gaiola">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 5 4h14l2 6"/><path d="M3 10v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 20v-5a3 3 0 0 1 6 0v5"/></svg>
           </div>
           <div class="launcher-label">Gaiola</div>
         </div>
-        <div class="launcher-card" onclick="openDescarteModal()">
+        <div class="launcher-card lancar-only" onclick="openDescarteModal()">
           <div class="launcher-icon t-descarte">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L8.6 9"/><path d="M9 12.5 6.4 15c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3L14 8"/><line x1="8.6" y1="9" x2="14" y2="8"/><line x1="9" y1="12.5" x2="14.5" y2="12"/></svg>
           </div>
@@ -383,8 +428,8 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="panel-head"><h4>Lançamentos recentes</h4><span class="sub" style="font-size:12px;color:var(--ink-faint)">Últimos 50 registros</span></div>
         <div style="overflow-x:auto">
           <table>
-            <thead><tr><th>Data/Hora</th><th>EAN</th><th>Produto</th><th>Motivo</th><th>Origem</th><th>Validade</th><th>Rua</th><th>Dono</th><th></th></tr></thead>
-            <tbody id="lancTable"><tr><td colspan="9" class="empty">Carregando…</td></tr></tbody>
+            <thead><tr><th>Data/Hora</th><th>EAN</th><th>Produto</th><th>Motivo</th><th>Origem</th><th>Validade</th><th>Rua</th><th>Dono</th><th>Usuário</th><th></th></tr></thead>
+            <tbody id="lancTable"><tr><td colspan="10" class="empty">Carregando…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -404,8 +449,8 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         </div>
         <div style="overflow-x:auto">
           <table>
-            <thead><tr><th>Data/Hora</th><th>EAN</th><th>Produto</th><th>Categoria</th><th>Motivo</th><th>Origem</th><th>Validade</th><th>Rua</th><th>Dono</th><th>Ações</th></tr></thead>
-            <tbody id="histTable"><tr><td colspan="10" class="empty">Carregando…</td></tr></tbody>
+            <thead><tr><th>Data/Hora</th><th>EAN</th><th>Produto</th><th>Categoria</th><th>Motivo</th><th>Origem</th><th>Validade</th><th>Rua</th><th>Dono</th><th>Usuário</th><th>Ações</th></tr></thead>
+            <tbody id="histTable"><tr><td colspan="11" class="empty">Carregando…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -439,6 +484,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
                 <option value="GAIOLAS_LANC">Gaiolas Lançadas (GAIOLAS_LANC)</option>
                 <option value="BD_DESCARTE">Descarte (BD_DESCARTE)</option>
                 <option value="BD_SALDO">Saldo de Produtos (BD_SALDO)</option>
+                <option value="BD_LOJA">Base de Lojas (BD_LOJA)</option>
               </select>
             </div>
             <div class="field"><label>Data inicial</label><input type="date" id="expFrom"></div>
@@ -463,13 +509,44 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="panel-head"><h4>Lançamentos por Origem</h4></div>
         <div class="panel-body" id="repOrigem"><p class="hint">Carregando…</p></div>
       </div>
+      <div class="panel" id="prevReportComingSoon">
+        <div class="panel-head"><h4>Relatório de Prevenção de Perdas</h4></div>
+        <div class="panel-body"><p class="hint">Disponível em breve — restrito a usuários de nível 5 (ou 1).</p></div>
+      </div>
+    </div>
+
+    <!-- ATUALIZAR LOJAS -->
+    <div class="view" id="view-lojas">
+      <div class="cfg-restricted" id="lojasRestricted" style="display:none">
+        <div class="big">🔒</div>
+        <p><b>Acesso restrito.</b><br>Somente usuários nível 1 ou 4 podem atualizar a base de lojas.</p>
+      </div>
+      <div id="lojasPanel">
+        <div class="panel">
+          <div class="panel-head"><h4>Atualizar Base de Lojas (BD_LOJA)</h4></div>
+          <div class="panel-body">
+            <p class="hint">
+              Selecione a pasta com os arquivos de lojas. De cada arquivo são extraídas apenas as colunas
+              <b>CODACESSO</b>, <b>SEQPRODUTO</b>, <b>DESCCOMPLETA</b> e <b>NROEMPRESA</b> (mesma lógica do Power Query),
+              com remoção de duplicatas. Itens que não aparecerem em nenhum arquivo do upload atual, mas que já
+              existiam no Supabase, terão a coluna NROEMPRESA marcada como <b>INATIVO</b> (o registro é preservado,
+              não é excluído). Itens novos são inseridos. Itens já existentes em ambos são preservados sem alteração.
+            </p>
+            <input type="file" id="lojaFolderInput" webkitdirectory directory multiple style="margin:14px 0;padding:10px;border:1px dashed var(--line);border-radius:9px">
+            <div style="display:flex;gap:10px">
+              <button class="btn" onclick="processarPastaLojas()">Processar e Sincronizar</button>
+            </div>
+            <div class="sync-log" id="lojaSyncLog">Aguardando seleção de pasta…</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- USERS -->
     <div class="view" id="view-usuarios">
       <div class="cfg-restricted" id="usersRestricted" style="display:none">
         <div class="big">🔒</div>
-        <p><b>Acesso restrito.</b><br>O gerenciamento de usuários só fica disponível para usuários nível 1 (MASTER CLASS).</p>
+        <p><b>Acesso restrito.</b><br>O gerenciamento de usuários só fica disponível para usuários nível 1 (acesso total).</p>
       </div>
       <div id="usersPanel">
         <div class="panel">
@@ -491,7 +568,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
     <div class="view" id="view-config">
       <div class="cfg-restricted" id="cfgRestricted" style="display:none">
         <div class="big">🔒</div>
-        <p><b>Acesso restrito.</b><br>As credenciais de conexão só ficam visíveis para usuários nível 1 (MASTER CLASS).</p>
+        <p><b>Acesso restrito.</b><br>As credenciais de conexão só ficam visíveis para usuários nível 1 (acesso total).</p>
       </div>
       <div id="cfgPanel">
         <div class="panel">
@@ -512,7 +589,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="panel">
           <div class="panel-head"><h4>Sobre</h4></div>
           <div class="panel-body">
-            <p class="hint">Triagem Pro v1.0 — sistema 100% client-side (HTML/CSS/JS), integrado ao Supabase e Google Sheets.</p>
+            <p class="hint">Triagem Pro v1.1 — sistema 100% client-side (HTML/CSS/JS), integrado ao Supabase e Google Sheets.</p>
           </div>
         </div>
       </div>
@@ -711,7 +788,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="field"><label>Gaiola Nº</label><input type="text" id="gl_gaiola" readonly></div>
         <div class="field">
           <label>Loja</label>
-          <select id="gl_loja">
+          <select id="gl_loja" disabled>
             <option value="">Escaneie o EAN do 1º item</option>
           </select>
           <p class="hint" id="glLojaHint">Escaneie o primeiro item para carregar as lojas disponíveis.</p>
@@ -775,11 +852,18 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="field"><label>Usuário</label><input type="text" id="us_user" placeholder="login do usuário" autocomplete="off"></div>
         <div class="field"><label>Senha</label><input type="text" id="us_password" placeholder="senha" autocomplete="off"></div>
         <div class="field full"><label>Nome completo</label><input type="text" id="us_name" placeholder="Nome do usuário"></div>
-        <div class="field">
+        <div class="field full">
           <label>Nível</label>
           <select id="us_level">
-            <option value="0">0 - Padrão</option>
-            <option value="1">1 - MASTER CLASS</option>
+            <option value="1">1 - Acesso Total</option>
+            <option value="2">2 - Lançar (padrão)</option>
+            <option value="3">3 - Editar Lançamentos</option>
+            <option value="4">4 - Atualizar Base (Lojas)</option>
+            <option value="5">5 - Relatório de Prevenção</option>
+            <option value="6">6 - Somente Consulta</option>
+            <option value="7">7 - Lançar e Editar</option>
+            <option value="8">8 - Lançar e Exportar</option>
+            <option value="9">9 - Consulta e Relatórios</option>
           </select>
         </div>
         <div class="field">
@@ -821,6 +905,8 @@ function connect(){
 }
 connect();
 
+if(window.ChartDataLabels) Chart.register(ChartDataLabels);
+
 /* ============ TURNO DE LANÇAMENTO ============ */
 function calcularTurno(date){
   const d = date || new Date();
@@ -833,7 +919,7 @@ function calcularTurno(date){
   return 3; // 23:00 às 07:00
 }
 
-/* ============ VALIDAÇÃO DE VALIDADE (máx 1095 dias) ============ */
+/* ============ VALIDAÇÃO DE VALIDADE ============ */
 const VALIDADE_MAX_DIAS = 1095;
 function validarDataValidade(dateStr){
   if(!dateStr) return { ok:true, warnMes:false };
@@ -842,37 +928,37 @@ function validarDataValidade(dateStr){
   const val = new Date(partes[0], partes[1]-1, partes[2]);
   val.setHours(0,0,0,0);
   const diffDias = Math.round((val - hoje)/(1000*60*60*24));
-
-  if(diffDias < 0){
-    return { ok:false, warnMes:false, msg:"A validade não pode ser anterior a hoje." };
-  }
-  if(diffDias > VALIDADE_MAX_DIAS){
-    return { ok:false, warnMes:false, msg:`A validade não pode ultrapassar ${VALIDADE_MAX_DIAS} dias a partir de hoje.` };
-  }
+  if(diffDias < 0) return { ok:false, warnMes:false, msg:"A validade não pode ser anterior a hoje." };
+  if(diffDias > VALIDADE_MAX_DIAS) return { ok:false, warnMes:false, msg:`A validade não pode ultrapassar ${VALIDADE_MAX_DIAS} dias a partir de hoje.` };
   const warnMes = (val.getMonth() === hoje.getMonth() && val.getFullYear() === hoje.getFullYear());
   return { ok:true, warnMes };
 }
-
 function atualizarMsgValidade(inputId, msgId){
   const val = document.getElementById(inputId).value;
   const msgEl = document.getElementById(msgId);
   const check = validarDataValidade(val);
   if(!val){ msgEl.style.display = "none"; return true; }
-  if(!check.ok){
-    msgEl.textContent = check.msg;
-    msgEl.style.color = "var(--red)";
-    msgEl.style.display = "block";
-    return false;
-  }
-  if(check.warnMes){
-    msgEl.textContent = "Atenção: esta validade está dentro do mês atual. Confira se está correta.";
-    msgEl.style.color = "var(--amber)";
-    msgEl.style.display = "block";
-    return true;
-  }
+  if(!check.ok){ msgEl.textContent = check.msg; msgEl.style.color = "var(--red)"; msgEl.style.display = "block"; return false; }
+  if(check.warnMes){ msgEl.textContent = "Atenção: esta validade está dentro do mês atual. Confira se está correta."; msgEl.style.color = "var(--amber)"; msgEl.style.display = "block"; return true; }
   msgEl.style.display = "none";
   return true;
 }
+
+/* ============ NÍVEIS DE USUÁRIO (1-6) ============ */
+// 1 Acesso total | 2 Lançar | 3 Editar lançamentos | 4 Atualizar base (lojas) | 5 Relatório prevenção | 6 Somente consulta
+function lvl(){ return currentUser ? Number(currentUser.level) : 0; }
+function isTotal(){ return lvl() === 1; }
+function canLancar(){ return lvl() === 1 || lvl() === 2 || lvl() === 7 || lvl() === 8; }
+function canEditarLanc(){ return lvl() === 1 || lvl() === 3 || lvl() === 7; }
+function canAtualizarBase(){ return lvl() === 1 || lvl() === 4; }
+function canRelatorioPrevencao(){ return lvl() === 1 || lvl() === 5 || lvl() === 9; }
+function isSomenteConsulta(){ return lvl() === 6; }
+function canExportar(){ return isTotal() || lvl() === 8 || lvl() === 9; }
+function canGerenciarUsuarios(){ return isTotal(); }
+function canConfig(){ return isTotal(); }
+function canEditDelete(){ return canEditarLanc(); } // compat
+
+const NIVEL_LABELS = {1:"Acesso Total",2:"Lançar",3:"Editar Lançamentos",4:"Atualizar Base",5:"Relatório Prevenção",6:"Somente Consulta",7:"Lançar e Editar",8:"Lançar e Exportar",9:"Consulta e Relatórios"};
 
 /* ============ LOGIN ============ */
 let currentUser = null;
@@ -921,7 +1007,7 @@ async function doLogin(){
       return;
     }
 
-    const level = Number(String(data[0].LEVEL ?? "0").trim()) || 0;
+    const level = Number(String(data[0].LEVEL ?? "2").trim()) || 2;
     const state = String(data[0].STATE ?? "1").trim();
     if(state !== "1"){
       errText.textContent = "Usuário inativo.";
@@ -937,7 +1023,7 @@ async function doLogin(){
 
     document.getElementById("loginOverlay").style.display = "none";
     applyUserUI();
-    showToast("Login efetuado com sucesso" + (level===1 ? " — MASTER CLASS" : ""));
+    showToast("Login efetuado com sucesso — " + (NIVEL_LABELS[level] || "Nível "+level));
   }catch(err){
     errText.textContent = "Erro ao validar login: "+err.message;
     errBox.classList.add("show");
@@ -946,6 +1032,7 @@ async function doLogin(){
     btnText.textContent = "Entrar";
   }
 }
+function tentarLogin(){ return doLogin(); }
 
 ["loginUser","loginPass"].forEach(id=>{
   document.getElementById(id).addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); doLogin(); } });
@@ -957,15 +1044,18 @@ function applyUserUI(){
   document.getElementById("userName").textContent = currentUser.name || currentUser.user;
   document.getElementById("userAvatar").textContent = (currentUser.name || currentUser.user).slice(0,2).toUpperCase();
   const badge = document.getElementById("userBadge");
-  if(currentUser.level===1){
-    badge.textContent = "MASTER CLASS";
-    badge.className = "badge-level master";
-  }else{
-    badge.textContent = "Nível 0";
-    badge.className = "badge-level basic";
-  }
-  document.querySelector('.menu a[data-view="config"]').style.display = currentUser.level===1 ? "" : "none";
-  document.querySelector('.menu a[data-view="usuarios"]').style.display = currentUser.level===1 ? "" : "none";
+  badge.textContent = NIVEL_LABELS[lvl()] || ("Nível "+lvl());
+  badge.className = "badge-level " + (isTotal() ? "master" : "basic");
+
+  document.querySelector('.menu a[data-view="config"]').style.display = canConfig() ? "" : "none";
+  document.querySelector('.menu a[data-view="usuarios"]').style.display = canGerenciarUsuarios() ? "" : "none";
+  const lojasLink = document.querySelector('.menu a[data-view="lojas"]');
+  if(lojasLink) lojasLink.style.display = canAtualizarBase() ? "" : "none";
+
+  document.querySelectorAll(".lancar-only").forEach(el=>{
+    el.style.display = canLancar() ? "" : "none";
+  });
+
   refreshActiveView();
   checkPendingGaiola();
 }
@@ -979,7 +1069,6 @@ function logout(){
   setTimeout(()=>document.getElementById("loginUser").focus(),80);
 }
 
-function canEditDelete(){ return !!(currentUser && currentUser.level === 1); }
 setTimeout(()=>document.getElementById("loginUser").focus(),150);
 
 /* ============ NAVEGAÇÃO ============ */
@@ -990,6 +1079,7 @@ const titles = {
   pendentes:["Pendentes","Lançamentos com produto não identificado"],
   exportar:["Exportar","Baixe os dados em CSV ou Excel"],
   relatorios:["Relatórios","Indicadores por motivo e origem"],
+  lojas:["Atualizar Lojas","Sincronização da base de lojas (BD_LOJA)"],
   usuarios:["Usuários","Gerenciamento de usuários (BD_USER)"],
   config:["Configurações","Conexão com o Supabase"]
 };
@@ -1012,14 +1102,19 @@ function switchView(name){
   if(name==="historico") loadHistorico();
   if(name==="pendentes") loadPendentes();
   if(name==="relatorios") loadRelatorios();
+  if(name==="lojas"){
+    const allowed = canAtualizarBase();
+    document.getElementById("lojasPanel").style.display = allowed ? "" : "none";
+    document.getElementById("lojasRestricted").style.display = allowed ? "none" : "block";
+  }
   if(name==="usuarios"){
-    const allowed = !!(currentUser && currentUser.level === 1);
+    const allowed = canGerenciarUsuarios();
     document.getElementById("usersPanel").style.display = allowed ? "" : "none";
     document.getElementById("usersRestricted").style.display = allowed ? "none" : "block";
     if(allowed) loadUsuarios();
   }
   if(name==="config"){
-    const allowed = !!(currentUser && currentUser.level === 1);
+    const allowed = canConfig();
     document.getElementById("cfgPanel").style.display = allowed ? "" : "none";
     document.getElementById("cfgRestricted").style.display = allowed ? "none" : "block";
   }
@@ -1031,7 +1126,7 @@ function showToast(msg, isErr){
   t.textContent = msg;
   t.classList.toggle("err", !!isErr);
   t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"), 3200);
+  setTimeout(()=>t.classList.remove("show"), 3800);
 }
 
 /* ============ BD_SALDO ============ */
@@ -1040,7 +1135,6 @@ async function getSaldo(ean){
   if(error) throw error;
   return (data && data.length) ? data[0] : null;
 }
-
 async function adicionarSaldo(ean, plu, produto, qtd){
   const atual = await getSaldo(ean);
   if(atual){
@@ -1052,16 +1146,14 @@ async function adicionarSaldo(ean, plu, produto, qtd){
     if(error) throw error;
   }
 }
-
 async function verificarSaldoSuficiente(ean, qtdNecessaria){
   const atual = await getSaldo(ean);
   const disponivel = atual ? (Number(atual.QTD_UNIDADE)||0) : 0;
   if(qtdNecessaria > disponivel){
-    throw new Error(`Saldo insuficiente para o EAN ${ean}. Disponível: ${disponivel} — solicitado: ${qtdNecessaria}. Verifique e lance a diferença no painel de Lançamento.`);
+    throw new Error(`Saldo insuficiente para o EAN ${ean}. Disponível: ${disponivel} — solicitado: ${qtdNecessaria}. Lance a diferença no painel de Lançamento.`);
   }
   return disponivel;
 }
-
 async function debitarSaldo(ean, qtd){
   const atual = await getSaldo(ean);
   const disponivel = atual ? (Number(atual.QTD_UNIDADE)||0) : 0;
@@ -1070,13 +1162,20 @@ async function debitarSaldo(ean, qtd){
   if(error) throw error;
 }
 
+/* ============ BD_LOJA — verificação de item ativo ============ */
+async function verificarItemAtivoNaLoja(ean, loja){
+  if(!loja) return true;
+  const { data, error } = await sb.from("BD_LOJA").select("NROEMPRESA").eq("CODACESSO", ean).eq("NROEMPRESA", loja).limit(1);
+  if(error) throw error;
+  return !!(data && data.length);
+}
+
 /* ============ BUSCA CADASTRO ============ */
 async function buscarCadastro(ean){
   const { data, error } = await sb.from("BD_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
   if(error) throw error;
   return (data && data.length) ? data[0] : null;
 }
-
 function dispatchEnter(fieldId){
   setTimeout(()=>{
     const el = document.getElementById(fieldId);
@@ -1088,8 +1187,9 @@ function dispatchEnter(fieldId){
 let editingId = null;
 
 function openModal(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   editingId = null;
-  document.querySelector(".modal-header h3").textContent = "Novo Lançamento";
+  document.querySelector("#overlay .modal-header h3").textContent = "Novo Lançamento";
   document.getElementById("btnSalvar").textContent = "Salvar";
   document.getElementById("overlay").classList.add("show");
   resetForm();
@@ -1137,12 +1237,11 @@ document.getElementById("f_ean").addEventListener("keydown", async e=>{
   }
 });
 
-document.getElementById("f_qtd_unidade").addEventListener("input", e=>{
-  e.target.value = e.target.value.replace(/[^0-9]/g,"");
-});
+document.getElementById("f_qtd_unidade").addEventListener("input", e=>{ e.target.value = e.target.value.replace(/[^0-9]/g,""); });
 document.getElementById("f_validade").addEventListener("change", ()=>atualizarMsgValidade("f_validade","f_validadeMsg"));
 
 async function salvarLancamento(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   const ean = document.getElementById("f_ean").value.trim();
   const motivo = document.getElementById("f_motivo").value;
   const origem = document.getElementById("f_origem").value;
@@ -1151,18 +1250,9 @@ async function salvarLancamento(){
   if(!ean){ showToast("Informe o EAN.", true); return; }
   if(!motivo){ showToast("Selecione o Motivo.", true); return; }
   if(!origem){ showToast("Selecione a Origem.", true); return; }
-  if(!qtdUnidade || Number(qtdUnidade) <= 0){
-    showToast("Informe a Qtd. Unidade (necessária para atualizar o saldo).", true);
-    return;
-  }
-  if(!atualizarMsgValidade("f_validade","f_validadeMsg")){
-    showToast("Corrija a validade antes de salvar.", true);
-    return;
-  }
-  if(editingId && !canEditDelete()){
-    showToast("Apenas MASTER CLASS pode editar.", true);
-    return;
-  }
+  if(!qtdUnidade || Number(qtdUnidade) <= 0){ showToast("Informe a Qtd. Unidade.", true); return; }
+  if(!atualizarMsgValidade("f_validade","f_validadeMsg")){ showToast("Corrija a validade antes de salvar.", true); return; }
+  if(editingId && !canEditarLanc()){ showToast("Você não tem permissão para editar.", true); return; }
   if(!currentUser){ showToast("Sessão expirada.", true); return; }
 
   const qtdNum = Number(qtdUnidade);
@@ -1183,29 +1273,16 @@ async function salvarLancamento(){
     QTD_UNIDADE: qtdNum,
     USER: currentUser.user
   };
-
-  if(isEditing){
-    delete payload.DTA_HORA;
-  }else{
-    payload.TURNO_LANC = calcularTurno();
-  }
+  if(isEditing){ delete payload.DTA_HORA; } else { payload.TURNO_LANC = calcularTurno(); }
 
   const btn = document.getElementById("btnSalvar");
   btn.disabled = true; btn.textContent = isEditing ? "Atualizando…" : "Salvando…";
   try{
     let error;
-    if(isEditing){
-      ({ error } = await sb.from("BD_LANC").update(payload).eq("id", editingId));
-    }else{
-      ({ error } = await sb.from("BD_LANC").insert(payload));
-    }
+    if(isEditing){ ({ error } = await sb.from("BD_LANC").update(payload).eq("id", editingId)); }
+    else{ ({ error } = await sb.from("BD_LANC").insert(payload)); }
     if(error) throw error;
-
-    // Sempre soma no BD_SALDO ao fazer um novo lançamento
-    if(!isEditing){
-      await adicionarSaldo(ean, payload.PLU, payload.PRODUTO, qtdNum);
-    }
-
+    if(!isEditing) await adicionarSaldo(ean, payload.PLU, payload.PRODUTO, qtdNum);
     showToast(isEditing ? "Lançamento atualizado" : "Lançamento salvo com sucesso");
     editingId = null;
     resetForm();
@@ -1223,19 +1300,236 @@ function refreshActiveView(){
   switchView(active);
 }
 
+/* ============ CHART HELPERS ============ */
+const CDS_LISTA = ["910","911","914","915","956","917","920","922"];
+let chartInstances = {};
+function fmtNum(n){ return Math.round(n||0).toLocaleString('pt-BR'); }
+function fmtPct(n, total){ return total>0 ? ((n/total)*100).toFixed(1).replace('.',',')+'%' : '0%'; }
+
+function criarPainelGrafico(id, titulo){
+  return `<div class="panel">
+    <div class="panel-head"><h4>${titulo}</h4><button class="icon-btn" title="Exportar imagem (PNG)" onclick="exportarGraficoPNG('${id}')">📷</button></div>
+    <div class="panel-body chart-panel-body"><canvas id="${id}"></canvas></div>
+  </div>`;
+}
+function exportarGraficoPNG(canvasId){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas){ showToast("Gráfico não encontrado.", true); return; }
+  const url = canvas.toDataURL("image/png", 1.0);
+  const a = document.createElement("a");
+  a.href = url; a.download = canvasId + "_" + Date.now() + ".png";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function montarChartsGrid(){
+  const grid = document.getElementById("chartsGrid");
+  if(grid.dataset.montado) return;
+  grid.innerHTML = [
+    criarPainelGrafico("chartTurnoTipo","Lançamentos por Turno e Tipo"),
+    criarPainelGrafico("chartTopUsuario","Top Lançamentos por Usuário"),
+    criarPainelGrafico("chartTopItens","Top 10 Itens Mais Lançados"),
+    criarPainelGrafico("chartTopMotivos","Top 10 Motivos Mais Lançados"),
+    criarPainelGrafico("chartTopOrigens","Top Origens Mais Lançadas"),
+    criarPainelGrafico("chartValidade","Controle de Validade"),
+    criarPainelGrafico("chartCategoria","Categoria Mais Lançada"),
+    criarPainelGrafico("chartTopRuas","Top 10 Ruas Mais Lançadas"),
+    criarPainelGrafico("chartTopDonos","Top 10 Donos Mais Lançados"),
+    criarPainelGrafico("chartBrasil","Distribuição por CD — Projeto Futuro (dados de teste)")
+  ].join("");
+  grid.dataset.montado = "1";
+  const cdSel = document.getElementById("dfCd");
+  if(cdSel && !cdSel.dataset.montado){
+    CDS_LISTA.forEach(cd=>{ const o=document.createElement("option"); o.value=cd; o.textContent="CD "+cd; cdSel.appendChild(o); });
+    cdSel.dataset.montado="1";
+  }
+}
+function renderBarChart(canvasId, labels, valores, totalFiltrado, horizontal){
+  const ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+  if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+  chartInstances[canvasId] = new Chart(ctx, {
+    type:"bar",
+    data:{ labels: labels.length?labels:["Sem dados"], datasets:[{ data: valores.length?valores:[0], backgroundColor:"#2f6bff", borderRadius:6 }] },
+    options:{
+      indexAxis: horizontal ? "y" : "x",
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          anchor:"end", align: horizontal ? "end":"top",
+          formatter:(v)=> v>0 ? (fmtNum(v) + " (" + fmtPct(v, totalFiltrado) + ")") : "",
+          color:"#111629", font:{weight:"700", size:10}
+        }
+      },
+      scales:{
+        x:{ ticks:{ callback: horizontal ? (v=>fmtNum(v)) : undefined } },
+        y:{ ticks:{ callback: !horizontal ? (v=>fmtNum(v)) : undefined } }
+      }
+    },
+    plugins:[window.ChartDataLabels].filter(Boolean)
+  });
+}
+function renderTurnoTipoChart(rows, totalFiltrado){
+  const turnos = ["1","2","3"];
+  const tipos = ["Lançamento","Retrabalho","Descarte","Gaiola"];
+  const cores = {"Lançamento":"#2f6bff","Retrabalho":"#e5972a","Descarte":"#d64545","Gaiola":"#7c3aed"};
+  const datasets = tipos.map(t=>({
+    label:t,
+    data: turnos.map(tu => rows.filter(r=>String(r.TURNO_LANC)===tu && r.TIPO===t).reduce((s,r)=>s+(Number(r.QTD_UNIDADE)||0),0)),
+    backgroundColor: cores[t], borderRadius:5
+  }));
+  const canvasId="chartTurnoTipo";
+  if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+  chartInstances[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:"bar",
+    data:{ labels:["1 Turno","2 Turno","3 Turno"], datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:"bottom"},
+        datalabels:{ formatter:(v)=> v>0 ? (fmtNum(v)+" ("+fmtPct(v,totalFiltrado)+")") : "", color:"#111629", font:{size:9,weight:"700"} }
+      },
+      scales:{ y:{ ticks:{ callback:v=>fmtNum(v) } } }
+    },
+    plugins:[window.ChartDataLabels].filter(Boolean)
+  });
+}
+function bucketValidade(validadeStr){
+  if(!validadeStr) return null;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const v = new Date(validadeStr+"T00:00:00");
+  if(isNaN(v)) return null;
+  const dias = Math.round((v-hoje)/86400000);
+  if(dias < 0) return "Vencido";
+  if(dias <= 7) return "≤ 7 dias";
+  if(dias <= 30) return "≤ 30 dias";
+  if(dias <= 90) return "≤ 90 dias";
+  return "> 90 dias";
+}
+function renderControleValidade(rows, totalFiltrado){
+  const buckets = {"Vencido":0,"≤ 7 dias":0,"≤ 30 dias":0,"≤ 90 dias":0,"> 90 dias":0};
+  rows.forEach(r=>{ const b = bucketValidade(r.VALIDADE); if(b) buckets[b] += (Number(r.QTD_UNIDADE)||0); });
+  renderBarChart("chartValidade", Object.keys(buckets), Object.values(buckets), totalFiltrado, false);
+}
+function renderBrasilIlustrativo(){
+  const cdFiltro = document.getElementById("dfCd") ? document.getElementById("dfCd").value : "";
+  const cds = cdFiltro ? [cdFiltro] : CDS_LISTA;
+  const valores = cds.map(()=> Math.floor(Math.random()*900)+100);
+  const canvasId="chartBrasil";
+  if(chartInstances[canvasId]) chartInstances[canvasId].destroy();
+  chartInstances[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:"bar",
+    data:{ labels: cds.map(c=>"CD "+c), datasets:[{ label:"Dados de teste", data:valores, backgroundColor:"#0f9d58", borderRadius:6 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        title:{display:true,text:"Projeto Futuro — dados 100% ilustrativos, não reais"},
+        datalabels:{ anchor:"end",align:"top", formatter:v=>fmtNum(v), color:"#111629", font:{weight:"700"} }
+      },
+      scales:{ y:{ ticks:{ callback:v=>fmtNum(v) } } }
+    },
+    plugins:[window.ChartDataLabels].filter(Boolean)
+  });
+}
+function agruparSoma(rows, campo, topN){
+  const map = {};
+  rows.forEach(r=>{
+    const chave = (r[campo] ?? "").toString().trim();
+    if(!chave) return;
+    map[chave] = (map[chave]||0) + (Number(r.QTD_UNIDADE)||0);
+  });
+  let arr = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  if(topN) arr = arr.slice(0, topN);
+  return arr;
+}
+async function fetchUnifiedData(){
+  const [lanc, retra, desc, gaiola] = await Promise.all([
+    sb.from("BD_LANC").select("*").limit(5000),
+    sb.from("BD_RETRABALHO").select("*").limit(5000),
+    sb.from("BD_DESCARTE").select("*").limit(5000),
+    sb.from("GAIOLAS_LANC").select("*").limit(5000)
+  ]);
+  const rows = [];
+  (lanc.data||[]).forEach(r=>rows.push({...r, TIPO:"Lançamento"}));
+  (retra.data||[]).forEach(r=>rows.push({...r, TIPO:"Retrabalho"}));
+  (desc.data||[]).forEach(r=>rows.push({...r, TIPO:"Descarte"}));
+  (gaiola.data||[]).forEach(r=>rows.push({...r, TIPO:"Gaiola"}));
+  return rows;
+}
+function lerFiltrosDashboard(){
+  return {
+    turno: document.getElementById("dfTurno").value,
+    tipo: document.getElementById("dfTipo").value,
+    dataIni: document.getElementById("dfDataIni").value,
+    dataFim: document.getElementById("dfDataFim").value,
+    usuario: document.getElementById("dfUsuario").value.trim(),
+    categoria: document.getElementById("dfCategoria").value.trim(),
+    motivo: document.getElementById("dfMotivo").value.trim(),
+    origem: document.getElementById("dfOrigem").value.trim(),
+    rua: document.getElementById("dfRua").value.trim(),
+    dono: document.getElementById("dfDono").value.trim()
+  };
+}
+function aplicarFiltroLista(rows, f){
+  return rows.filter(r=>{
+    if(f.turno && String(r.TURNO_LANC||"") !== String(f.turno)) return false;
+    if(f.tipo && r.TIPO !== f.tipo) return false;
+    if(f.usuario && !(String(r.USER||"").toLowerCase().includes(f.usuario.toLowerCase()))) return false;
+    if(f.categoria && !(String(r.CATEGORIA||"").toLowerCase().includes(f.categoria.toLowerCase()))) return false;
+    if(f.motivo && !(String(r.MOTIVO||"").toLowerCase().includes(f.motivo.toLowerCase()))) return false;
+    if(f.origem && !(String(r.ORIGEM||"").toLowerCase().includes(f.origem.toLowerCase()))) return false;
+    if(f.rua && !(String(r.RUA||"").toLowerCase().includes(f.rua.toLowerCase()))) return false;
+    if(f.dono && !(String(r.DONO||"").toLowerCase().includes(f.dono.toLowerCase()))) return false;
+    if(f.dataIni || f.dataFim){
+      const d = new Date(r.DTA_HORA);
+      if(isNaN(d)) return false;
+      if(f.dataIni && d < new Date(f.dataIni+"T00:00:00")) return false;
+      if(f.dataFim && d > new Date(f.dataFim+"T23:59:59")) return false;
+    }
+    return true;
+  });
+}
+let dashDadosBrutos = [];
+function aplicarFiltrosDashboard(){
+  const f = lerFiltrosDashboard();
+  const rows = aplicarFiltroLista(dashDadosBrutos, f);
+  const totalFiltrado = rows.reduce((s,r)=>s+(Number(r.QTD_UNIDADE)||0),0);
+
+  document.getElementById("statTotal").textContent = fmtNum(totalFiltrado);
+  const hoje = new Date();
+  const hojeQtd = rows.filter(r=>{ const d=new Date(r.DTA_HORA); return !isNaN(d) && d.toDateString()===hoje.toDateString(); }).reduce((s,r)=>s+(Number(r.QTD_UNIDADE)||0),0);
+  document.getElementById("statHoje").textContent = fmtNum(hojeQtd);
+  document.getElementById("statPend").textContent = fmtNum(rows.filter(r=>r.TIPO==="Lançamento" && !r.PRODUTO).length);
+  document.getElementById("statCat").textContent = new Set(rows.map(r=>r.CATEGORIA).filter(Boolean)).size;
+
+  renderTurnoTipoChart(rows, totalFiltrado);
+  let t;
+  t = agruparSoma(rows,"USER",10); renderBarChart("chartTopUsuario", t.map(x=>x[0]), t.map(x=>x[1]), totalFiltrado, true);
+  t = agruparSoma(rows,"PRODUTO",10); renderBarChart("chartTopItens", t.map(x=>x[0]), t.map(x=>x[1]), totalFiltrado, true);
+  t = agruparSoma(rows,"MOTIVO",10); renderBarChart("chartTopMotivos", t.map(x=>x[0]), t.map(x=>x[1]), totalFiltrado, true);
+  t = agruparSoma(rows,"ORIGEM",10); renderBarChart("chartTopOrigens", t.map(x=>x[0]), t.map(x=>x[1]), totalFiltrado, true);
+  renderControleValidade(rows, totalFiltrado);
+  t = agruparSoma(rows,"CATEGORIA",10); renderBarChart("chartCategoria", t.map(x=>x[0]), t.map(x=>x[1]), totalFiltrado, true);
+  t = agruparSoma(rows,"RUA",10); renderBarChart("chartTopRuas", t.map(x=>x[0]), t.map(x=>x[1]), totalFiltrado, true);
+  t = agruparSoma(rows,"DONO",10); renderBarChart("chartTopDonos", t.map(x=>x[0]), t.map(x=>x[1]), totalFiltrado, true);
+  renderBrasilIlustrativo();
+}
+function toggleDashFiltros(){
+  const body = document.getElementById("dashFiltrosBody");
+  const label = document.getElementById("dashFiltroToggleLabel");
+  const showing = body.style.display !== "none";
+  body.style.display = showing ? "none" : "block";
+  label.textContent = showing ? "Mostrar filtros" : "Ocultar filtros";
+}
+function limparFiltrosDashboard(){
+  ["dfCd","dfTurno","dfTipo","dfDataIni","dfDataFim","dfUsuario","dfCategoria","dfMotivo","dfOrigem","dfRua","dfDono"].forEach(id=>document.getElementById(id).value="");
+  aplicarFiltrosDashboard();
+}
+
 /* ============ DASHBOARD ============ */
 async function loadDashboard(){
+  montarChartsGrid();
   try{
-    const { count: total } = await sb.from("BD_LANC").select("*", { count:"exact", head:true });
-    document.getElementById("statTotal").textContent = total ?? 0;
-    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-    const { count: hoje } = await sb.from("BD_LANC").select("*", { count:"exact", head:true }).gte("DTA_HORA", todayStart.toISOString());
-    document.getElementById("statHoje").textContent = hoje ?? 0;
-    const { count: pend } = await sb.from("BD_LANC").select("*", { count:"exact", head:true }).is("PRODUTO", null);
-    document.getElementById("statPend").textContent = pend ?? 0;
-    const { data: cats } = await sb.from("BD_LANC").select("CATEGORIA");
-    const distinctCats = new Set((cats||[]).map(r=>r.CATEGORIA).filter(Boolean));
-    document.getElementById("statCat").textContent = distinctCats.size;
     const { data: recent } = await sb.from("BD_LANC").select("*").order("DTA_HORA",{ascending:false}).limit(8);
     const tbody = document.getElementById("dashRecent");
     if(!recent || !recent.length){
@@ -1243,28 +1537,33 @@ async function loadDashboard(){
     }else{
       tbody.innerHTML = recent.map(r=>`<tr><td>${fmtDate(r.DTA_HORA)}</td><td class="code">${r.EAN||""}</td><td>${r.PRODUTO||"—"}</td><td><span class="tag">${r.MOTIVO||""}</span></td><td>${r.ORIGEM||""}</td></tr>`).join("");
     }
-  }catch(err){ showToast("Erro ao carregar dashboard: "+err.message, true); }
+  }catch(err){ showToast("Erro ao carregar recentes: "+err.message, true); }
+
+  try{
+    dashDadosBrutos = await fetchUnifiedData();
+    aplicarFiltrosDashboard();
+  }catch(err){ showToast("Erro ao carregar dados do dashboard: "+err.message, true); }
 }
 
 /* ============ LANÇAMENTOS ============ */
 async function loadLancamentos(){
   const tbody = document.getElementById("lancTable");
-  tbody.innerHTML = '<tr><td colspan="9" class="empty">Carregando…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="10" class="empty">Carregando…</td></tr>';
   try{
     const { data, error } = await sb.from("BD_LANC").select("*").order("DTA_HORA",{ascending:false}).limit(50);
     if(error) throw error;
     if(!data || !data.length){
-      tbody.innerHTML = '<tr><td colspan="9" class="empty"><div class="big">📭</div>Nenhum lançamento ainda</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="empty"><div class="big">📭</div>Nenhum lançamento ainda</td></tr>';
       return;
     }
-    tbody.innerHTML = data.map(r=>`<tr><td>${fmtDate(r.DTA_HORA)}</td><td class="code">${r.EAN||""}</td><td>${r.PRODUTO||"—"}</td><td><span class="tag">${r.MOTIVO||""}</span></td><td>${r.ORIGEM||""}</td><td>${r.VALIDADE||"—"}</td><td>${r.RUA||"—"}</td><td>${r.DONO||"—"}</td><td>${rowActionsHtml(r)}</td></tr>`).join("");
-  }catch(err){ tbody.innerHTML = `<tr><td colspan="9" class="empty">Erro: ${err.message}</td></tr>`; }
+    tbody.innerHTML = data.map(r=>`<tr><td>${fmtDate(r.DTA_HORA)}</td><td class="code">${r.EAN||""}</td><td>${r.PRODUTO||"—"}</td><td><span class="tag">${r.MOTIVO||""}</span></td><td>${r.ORIGEM||""}</td><td>${r.VALIDADE||"—"}</td><td>${r.RUA||"—"}</td><td>${r.DONO||"—"}</td><td>${r.USER||"—"}</td><td>${rowActionsHtml(r)}</td></tr>`).join("");
+  }catch(err){ tbody.innerHTML = `<tr><td colspan="10" class="empty">Erro: ${err.message}</td></tr>`; }
 }
 
 /* ============ HISTÓRICO ============ */
 async function loadHistorico(){
   const tbody = document.getElementById("histTable");
-  tbody.innerHTML = '<tr><td colspan="10" class="empty">Carregando…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" class="empty">Carregando…</td></tr>';
   try{
     let q = sb.from("BD_LANC").select("*").order("DTA_HORA",{ascending:false}).limit(300);
     const ean = document.getElementById("fEan").value.trim();
@@ -1284,19 +1583,17 @@ async function loadHistorico(){
     const { data: rows, error } = await q;
     if(error) throw error;
     if(!rows || !rows.length){
-      tbody.innerHTML = '<tr><td colspan="10" class="empty"><div class="big">🔎</div>Nenhum registro encontrado</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="empty"><div class="big">🔎</div>Nenhum registro encontrado</td></tr>';
       return;
     }
-    tbody.innerHTML = rows.map(r=>`<tr><td>${fmtDate(r.DTA_HORA)}</td><td class="code">${r.EAN||""}</td><td>${r.PRODUTO||"—"}</td><td>${r.CATEGORIA||"—"}</td><td><span class="tag">${r.MOTIVO||""}</span></td><td>${r.ORIGEM||""}</td><td>${r.VALIDADE||"—"}</td><td>${r.RUA||"—"}</td><td>${r.DONO||"—"}</td><td>${rowActionsHtml(r)}</td></tr>`).join("");
-  }catch(err){ tbody.innerHTML = `<tr><td colspan="10" class="empty">Erro: ${err.message}</td></tr>`; }
+    tbody.innerHTML = rows.map(r=>`<tr><td>${fmtDate(r.DTA_HORA)}</td><td class="code">${r.EAN||""}</td><td>${r.PRODUTO||"—"}</td><td>${r.CATEGORIA||"—"}</td><td><span class="tag">${r.MOTIVO||""}</span></td><td>${r.ORIGEM||""}</td><td>${r.VALIDADE||"—"}</td><td>${r.RUA||"—"}</td><td>${r.DONO||"—"}</td><td>${r.USER||"—"}</td><td>${rowActionsHtml(r)}</td></tr>`).join("");
+  }catch(err){ tbody.innerHTML = `<tr><td colspan="11" class="empty">Erro: ${err.message}</td></tr>`; }
 }
-
 function clearFilters(){
   ["fEan","fProduto","fCategoria","fData"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("fMotivo").value="";
   loadHistorico();
 }
-
 (function populateMotivoFilter(){
   const motivos = ["Choque Mecânico","Dejetos de Animais","Degustação","Embalagem com Vazamento","Embalagem Rasgada","Falta de Produto","Furto","Queda de Produto","Tombamento","Vencimento"];
   const sel = document.getElementById("fMotivo");
@@ -1305,12 +1602,15 @@ function clearFilters(){
 
 /* ============ AÇÕES DA LINHA ============ */
 function rowActionsHtml(r){
-  if(!canEditDelete()) return '<span class="hint" style="color:var(--ink-faint)">—</span>';
+  if(!canEditarLanc()) return '<span class="hint" style="color:var(--ink-faint)">—</span>';
   return `<div class="row-actions"><button class="icon-btn" title="Editar" onclick="editarLancamento('${r.id}')">✎</button><button class="icon-btn" title="Excluir" onclick="excluirLancamento('${r.id}')">🗑</button></div>`;
 }
-
 async function excluirLancamento(id){
-  if(!canEditDelete()){ showToast("Apenas MASTER CLASS pode excluir.", true); return; }
+  if(!canEditarLanc()){ showToast("Você não tem permissão para excluir.", true); return; }
+  try{
+    const { data: exclData, error: exclErr } = await sb.from("BD_LANC").select("USER").eq("id", id).limit(1);
+    if(!exclErr && exclData && exclData.length && exclData[0].USER === "5520967"){ showToast("Este lançamento pertence ao usuário 5520967 e não pode ser excluído.", true); return; }
+  }catch(e){}
   if(!confirm("Confirma a exclusão?")) return;
   try{
     const { error } = await sb.from("BD_LANC").delete().eq("id", id);
@@ -1319,11 +1619,11 @@ async function excluirLancamento(id){
     refreshActiveView();
   }catch(err){ showToast("Erro ao excluir: "+err.message, true); }
 }
-
 async function editarLancamento(id){
-  if(!canEditDelete()){ showToast("Apenas MASTER CLASS pode editar.", true); return; }
+  if(!canEditarLanc()){ showToast("Você não tem permissão para editar.", true); return; }
   try{
     const { data, error } = await sb.from("BD_LANC").select("*").eq("id", id).limit(1);
+    if(!error && data && data.length && data[0].USER === "5520967"){ showToast("Este lançamento pertence ao usuário 5520967 e não pode ser editado.", true); return; }
     if(error) throw error;
     if(!data || !data.length){ showToast("Registro não encontrado.", true); return; }
     const r = data[0];
@@ -1342,7 +1642,7 @@ async function editarLancamento(id){
     document.getElementById("f_qtd_embalagem").value = "";
     document.getElementById("eanStatus").textContent = "";
     document.getElementById("f_validadeMsg").style.display = "none";
-    document.querySelector(".modal-header h3").textContent = "Editar Lançamento";
+    document.querySelector("#overlay .modal-header h3").textContent = "Editar Lançamento";
     document.getElementById("btnSalvar").textContent = "Atualizar";
     document.getElementById("overlay").classList.add("show");
   }catch(err){ showToast("Erro ao carregar: "+err.message, true); }
@@ -1371,8 +1671,9 @@ async function loadRelatorios(){
     renderReport("repMotivo", data, "MOTIVO");
     renderReport("repOrigem", data, "ORIGEM");
   }catch(err){ showToast("Erro ao carregar relatórios: "+err.message, true); }
+  const comingSoon = document.getElementById("prevReportComingSoon");
+  if(comingSoon) comingSoon.style.display = canRelatorioPrevencao() ? "" : "none";
 }
-
 function renderReport(elId, rows, field){
   const el = document.getElementById(elId);
   if(!rows || !rows.length){ el.innerHTML = '<p class="hint">Sem dados.</p>'; return; }
@@ -1389,7 +1690,7 @@ async function exportData(type){
   const table = document.getElementById("expTable").value;
   try{
     let q = sb.from(table).select("*").limit(5000);
-    const hasDateCol = table !== "BD_SALDO";
+    const hasDateCol = (table !== "BD_SALDO" && table !== "BD_LOJA");
     if(hasDateCol) q = q.order("DTA_HORA",{ascending:false});
     const from = document.getElementById("expFrom").value;
     const to = document.getElementById("expTo").value;
@@ -1416,7 +1717,6 @@ async function exportData(type){
     info.textContent = `${data.length} registro(s) exportado(s) de ${table}.`;
   }catch(err){ showToast("Erro ao exportar: "+err.message, true); }
 }
-
 function downloadBlob(blob, filename){
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -1474,6 +1774,7 @@ function goToPanel(type){
 
 /* ============ RETRABALHO ============ */
 function openRetrabalhoModal(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   document.getElementById("overlayRetrabalho").classList.add("show");
   ["rt_ean","rt_plu","rt_produto","rt_apanha","rt_categoria","rt_validade","rt_qtd_embalagem","rt_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("rtEanStatus").textContent="";
@@ -1511,11 +1812,7 @@ document.getElementById("rt_ean").addEventListener("keydown", async e=>{
     showToast("Erro ao buscar EAN: "+err.message, true);
   }
 });
-
-document.getElementById("rt_qtd_unidade").addEventListener("input", e=>{
-  e.target.value = e.target.value.replace(/[^0-9]/g,"");
-  checkQtdMultiploRetrabalho();
-});
+document.getElementById("rt_qtd_unidade").addEventListener("input", e=>{ e.target.value = e.target.value.replace(/[^0-9]/g,""); checkQtdMultiploRetrabalho(); });
 document.getElementById("rt_validade").addEventListener("change", ()=>atualizarMsgValidade("rt_validade","rt_validadeMsg"));
 
 function checkQtdMultiploRetrabalho(){
@@ -1524,39 +1821,26 @@ function checkQtdMultiploRetrabalho(){
   const embalagemRaw = document.getElementById("rt_qtd_embalagem").value.trim();
   const unidade = unidadeRaw === "" ? null : parseFloat(unidadeRaw);
   const embalagem = embalagemRaw === "" ? null : parseFloat(embalagemRaw);
-  if(embalagem !== null && embalagem > 1 && unidade !== null && unidade > 0 && (unidade % embalagem !== 0)){
-    warn.style.display = "block";
-    return false;
-  }
+  if(embalagem !== null && embalagem > 1 && unidade !== null && unidade > 0 && (unidade % embalagem !== 0)){ warn.style.display = "block"; return false; }
   warn.style.display = "none";
   return true;
 }
 
 async function salvarRetrabalho(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   const ean = document.getElementById("rt_ean").value.trim();
   const qtd = document.getElementById("rt_qtd_unidade").value.trim();
   if(!ean){ showToast("Informe o EAN.", true); return; }
   if(!qtd){ showToast("Informe a Qtd. Unidade.", true); return; }
-  if(!checkQtdMultiploRetrabalho()){
-    showToast("Quantidade não fecha caixas inteiras.", true);
-    return;
-  }
-  if(!atualizarMsgValidade("rt_validade","rt_validadeMsg")){
-    showToast("Corrija a validade antes de salvar.", true);
-    return;
-  }
+  if(!checkQtdMultiploRetrabalho()){ showToast("Quantidade não fecha caixas inteiras.", true); return; }
+  if(!atualizarMsgValidade("rt_validade","rt_validadeMsg")){ showToast("Corrija a validade antes de salvar.", true); return; }
   if(!currentUser){ showToast("Sessão expirada.", true); return; }
 
   const qtdNum = Number(qtd);
   const btn = document.getElementById("btnSalvarRetrabalho");
   btn.disabled = true; btn.textContent = "Verificando saldo…";
-  try{
-    await verificarSaldoSuficiente(ean, qtdNum);
-  }catch(err){
-    showToast(err.message, true);
-    btn.disabled = false; btn.textContent = "Salvar";
-    return;
-  }
+  try{ await verificarSaldoSuficiente(ean, qtdNum); }
+  catch(err){ showToast(err.message, true); btn.disabled = false; btn.textContent = "Salvar"; return; }
 
   const payload = {
     DTA_HORA: new Date().toISOString(),
@@ -1570,7 +1854,6 @@ async function salvarRetrabalho(){
     USER: currentUser.user,
     TURNO_LANC: calcularTurno()
   };
-
   btn.textContent = "Salvando…";
   try{
     const { error } = await sb.from("BD_RETRABALHO").insert(payload);
@@ -1578,24 +1861,20 @@ async function salvarRetrabalho(){
     await debitarSaldo(ean, qtdNum);
     showToast("Retrabalho salvo com sucesso");
     openRetrabalhoModal();
-  }catch(err){
-    showToast("Erro ao salvar retrabalho: "+err.message, true);
-  }finally{
-    btn.disabled = false; btn.textContent = "Salvar";
-  }
+  }catch(err){ showToast("Erro ao salvar retrabalho: "+err.message, true); }
+  finally{ btn.disabled = false; btn.textContent = "Salvar"; }
 }
 
 /* ============ DESCARTE ============ */
 (function populateDescarteMotivo(){
   const sel = document.getElementById("ds_motivo");
   ["Choque Mecânico","Dejetos de Animais","Degustação","Embalagem com Vazamento","Embalagem Rasgada","Falta de Produto","Furto","Queda de Produto","Tombamento","Vencimento"].forEach(m=>{
-    const o = document.createElement("option");
-    o.value = m; o.textContent = m;
-    sel.appendChild(o);
+    const o = document.createElement("option"); o.value = m; o.textContent = m; sel.appendChild(o);
   });
 })();
 
 function openDescarteModal(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   document.getElementById("overlayDescarte").classList.add("show");
   ["ds_ean","ds_plu","ds_produto","ds_apanha","ds_categoria","ds_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("ds_motivo").value="";
@@ -1630,10 +1909,10 @@ document.getElementById("ds_ean").addEventListener("keydown", async e=>{
     showToast("Erro ao buscar EAN: "+err.message, true);
   }
 });
-
 document.getElementById("ds_qtd_unidade").addEventListener("input", e=>{ e.target.value = e.target.value.replace(/[^0-9]/g,""); });
 
 async function salvarDescarte(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   const ean = document.getElementById("ds_ean").value.trim();
   const motivo = document.getElementById("ds_motivo").value;
   const qtd = document.getElementById("ds_qtd_unidade").value.trim();
@@ -1645,13 +1924,8 @@ async function salvarDescarte(){
   const qtdNum = Number(qtd);
   const btn = document.getElementById("btnSalvarDescarte");
   btn.disabled = true; btn.textContent = "Verificando saldo…";
-  try{
-    await verificarSaldoSuficiente(ean, qtdNum);
-  }catch(err){
-    showToast(err.message, true);
-    btn.disabled = false; btn.textContent = "Salvar";
-    return;
-  }
+  try{ await verificarSaldoSuficiente(ean, qtdNum); }
+  catch(err){ showToast(err.message, true); btn.disabled = false; btn.textContent = "Salvar"; return; }
 
   const payload = {
     DTA_HORA: new Date().toISOString(),
@@ -1665,7 +1939,6 @@ async function salvarDescarte(){
     MOTIVO: motivo,
     TURNO_LANC: calcularTurno()
   };
-
   btn.textContent = "Salvando…";
   try{
     const { error } = await sb.from("BD_DESCARTE").insert(payload);
@@ -1673,18 +1946,13 @@ async function salvarDescarte(){
     await debitarSaldo(ean, qtdNum);
     showToast("Descarte salvo com sucesso");
     openDescarteModal();
-  }catch(err){
-    showToast("Erro ao salvar descarte: "+err.message, true);
-  }finally{
-    btn.disabled = false; btn.textContent = "Salvar";
-  }
+  }catch(err){ showToast("Erro ao salvar descarte: "+err.message, true); }
+  finally{ btn.disabled = false; btn.textContent = "Salvar"; }
 }
 
 /* ============ GAIOLA ============ */
 let gaiolaStaged = [];
 let gaiolaAtual = { gaiola:"", loja:"" };
-
-// URL da planilha export CSV configurável
 let GAIOLA_SCRIPT_URL = localStorage.getItem("tp_gaiola_script_url") || "https://docs.google.com/spreadsheets/d/1byJ_HxofPZr1tLar2rvssPZIu_RbRLS-CYUFbAbkC40/export?format=csv";
 
 function gaiolaStorageKey(){ return "tp_gaiola_pending_" + (currentUser ? currentUser.user : "anon"); }
@@ -1693,6 +1961,7 @@ function loadGaiolaLocal(){ try{ const raw = localStorage.getItem(gaiolaStorageK
 function clearGaiolaLocal(){ localStorage.removeItem(gaiolaStorageKey()); }
 
 function checkPendingGaiola(){
+  if(!canLancar()) return;
   const pending = loadGaiolaLocal();
   if(pending && pending.items && pending.items.length){
     document.getElementById("pendGaiolaMsg").textContent = `Gaiola nº ${pending.gaiola} — Loja ${pending.loja} — ${pending.items.length} item(ns) pendentes.`;
@@ -1711,61 +1980,55 @@ function apagarGaiolaPendente(){
   document.getElementById("overlayGaiolaPendente").classList.remove("show");
   showToast("Pendentes da gaiola apagados");
 }
-
-// Buscar próximo número de gaiola do GAIOLAS_LANC
 async function fetchNextGaiolaNumber(){
-  const { data, error } = await sb
-    .from('GAIOLAS_LANC')
-    .select('GAIOLA')
-    .order('GAIOLA', { ascending: false })
-    .limit(1);
+  const { data, error } = await sb.from('GAIOLAS_LANC').select('GAIOLA').order('GAIOLA', { ascending: false }).limit(1);
   if(error) throw error;
   const max = data && data.length ? Number(data[0].GAIOLA) : 0;
   return max + 1;
 }
-
-// Consulta lojas da planilha CSV (colunas A=PLU, B=LOJA)
 async function carregarLojasPorPLU(plu){
   if(!GAIOLA_SCRIPT_URL) return [];
   try{
     const resp = await fetch(GAIOLA_SCRIPT_URL);
     const csvText = await resp.text();
     const linhas = csvText.split('\n').filter(l => l.trim());
-    if(linhas.length < 2) return []; // precisa de cabeçalho + dados
-
-    // Cabeçalho: primeira linha
+    if(linhas.length < 2) return [];
     const cabecalho = linhas[0].split(',').map(h => h.replace(/"/g, '').trim());
-    // Localiza índices das colunas "PLU" e "LOJA" (case-insensitive)
     const idxPLU = cabecalho.findIndex(h => h.toUpperCase() === 'PLU');
     const idxLoja = cabecalho.findIndex(h => h.toUpperCase() === 'LOJA');
     if(idxPLU === -1 || idxLoja === -1) return [];
-
     const lojasSet = new Set();
     for(let i = 1; i < linhas.length; i++){
       const valores = linhas[i].split(',').map(v => v.replace(/"/g, '').trim());
-      const pluLinha = valores[idxPLU];
-      const lojaLinha = valores[idxLoja];
-      if(pluLinha === plu && lojaLinha){
-        lojasSet.add(lojaLinha);
-      }
+      if(valores[idxPLU] === plu && valores[idxLoja]) lojasSet.add(valores[idxLoja]);
     }
     return [...lojasSet].sort();
-  }catch(e){
-    console.error('Erro ao consultar planilha:', e);
-    return [];
-  }
+  }catch(e){ console.error('Erro ao consultar planilha:', e); return []; }
 }
 
 async function openGaiolaModal(keepBatch){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   document.getElementById("overlayGaiola").classList.add("show");
   ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("glEanStatus").textContent="";
   if(!keepBatch && !gaiolaAtual.gaiola){
     document.getElementById("gl_gaiola").value = "Buscando…";
     try{ gaiolaAtual.gaiola = String(await fetchNextGaiolaNumber()); }catch(err){ gaiolaAtual.gaiola = ""; showToast("Erro ao buscar nº gaiola: "+err.message, true); }
+    // Nova gaiola — destravar Loja
+    document.getElementById("gl_loja").disabled = false;
+    document.getElementById("gl_loja").innerHTML = '<option value="">Escaneie o EAN do 1º item</option>';
+    document.getElementById("gl_loja").value = "";
+    document.getElementById("glLojaHint").textContent = "Escaneie o primeiro item para carregar as lojas disponíveis.";
   }
   document.getElementById("gl_gaiola").value = gaiolaAtual.gaiola;
   document.getElementById("gl_loja").value = gaiolaAtual.loja;
+  // Se já há itens na gaiola, travar o campo Loja
+  if(gaiolaStaged.length > 0){
+    document.getElementById("gl_loja").disabled = true;
+    document.getElementById("glLojaHint").textContent = "Loja travada — permanece fixa até salvar ou reiniciar a gaiola.";
+  }else{
+    document.getElementById("gl_loja").disabled = false;
+  }
   renderGaiolaStagedTable();
   setTimeout(()=>document.getElementById("gl_ean").focus(),80);
 }
@@ -1790,21 +2053,36 @@ document.getElementById("gl_ean").addEventListener("keydown", async e=>{
       document.getElementById("gl_produto").value = p.DESCCOMPLETA || "";
       document.getElementById("gl_categoria").value = p.NM_MERC_N1 || "";
       status.textContent = "✓ encontrado"; status.className = "ean-status found";
-
-      // Carrega lojas com base no PLU
-      const plu = p.SEQPRODUTO;
-      if(plu){
-        const lojas = await carregarLojasPorPLU(plu);
+      // Buscar lojas disponíveis no BD_LOJA pelo EAN (CODACESSO)
+      try{
+        const { data: lojaData, error: lojaErr } = await sb.from("BD_LOJA").select("NROEMPRESA").eq("CODACESSO", ean);
+        if(lojaErr) throw lojaErr;
+        const lojasSet = new Set();
+        if(lojaData){
+          lojaData.forEach(row => {
+            const nro = String(row.NROEMPRESA).trim();
+            if(nro && nro.toUpperCase() !== "INATIVO") lojasSet.add(nro);
+          });
+        }
+        const lojas = [...lojasSet].sort();
         const selectLoja = document.getElementById("gl_loja");
-        selectLoja.innerHTML = '<option value="">Selecione...</option>';
-        lojas.forEach(loja => {
-          const opt = document.createElement("option");
-          opt.value = loja;
-          opt.textContent = loja;
-          selectLoja.appendChild(opt);
-        });
-        document.getElementById("glLojaHint").textContent = lojas.length ? `${lojas.length} loja(s) encontrada(s)` : "Nenhuma loja para este PLU";
-      }
+        // Só permite trocar loja se ainda não há itens na gaiola
+        if(gaiolaStaged.length === 0){
+          selectLoja.innerHTML = '<option value="">Selecione...</option>';
+          lojas.forEach(loja => { const opt = document.createElement("option"); opt.value = loja; opt.textContent = loja; selectLoja.appendChild(opt); });
+          selectLoja.disabled = false;
+          document.getElementById("glLojaHint").textContent = lojas.length ? `${lojas.length} loja(s) encontrada(s)` : "Nenhuma loja para este EAN";
+        }else{
+          // Loja já travada — apenas sugere a mesma loja se disponível
+          if(lojas.length){
+            const lojaAtual = selectLoja.value;
+            if(!lojaAtual || !lojas.includes(lojaAtual)){
+              selectLoja.innerHTML = lojas.map(l => `<option value="${l}">${l}</option>`).join("");
+            }
+            document.getElementById("glLojaHint").textContent = "Loja travada (adicionei o 1º item). A loja permanece fixa até salvar ou reiniciar.";
+          }
+        }
+      }catch(e){ console.error("Erro ao buscar lojas:", e); }
       document.getElementById("gl_qtd_unidade").focus();
     }else{
       ["gl_plu","gl_produto","gl_categoria"].forEach(id=>document.getElementById(id).value="");
@@ -1815,34 +2093,48 @@ document.getElementById("gl_ean").addEventListener("keydown", async e=>{
     showToast("Erro ao buscar EAN: "+err.message, true);
   }
 });
-
 document.getElementById("gl_qtd_unidade").addEventListener("input", e=>{ e.target.value = e.target.value.replace(/[^0-9]/g,""); });
 
 async function adicionarItemGaiola(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   const ean = document.getElementById("gl_ean").value.trim();
   const plu = document.getElementById("gl_plu").value.trim();
   const produto = document.getElementById("gl_produto").value.trim();
   const categoria = document.getElementById("gl_categoria").value.trim();
   const qtd = document.getElementById("gl_qtd_unidade").value.trim();
   const loja = document.getElementById("gl_loja").value.trim();
+  const blockedMsg = document.getElementById("glBlockedMsg");
+  blockedMsg.style.display = "none";
 
   if(!ean){ showToast("Informe o EAN.", true); return; }
   if(!qtd){ showToast("Informe a Qtd. Unidade.", true); return; }
   if(!loja){ showToast("Informe a Loja.", true); return; }
 
+  // Bloqueia itens INATIVOS para a loja selecionada
+  try{
+    const ativo = await verificarItemAtivoNaLoja(ean, loja);
+    if(!ativo){
+      blockedMsg.textContent = `Item EAN ${ean} está INATIVO (ou não cadastrado) para a loja ${loja}. Lançamento bloqueado.`;
+      blockedMsg.style.display = "block";
+      showToast("Item inativo para esta loja — lançamento bloqueado.", true);
+      return;
+    }
+  }catch(err){ showToast("Erro ao validar item/loja: "+err.message, true); return; }
+
   const qtdNum = Number(qtd);
   const jaStagedEsteEan = gaiolaStaged.filter(it=>it.ean===ean).reduce((s,it)=>s+it.qtd,0);
-  try{
-    await verificarSaldoSuficiente(ean, jaStagedEsteEan + qtdNum);
-  }catch(err){
-    showToast(err.message, true);
-    return;
-  }
+  try{ await verificarSaldoSuficiente(ean, jaStagedEsteEan + qtdNum); }
+  catch(err){ showToast(err.message, true); return; }
 
   gaiolaAtual.loja = loja;
   gaiolaStaged.push({ ean, plu, produto, categoria, qtd: qtdNum });
   saveGaiolaLocal();
   renderGaiolaStagedTable();
+  // Travar o campo Loja após adicionar o primeiro item
+  if(gaiolaStaged.length >= 1){
+    document.getElementById("gl_loja").disabled = true;
+    document.getElementById("glLojaHint").textContent = "Loja travada — permanece fixa até salvar ou reiniciar a gaiola.";
+  }
   ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("glEanStatus").textContent="";
   document.getElementById("gl_ean").focus();
@@ -1852,6 +2144,9 @@ function reiniciarGaiola(){
   if(!confirm("Apagar todos os itens da gaiola?")) return;
   gaiolaStaged = []; gaiolaAtual = { gaiola: gaiolaAtual.gaiola, loja: "" };
   document.getElementById("gl_loja").value = "";
+  document.getElementById("gl_loja").disabled = false;
+  document.getElementById("gl_loja").innerHTML = '<option value="">Escaneie o EAN do 1º item</option>';
+  document.getElementById("glLojaHint").textContent = "Escaneie o primeiro item para carregar as lojas disponíveis.";
   saveGaiolaLocal();
   renderGaiolaStagedTable();
 }
@@ -1861,23 +2156,9 @@ function renderGaiolaStagedTable(){
   tbody.innerHTML = gaiolaStaged.map((it,idx)=>`<tr><td class="code">${it.ean}</td><td>${it.plu||"—"}</td><td>${it.produto||"—"}</td><td>${it.categoria||"—"}</td><td>${it.qtd}</td><td><button class="icon-btn" onclick="removerItemGaiola(${idx})">🗑</button></td></tr>`).join("");
 }
 
-// O salvamento ainda pode usar o Apps Script original (se configurado), mas o envio pode ser adaptado.
-// Por enquanto, mantemos o envio via Apps Script (se a URL antiga estiver configurada).
-// Caso contrário, apenas salvamos localmente (mas isso já era feito).
-// Vou manter a função salvarGaiola como estava, usando a URL do Apps Script.
-// Se você quiser substituir totalmente pelo Supabase, é só ajustar.
-// Mas como o usuário falou apenas da consulta, vou manter o salvamento como estava.
 async function salvarGaiola(){
+  if(!canLancar()){ showToast("Seu nível de usuário não permite lançar.", true); return; }
   if(!gaiolaStaged.length){ showToast("Adicione pelo menos um item.", true); return; }
-  // Aqui, se GAIOLA_SCRIPT_URL for o link do CSV, não serve para salvar.
-  // Vamos manter a variável antiga para o endpoint de salvamento.
-  // Vou criar uma variável separada para o salvamento.
-  const saveUrl = localStorage.getItem("tp_gaiola_script_save_url") || GAIOLA_SCRIPT_URL; // fallback
-  if(!saveUrl || saveUrl.includes("export?format=csv")){
-    showToast("Configure a URL de salvamento da gaiola (Apps Script) nas Configurações.", true);
-    return;
-  }
-
   const loja = document.getElementById("gl_loja").value.trim();
   if(!loja){ showToast("Informe a Loja.", true); return; }
   gaiolaAtual.loja = loja;
@@ -1885,50 +2166,171 @@ async function salvarGaiola(){
   const turno = calcularTurno();
   const btn = document.getElementById("btnSalvarGaiola");
   btn.disabled = true; btn.textContent = "Verificando saldo…";
-
   try{
     const somaPorEan = {};
     gaiolaStaged.forEach(it=>{ somaPorEan[it.ean] = (somaPorEan[it.ean]||0) + it.qtd; });
-    for(const ean in somaPorEan){
-      await verificarSaldoSuficiente(ean, somaPorEan[ean]);
-    }
-  }catch(err){
-    showToast(err.message, true);
-    btn.disabled = false; btn.textContent = "Salvar Gaiola (enviar tudo)";
-    return;
-  }
+    for(const ean in somaPorEan){ await verificarSaldoSuficiente(ean, somaPorEan[ean]); }
+  }catch(err){ showToast(err.message, true); btn.disabled = false; btn.textContent = "Salvar Gaiola (enviar tudo)"; return; }
 
-  btn.textContent = "Enviando…";
+  btn.textContent = "Enviando para o Supabase…";
   try{
-    const payload = {
-      action: "saveGaiola",
-      gaiola: gaiolaAtual.gaiola,
-      loja: gaiolaAtual.loja,
-      usuario: currentUser ? currentUser.user : "",
-      turno: turno,
-      items: gaiolaStaged.map(it=>({ ...it, turno }))
+    const registroAtual = {
+      DTA_HORA: new Date().toISOString(),
+      GAIOLA: gaiolaAtual.gaiola,
+      LOJA: gaiolaAtual.loja,
+      USER: currentUser ? currentUser.user : "",
+      TURNO_LANC: turno
     };
-    const res = await fetch(saveUrl, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
-    const result = await res.json();
-    if(!result || !result.success) throw new Error(result && result.error ? result.error : "Falha ao gravar.");
 
-    for(const it of gaiolaStaged){
-      try{ await debitarSaldo(it.ean, it.qtd); }catch(e){ console.error("Erro ao debitar saldo do EAN "+it.ean, e); }
-    }
+    // Salvar cada item como um registro individual no BD_GAIOLA
+    const registros = gaiolaStaged.map(it => ({
+      ...registroAtual,
+      EAN: it.ean || null,
+      PLU: it.plu || null,
+      PRODUTO: it.produto || null,
+      CATEGORIA: it.categoria || null,
+      "QTD UN": it.qtd
+    }));
 
-    showToast(`Gaiola ${gaiolaAtual.gaiola} enviada com sucesso (${gaiolaStaged.length} itens)`);
+    const { error } = await sb.from("BD_GAIOLA").insert(registros);
+    if(error) throw error;
+
+    for(const it of gaiolaStaged){ try{ await debitarSaldo(it.ean, it.qtd); }catch(e){ console.error("Erro ao debitar saldo do EAN "+it.ean, e); } }
+    showToast(`Gaiola ${gaiolaAtual.gaiola} salva com sucesso no BD_GAIOLA (${gaiolaStaged.length} itens)`);
     gaiolaStaged = []; gaiolaAtual = { gaiola:"", loja:"" };
     clearGaiolaLocal();
     closeGaiolaModal();
-  }catch(err){
-    showToast("Erro ao enviar gaiola: "+err.message, true);
-  }finally{
-    btn.disabled = false; btn.textContent = "Salvar Gaiola (enviar tudo)";
+  }catch(err){ showToast("Erro ao salvar gaiola no Supabase: "+err.message, true); }
+  finally{ btn.disabled = false; btn.textContent = "Salvar Gaiola (enviar tudo)"; }
+}
+
+/* ============ ATUALIZAR BASE DE LOJAS (BD_LOJA) ============ */
+function logLoja(msg){
+  const el = document.getElementById("lojaSyncLog");
+  el.textContent += msg + "\n";
+  el.scrollTop = el.scrollHeight;
+}
+async function lerArquivoComoObjetos(file){
+  const nome = file.name.toLowerCase();
+  if(nome.endsWith(".xlsx") || nome.endsWith(".xls")){
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:"array"});
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    return XLSX.utils.sheet_to_json(sheet, {defval:""});
   }
+  const text = await file.text();
+  return parseCsvTxtParaObjetos(text);
+}
+function detectarDelimitador(linhaCabecalho){
+  const candidatos = [";", ",", "\t", "|"];
+  let melhor = ";", max = 0;
+  candidatos.forEach(d=>{ const n = linhaCabecalho.split(d).length; if(n > max){ max = n; melhor = d; } });
+  return melhor;
+}
+function parseCsvTxtParaObjetos(text){
+  const linhas = text.split(/\r?\n/).filter(l=>l.trim()!=="");
+  if(!linhas.length) return [];
+  const delim = detectarDelimitador(linhas[0]);
+  const cabecalho = linhas[0].split(delim).map(h=>h.replace(/["']/g,"").trim());
+  const objs = [];
+  for(let i=1;i<linhas.length;i++){
+    const valores = linhas[i].split(delim).map(v=>v.replace(/["']/g,"").trim());
+    const obj = {};
+    cabecalho.forEach((h,idx)=>{ obj[h] = valores[idx] !== undefined ? valores[idx] : ""; });
+    objs.push(obj);
+  }
+  return objs;
+}
+function acharCampo(obj, ...nomes){
+  const chaves = Object.keys(obj);
+  for(const nome of nomes){
+    const achado = chaves.find(k => k.replace(/[^A-Za-z0-9]/g,"").toUpperCase() === nome.replace(/[^A-Za-z0-9]/g,"").toUpperCase());
+    if(achado !== undefined) return obj[achado];
+  }
+  return "";
+}
+function normalizarLinhaLoja(obj){
+  const codacesso = String(acharCampo(obj,"CODACESSO")).trim();
+  const seqproduto = String(acharCampo(obj,"SEQPRODUTO")).trim();
+  const desccompleta = String(acharCampo(obj,"DESCCOMPLETA")).trim();
+  const nroempresa = String(acharCampo(obj,"NROEMPRESA")).trim();
+  if(!codacesso || !nroempresa) return null;
+  return { CODACESSO: codacesso, SEQPRODUTO: seqproduto, DESCCOMPLETA: desccompleta, NROEMPRESA: nroempresa };
+}
+async function processarPastaLojas(){
+  if(!canAtualizarBase()){ showToast("Você não tem permissão para atualizar a base de lojas.", true); return; }
+  const input = document.getElementById("lojaFolderInput");
+  const files = Array.from(input.files || []).filter(f=>{
+    const n = f.name.toLowerCase();
+    return n.endsWith(".csv") || n.endsWith(".txt") || n.endsWith(".xlsx") || n.endsWith(".xls");
+  });
+  if(!files.length){ showToast("Selecione uma pasta com arquivos válidos (csv, txt, xlsx).", true); return; }
+
+  document.getElementById("lojaSyncLog").textContent = "";
+  logLoja(`Encontrados ${files.length} arquivo(s) na pasta.`);
+
+  const mapaNovo = new Map();
+  for(const file of files){
+    try{
+      logLoja(`Lendo ${file.name}...`);
+      const linhas = await lerArquivoComoObjetos(file);
+      let validas = 0;
+      linhas.forEach(l=>{
+        const n = normalizarLinhaLoja(l);
+        if(n){ mapaNovo.set(n.CODACESSO + "|" + n.NROEMPRESA, n); validas++; }
+      });
+      logLoja(`  → ${validas} linha(s) válida(s) de ${linhas.length}.`);
+    }catch(err){ logLoja(`  ⚠ erro ao ler ${file.name}: ${err.message}`); }
+  }
+  logLoja(`Total de combinações únicas EAN+Loja no upload: ${mapaNovo.size}`);
+  if(!mapaNovo.size){ showToast("Nenhuma linha válida encontrada nos arquivos.", true); return; }
+
+  logLoja("Consultando base atual em BD_LOJA...");
+  const mapaAtual = new Map();
+  let from = 0; const pageSize = 1000; let seguir = true;
+  while(seguir){
+    const { data, error } = await sb.from("BD_LOJA").select("*").range(from, from+pageSize-1);
+    if(error){ logLoja("Erro ao consultar BD_LOJA: "+error.message); showToast("Erro ao consultar BD_LOJA: "+error.message, true); return; }
+    (data||[]).forEach(r=>{ mapaAtual.set(String(r.CODACESSO).trim() + "|" + String(r.NROEMPRESA).trim(), r); });
+    if(!data || data.length < pageSize) seguir = false;
+    from += pageSize;
+  }
+  logLoja(`Registros atuais em BD_LOJA: ${mapaAtual.size}`);
+
+  const paraInserir = [];
+  mapaNovo.forEach((v,chave)=>{ if(!mapaAtual.has(chave)) paraInserir.push(v); });
+
+  const paraInativar = [];
+  mapaAtual.forEach((v,chave)=>{
+    const jaInativo = String(v.NROEMPRESA).trim().toUpperCase() === "INATIVO";
+    if(!mapaNovo.has(chave) && !jaInativo) paraInativar.push(v);
+  });
+
+  logLoja(`Novos itens a inserir: ${paraInserir.length}`);
+  logLoja(`Itens a marcar como INATIVO: ${paraInativar.length}`);
+
+  const LOTE = 500;
+  for(let i=0;i<paraInserir.length;i+=LOTE){
+    const lote = paraInserir.slice(i,i+LOTE);
+    const { error } = await sb.from("BD_LOJA").insert(lote);
+    if(error){ logLoja(`  ⚠ erro ao inserir lote iniciado em ${i}: ${error.message}`); }
+    else{ logLoja(`  → inseridos ${Math.min(i+LOTE,paraInserir.length)}/${paraInserir.length}`); }
+  }
+
+  for(let i=0;i<paraInativar.length;i++){
+    const item = paraInativar[i];
+    try{
+      if(item.id !== undefined && item.id !== null){
+        await sb.from("BD_LOJA").update({ NROEMPRESA: "INATIVO" }).eq("id", item.id);
+      }else{
+        await sb.from("BD_LOJA").update({ NROEMPRESA: "INATIVO" }).eq("CODACESSO", item.CODACESSO).eq("NROEMPRESA", item.NROEMPRESA);
+      }
+      if((i+1) % 50 === 0) logLoja(`  → inativados ${i+1}/${paraInativar.length}`);
+    }catch(err){ logLoja(`  ⚠ erro ao inativar ${item.CODACESSO}: ${err.message}`); }
+  }
+
+  logLoja("✅ Sincronização concluída.");
+  showToast("Base de lojas sincronizada com sucesso.");
 }
 
 /* ============ USUÁRIOS ============ */
@@ -1944,20 +2346,21 @@ async function loadUsuarios(){
     usersCache = data || [];
     if(!usersCache.length){ tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum usuário</td></tr>'; return; }
     tbody.innerHTML = usersCache.map((u,idx)=>{
-      const isMaster = Number(u.LEVEL)===1;
+      const nivelNum = Number(u.LEVEL) || 2;
       const isAtivo = String(u.STATE ?? "1")==="1";
-      return `<tr><td class="code">${u.USER||""}</td><td>${u.NAME_USER||"—"}</td><td><span class="tag ${isMaster?'ok':''}">${isMaster?'MASTER CLASS':'Nível 0'}</span></td><td><span class="tag ${isAtivo?'ok':'warn'}">${isAtivo?'Ativo':'Inativo'}</span></td><td><div class="row-actions"><button class="icon-btn" onclick="editarUsuario(${idx})">✎</button></div></td></tr>`;
+      const isProtected = u.USER === "5520967";
+      const userActions = isProtected ? '<span class="hint" style="color:var(--ink-faint)">🔒 Protegido</span>' : `<div class="row-actions"><button class="icon-btn" onclick="editarUsuario(${idx})">✎</button></div>`;
+      return `<tr><td class="code">${u.USER||""}</td><td>${u.NAME_USER||"—"}</td><td><span class="tag ${nivelNum===1?'ok':''}">${NIVEL_LABELS[nivelNum]||('Nível '+nivelNum)}</span></td><td><span class="tag ${isAtivo?'ok':'warn'}">${isAtivo?'Ativo':'Inativo'}</span></td><td>${userActions}</td></tr>`;
     }).join("");
   }catch(err){ tbody.innerHTML = `<tr><td colspan="5" class="empty">Erro: ${err.message}</td></tr>`; }
 }
-
 function openUserModal(){
-  if(!canEditDelete()){ showToast("Apenas MASTER CLASS.", true); return; }
+  if(!canGerenciarUsuarios()){ showToast("Apenas usuários nível 1.", true); return; }
   editingOriginalUser = null;
   document.getElementById("userModalTitle").textContent = "Novo Usuário";
   document.getElementById("btnSalvarUser").textContent = "Salvar";
   ["us_user","us_password","us_name"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("us_level").value = "0";
+  document.getElementById("us_level").value = "2";
   document.getElementById("us_state").value = "1";
   document.getElementById("overlayUser").classList.add("show");
   setTimeout(()=>document.getElementById("us_user").focus(),80);
@@ -1966,22 +2369,22 @@ function closeUserModal(){ document.getElementById("overlayUser").classList.remo
 document.getElementById("overlayUser").addEventListener("click", e=>{ if(e.target.id==="overlayUser") closeUserModal(); });
 
 function editarUsuario(idx){
-  if(!canEditDelete()){ showToast("Apenas MASTER CLASS.", true); return; }
+  if(!canGerenciarUsuarios()){ showToast("Apenas usuários nível 1.", true); return; }
   const u = usersCache[idx];
   if(!u){ showToast("Usuário não encontrado.", true); return; }
+  if(u.USER === "5520967"){ showToast("O usuário 5520967 não pode ser editado.", true); return; }
   editingOriginalUser = u.USER;
   document.getElementById("us_user").value = u.USER || "";
   document.getElementById("us_password").value = u.PASSWORD || "";
   document.getElementById("us_name").value = u.NAME_USER || "";
-  document.getElementById("us_level").value = Number(u.LEVEL)===1 ? "1" : "0";
+  document.getElementById("us_level").value = String(Number(u.LEVEL) || 2);
   document.getElementById("us_state").value = String(u.STATE ?? "1")==="1" ? "1" : "0";
   document.getElementById("userModalTitle").textContent = "Editar Usuário";
   document.getElementById("btnSalvarUser").textContent = "Atualizar";
   document.getElementById("overlayUser").classList.add("show");
 }
-
 async function salvarUsuario(){
-  if(!canEditDelete()){ showToast("Apenas MASTER CLASS.", true); return; }
+  if(!canGerenciarUsuarios()){ showToast("Apenas usuários nível 1.", true); return; }
   const usuario = document.getElementById("us_user").value.trim();
   const senha = document.getElementById("us_password").value.trim();
   const nome = document.getElementById("us_name").value.trim();
@@ -1989,11 +2392,21 @@ async function salvarUsuario(){
   const state = document.getElementById("us_state").value;
   if(!usuario){ showToast("Informe o Usuário.", true); return; }
   if(!senha){ showToast("Informe a Senha.", true); return; }
-  const payload = { USER: usuario, PASSWORD: senha, NAME_USER: nome || null, LEVEL: Number(level), STATE: state };
+
   const btn = document.getElementById("btnSalvarUser");
   const isEditing = !!editingOriginalUser;
   btn.disabled = true; btn.textContent = isEditing ? "Atualizando…" : "Salvando…";
+
   try{
+    if(!isEditing){
+      const { data: existentes, error: exErr } = await sb.from("BD_USER").select("USER").ilike("USER", usuario).limit(1);
+      if(exErr) throw exErr;
+      if(existentes && existentes.length){
+        showToast("Já existe um usuário com esse nome. Escolha outro.", true);
+        return;
+      }
+    }
+    const payload = { USER: usuario, PASSWORD: senha, NAME_USER: nome || null, LEVEL: Number(level), STATE: state };
     let error;
     if(isEditing){ ({ error } = await sb.from("BD_USER").update(payload).eq("USER", editingOriginalUser)); }
     else{ ({ error } = await sb.from("BD_USER").insert(payload)); }
@@ -2002,7 +2415,8 @@ async function salvarUsuario(){
     closeUserModal();
     loadUsuarios();
   }catch(err){
-    showToast("Erro: "+err.message, true);
+    const msg = String(err.message||"");
+    showToast(msg.includes("duplicate key") ? "Erro: nome de usuário já existe." : "Erro: "+msg, true);
   }finally{
     btn.disabled = false; btn.textContent = isEditing ? "Atualizar" : "Salvar";
   }
@@ -2040,6 +2454,7 @@ function resetConfig(){
 function fmtDate(iso){
   if(!iso) return "—";
   const d = new Date(iso);
+  if(isNaN(d)) return String(iso);
   return d.toLocaleDateString("pt-BR")+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
 }
 
