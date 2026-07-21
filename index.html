@@ -11,8 +11,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
 <style>
 :root{
@@ -114,6 +114,7 @@ tbody tr:hover{background:#fafbff}
 .tag{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;background:var(--blue-100);color:var(--blue-600)}
 .tag.warn{background:#fdf1de;color:var(--amber)}
 .tag.ok{background:#e5f6ec;color:var(--green)}
+.tag.purple{background:#f1e9fd;color:var(--purple)}
 .row-actions{display:flex;gap:6px}
 .icon-btn{
   border:1px solid var(--line);background:#fff;border-radius:7px;width:28px;height:28px;cursor:pointer;
@@ -298,6 +299,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
     <a href="#" data-view="dashboard" class="active"><span class="ic">▦</span><span class="label">Dashboard</span></a>
     <a href="#" data-view="lancamentos"><span class="ic">＋</span><span class="label">Lançamentos</span></a>
     <a href="#" data-view="historico"><span class="ic">≡</span><span class="label">Histórico</span></a>
+    <a href="#" data-view="ultimos"><span class="ic">⏱</span><span class="label">Últimos Lançamentos</span></a>
     <a href="#" data-view="pendentes"><span class="ic">◔</span><span class="label">Pendentes</span></a>
     <div class="menu-label">Gestão</div>
     <a href="#" data-view="exportar"><span class="ic">⭳</span><span class="label">Exportar</span></a>
@@ -456,6 +458,29 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
       </div>
     </div>
 
+    <!-- ÚLTIMOS LANÇAMENTOS (TODOS OS TIPOS) -->
+    <div class="view" id="view-ultimos">
+      <div class="panel">
+        <div class="filters">
+          <select id="fUltimoTipo">
+            <option value="">Todos os tipos</option>
+            <option value="Lançamento">Lançamento</option>
+            <option value="Retrabalho">Retrabalho</option>
+            <option value="Descarte">Descarte</option>
+            <option value="Gaiola">Gaiola</option>
+          </select>
+          <button class="btn" onclick="loadUltimosLancamentos()">Filtrar</button>
+          <button class="btn ghost" onclick="document.getElementById('fUltimoTipo').value='';loadUltimosLancamentos();">Limpar</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Data/Hora</th><th>Tipo</th><th>EAN</th><th>Produto</th><th>Motivo</th><th>Origem</th><th>Loja</th><th>Gaiola</th><th>Qtd Un</th><th>Usuário</th></tr></thead>
+            <tbody id="ultimosTable"><tr><td colspan="10" class="empty">Carregando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- PENDENTES -->
     <div class="view" id="view-pendentes">
       <div class="panel">
@@ -589,7 +614,7 @@ input[readonly]{background:#f6f7fb;color:var(--ink-soft)}
         <div class="panel">
           <div class="panel-head"><h4>Sobre</h4></div>
           <div class="panel-body">
-            <p class="hint">Triagem Pro v1.1 — sistema 100% client-side (HTML/CSS/JS), integrado ao Supabase e Google Sheets.</p>
+            <p class="hint">Triagem Pro v1.2 — sistema 100% client-side (HTML/CSS/JS), integrado ao Supabase e Google Sheets.</p>
           </div>
         </div>
       </div>
@@ -944,8 +969,7 @@ function atualizarMsgValidade(inputId, msgId){
   return true;
 }
 
-/* ============ NÍVEIS DE USUÁRIO (1-6) ============ */
-// 1 Acesso total | 2 Lançar | 3 Editar lançamentos | 4 Atualizar base (lojas) | 5 Relatório prevenção | 6 Somente consulta
+/* ============ NÍVEIS DE USUÁRIO (1-9) ============ */
 function lvl(){ return currentUser ? Number(currentUser.level) : 0; }
 function isTotal(){ return lvl() === 1; }
 function canLancar(){ return lvl() === 1 || lvl() === 2 || lvl() === 7 || lvl() === 8; }
@@ -956,7 +980,7 @@ function isSomenteConsulta(){ return lvl() === 6; }
 function canExportar(){ return isTotal() || lvl() === 8 || lvl() === 9; }
 function canGerenciarUsuarios(){ return isTotal(); }
 function canConfig(){ return isTotal(); }
-function canEditDelete(){ return canEditarLanc(); } // compat
+function canEditDelete(){ return canEditarLanc(); }
 
 const NIVEL_LABELS = {1:"Acesso Total",2:"Lançar",3:"Editar Lançamentos",4:"Atualizar Base",5:"Relatório Prevenção",6:"Somente Consulta",7:"Lançar e Editar",8:"Lançar e Exportar",9:"Consulta e Relatórios"};
 
@@ -1076,6 +1100,7 @@ const titles = {
   dashboard:["Dashboard","Visão geral da triagem"],
   lancamentos:["Lançamentos","Registros mais recentes"],
   historico:["Histórico","Consulte e filtre todos os lançamentos"],
+  ultimos:["Últimos Lançamentos","Todos os tipos: Lançamento, Retrabalho, Descarte e Gaiola"],
   pendentes:["Pendentes","Lançamentos com produto não identificado"],
   exportar:["Exportar","Baixe os dados em CSV ou Excel"],
   relatorios:["Relatórios","Indicadores por motivo e origem"],
@@ -1100,6 +1125,7 @@ function switchView(name){
   if(name==="dashboard") loadDashboard();
   if(name==="lancamentos") loadLancamentos();
   if(name==="historico") loadHistorico();
+  if(name==="ultimos") loadUltimosLancamentos();
   if(name==="pendentes") loadPendentes();
   if(name==="relatorios") loadRelatorios();
   if(name==="lojas"){
@@ -1329,7 +1355,7 @@ function montarChartsGrid(){
     criarPainelGrafico("chartTopItens","Top 10 Itens Mais Lançados"),
     criarPainelGrafico("chartTopMotivos","Top 10 Motivos Mais Lançados"),
     criarPainelGrafico("chartTopOrigens","Top Origens Mais Lançadas"),
-    criarPainelGrafico("chartValidade","Controle de Validade"),
+    criarPainelGrafico("chartValidade","Controle de Validade (3 em 3 meses)"),
     criarPainelGrafico("chartCategoria","Categoria Mais Lançada"),
     criarPainelGrafico("chartTopRuas","Top 10 Ruas Mais Lançadas"),
     criarPainelGrafico("chartTopDonos","Top 10 Donos Mais Lançados"),
@@ -1355,7 +1381,7 @@ function renderBarChart(canvasId, labels, valores, totalFiltrado, horizontal){
       plugins:{
         legend:{display:false},
         datalabels:{
-          anchor:"end", align: horizontal ? "end":"top",
+          anchor:"end", align: horizontal ? "right":"top",
           formatter:(v)=> v>0 ? (fmtNum(v) + " (" + fmtPct(v, totalFiltrado) + ")") : "",
           color:"#111629", font:{weight:"700", size:10}
         }
@@ -1398,15 +1424,16 @@ function bucketValidade(validadeStr){
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const v = new Date(validadeStr+"T00:00:00");
   if(isNaN(v)) return null;
-  const dias = Math.round((v-hoje)/86400000);
-  if(dias < 0) return "Vencido";
-  if(dias <= 7) return "≤ 7 dias";
-  if(dias <= 30) return "≤ 30 dias";
-  if(dias <= 90) return "≤ 90 dias";
-  return "> 90 dias";
+  const meses = Math.round((v - hoje) / (86400000 * 30.44));
+  if(meses < 0) return "Vencido";
+  if(meses <= 3) return "≤ 3 meses";
+  if(meses <= 6) return "3-6 meses";
+  if(meses <= 9) return "6-9 meses";
+  if(meses <= 12) return "9-12 meses";
+  return "> 12 meses";
 }
 function renderControleValidade(rows, totalFiltrado){
-  const buckets = {"Vencido":0,"≤ 7 dias":0,"≤ 30 dias":0,"≤ 90 dias":0,"> 90 dias":0};
+  const buckets = {"Vencido":0,"≤ 3 meses":0,"3-6 meses":0,"6-9 meses":0,"9-12 meses":0,"> 12 meses":0};
   rows.forEach(r=>{ const b = bucketValidade(r.VALIDADE); if(b) buckets[b] += (Number(r.QTD_UNIDADE)||0); });
   renderBarChart("chartValidade", Object.keys(buckets), Object.values(buckets), totalFiltrado, false);
 }
@@ -1599,6 +1626,53 @@ function clearFilters(){
   const sel = document.getElementById("fMotivo");
   motivos.forEach(m=>{ const o = document.createElement("option"); o.value = m; o.textContent = m; sel.appendChild(o); });
 })();
+
+/* ============ ÚLTIMOS LANÇAMENTOS (TODOS OS TIPOS) ============ */
+async function loadUltimosLancamentos(){
+  const tbody = document.getElementById("ultimosTable");
+  tbody.innerHTML = '<tr><td colspan="10" class="empty">Carregando…</td></tr>';
+  const tipoFiltro = document.getElementById("fUltimoTipo").value;
+  try{
+    const promessas = [];
+    if(!tipoFiltro || tipoFiltro === "Lançamento") promessas.push(sb.from("BD_LANC").select("*").order("DTA_HORA",{ascending:false}).limit(100).then(r=>({tipo:"Lançamento", data:r.data||[]})));
+    if(!tipoFiltro || tipoFiltro === "Retrabalho") promessas.push(sb.from("BD_RETRABALHO").select("*").order("DTA_HORA",{ascending:false}).limit(100).then(r=>({tipo:"Retrabalho", data:r.data||[]})));
+    if(!tipoFiltro || tipoFiltro === "Descarte") promessas.push(sb.from("BD_DESCARTE").select("*").order("DTA_HORA",{ascending:false}).limit(100).then(r=>({tipo:"Descarte", data:r.data||[]})));
+    if(!tipoFiltro || tipoFiltro === "Gaiola") promessas.push(sb.from("BD_GAIOLA").select("*").order("DTA_HORA",{ascending:false}).limit(100).then(r=>({tipo:"Gaiola", data:r.data||[]})));
+
+    const resultados = await Promise.all(promessas);
+    let todos = [];
+    resultados.forEach(({tipo, data})=>{
+      data.forEach(r=>todos.push({...r, TIPO: tipo}));
+    });
+    todos.sort((a,b)=>new Date(b.DTA_HORA) - new Date(a.DTA_HORA));
+    todos = todos.slice(0, 100);
+
+    if(!todos.length){
+      tbody.innerHTML = '<tr><td colspan="10" class="empty"><div class="big">📭</div>Nenhum lançamento encontrado</td></tr>';
+      return;
+    }
+    tbody.innerHTML = todos.map(r=>{
+      const tipoTag = r.TIPO === "Lançamento" ? '<span class="tag ok">Lançamento</span>' :
+                      r.TIPO === "Retrabalho" ? '<span class="tag warn">Retrabalho</span>' :
+                      r.TIPO === "Descarte" ? '<span class="tag" style="background:#fdecec;color:var(--red)">Descarte</span>' :
+                      '<span class="tag purple">Gaiola</span>';
+      return `<tr>
+        <td>${fmtDate(r.DTA_HORA)}</td>
+        <td>${tipoTag}</td>
+        <td class="code">${r.EAN||"—"}</td>
+        <td>${r.PRODUTO||"—"}</td>
+        <td>${r.MOTIVO||"—"}</td>
+        <td>${r.ORIGEM||"—"}</td>
+        <td>${r.LOJA||"—"}</td>
+        <td class="code">${r.GAIOLA||"—"}</td>
+        <td>${r.QTD_UNIDADE||r["QTD UN"]||"—"}</td>
+        <td>${r.USER||"—"}</td>
+      </tr>`;
+    }).join("");
+  }catch(err){
+    tbody.innerHTML = `<tr><td colspan="10" class="empty">Erro: ${err.message}</td></tr>`;
+  }
+}
 
 /* ============ AÇÕES DA LINHA ============ */
 function rowActionsHtml(r){
@@ -1983,27 +2057,9 @@ function apagarGaiolaPendente(){
 async function fetchNextGaiolaNumber(){
   const { data, error } = await sb.from('GAIOLAS_LANC').select('GAIOLA').order('GAIOLA', { ascending: false }).limit(1);
   if(error) throw error;
-  const max = data && data.length ? Number(data[0].GAIOLA) : 0;
+  // GAIOLA pode ser texto, então convertemos para número
+  const max = data && data.length ? (parseInt(String(data[0].GAIOLA).replace(/\D/g,'')) || 0) : 0;
   return max + 1;
-}
-async function carregarLojasPorPLU(plu){
-  if(!GAIOLA_SCRIPT_URL) return [];
-  try{
-    const resp = await fetch(GAIOLA_SCRIPT_URL);
-    const csvText = await resp.text();
-    const linhas = csvText.split('\n').filter(l => l.trim());
-    if(linhas.length < 2) return [];
-    const cabecalho = linhas[0].split(',').map(h => h.replace(/"/g, '').trim());
-    const idxPLU = cabecalho.findIndex(h => h.toUpperCase() === 'PLU');
-    const idxLoja = cabecalho.findIndex(h => h.toUpperCase() === 'LOJA');
-    if(idxPLU === -1 || idxLoja === -1) return [];
-    const lojasSet = new Set();
-    for(let i = 1; i < linhas.length; i++){
-      const valores = linhas[i].split(',').map(v => v.replace(/"/g, '').trim());
-      if(valores[idxPLU] === plu && valores[idxLoja]) lojasSet.add(valores[idxLoja]);
-    }
-    return [...lojasSet].sort();
-  }catch(e){ console.error('Erro ao consultar planilha:', e); return []; }
 }
 
 async function openGaiolaModal(keepBatch){
@@ -2182,8 +2238,8 @@ async function salvarGaiola(){
       TURNO_LANC: turno
     };
 
-    // Salvar cada item como um registro individual no BD_GAIOLA
-    const registros = gaiolaStaged.map(it => ({
+    // 1. Salvar cada item como um registro individual no BD_GAIOLA (tabela existente)
+    const registrosBDGaiola = gaiolaStaged.map(it => ({
       ...registroAtual,
       EAN: it.ean || null,
       PLU: it.plu || null,
@@ -2191,12 +2247,23 @@ async function salvarGaiola(){
       CATEGORIA: it.categoria || null,
       "QTD UN": it.qtd
     }));
+    const { error: errBDGaiola } = await sb.from("BD_GAIOLA").insert(registrosBDGaiola);
+    if(errBDGaiola) throw errBDGaiola;
 
-    const { error } = await sb.from("BD_GAIOLA").insert(registros);
-    if(error) throw error;
+    // 2. NOVO: Salvar na tabela GAIOLAS_LANC (registro único por gaiola)
+    const registroGaiolasLanc = {
+      DTA_HORA: new Date().toISOString(),
+      GAIOLA: gaiolaAtual.gaiola,
+      LOJA: gaiolaAtual.loja,
+      TURNO_LANC: turno,
+      USER: currentUser ? currentUser.user : ""
+    };
+    const { error: errGaiolasLanc } = await sb.from("GAIOLAS_LANC").insert(registroGaiolasLanc);
+    if(errGaiolasLanc) throw errGaiolasLanc;
 
+    // 3. Debitar saldo
     for(const it of gaiolaStaged){ try{ await debitarSaldo(it.ean, it.qtd); }catch(e){ console.error("Erro ao debitar saldo do EAN "+it.ean, e); } }
-    showToast(`Gaiola ${gaiolaAtual.gaiola} salva com sucesso no BD_GAIOLA (${gaiolaStaged.length} itens)`);
+    showToast(`Gaiola ${gaiolaAtual.gaiola} salva com sucesso!`);
     gaiolaStaged = []; gaiolaAtual = { gaiola:"", loja:"" };
     clearGaiolaLocal();
     closeGaiolaModal();
