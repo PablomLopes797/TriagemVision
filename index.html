@@ -177,14 +177,28 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--blue-600),var(--blue-500));border-radius:99px}
 .bar-row .num{width:38px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink-soft)}
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px}
+
+/* ===== LOGIN — vídeo de fundo + efeito Matrix ===== */
 .login-overlay{
   position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(1200px 600px at 15% 10%,#133a9e 0%,transparent 60%),
-             radial-gradient(1000px 600px at 90% 90%,#1b57e6 0%,transparent 55%),
-             linear-gradient(160deg,var(--navy-900)0%,#081a4d 55%,#0a2472 100%);
+  background:#000;
   overflow:hidden;transition:opacity 0.5s ease;
 }
 .login-overlay.fade-out{opacity:0;pointer-events:none}
+#loginVideo{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  object-fit:cover;z-index:0;
+}
+.login-overlay::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:radial-gradient(1200px 600px at 15% 10%,rgba(19,58,158,.55) 0%,transparent 60%),
+             radial-gradient(1000px 600px at 90% 90%,rgba(27,87,230,.45) 0%,transparent 55%),
+             linear-gradient(160deg,rgba(5,19,57,.65) 0%,rgba(8,26,77,.55) 55%,rgba(10,36,114,.65) 100%);
+}
+#matrixCanvas{
+  position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;
+  display:none;
+}
 .login-card{
   position:relative;width:400px;max-width:92%;
   background:rgba(15,25,60,.55);border:1px solid rgba(255,255,255,.14);
@@ -192,6 +206,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
   backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
   animation:loginIn .5s cubic-bezier(.2,.9,.25,1);
+  z-index:2;
 }
 @keyframes loginIn{from{opacity:0;transform:translateY(18px)scale(.97)}to{opacity:1;transform:translateY(0)scale(1)}}
 .login-card.shake{animation:shake .4s}
@@ -259,6 +274,10 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
+  <video id="loginVideo" autoplay loop muted playsinline>
+    <source src="background.mp4" type="video/mp4">
+  </video>
+  <canvas id="matrixCanvas"></canvas>
   <div class="login-card" id="loginCard">
     <div class="login-mark">TP</div>
     <div class="login-title">Triagem Pro</div>
@@ -620,6 +639,118 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 
 <div class="toast" id="toast"></div>
 <script>
+/* ========== EFEITO MATRIX (ativa digitando o usuário 5520967) ========== */
+(function() {
+  const canvas = document.getElementById('matrixCanvas');
+  const ctx = canvas.getContext('2d');
+  const video = document.getElementById('loginVideo');
+  const userField = document.getElementById('loginUser');
+
+  const chars = 'ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890'.split('');
+  const fontSize = 32;
+  let columns, drops;
+  let animationId;
+  let matrixActive = false;
+  let charsColor = '#0F0';
+  let impactWave = null;
+
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    columns = Math.floor(canvas.width / fontSize);
+    drops = Array(columns).fill(1);
+  }
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = fontSize + 'px monospace';
+    ctx.fillStyle = charsColor;
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i] += 0.3;
+    }
+
+    if (impactWave) {
+      const elapsed = Date.now() - impactWave.start;
+      const progress = Math.min(elapsed / impactWave.duration, 1);
+      impactWave.radius = impactWave.maxRadius * progress;
+      impactWave.alpha = 1 - progress;
+
+      ctx.beginPath();
+      ctx.arc(impactWave.x, impactWave.y, impactWave.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 0, 0, ${impactWave.alpha})`;
+      ctx.lineWidth = 3 * (1 - progress);
+      ctx.stroke();
+
+      if (progress >= 1) impactWave = null;
+    }
+
+    animationId = requestAnimationFrame(drawMatrix);
+  }
+
+  function startMatrix() {
+    if (!matrixActive) return;
+    canvas.style.display = 'block';
+    if (video) video.style.display = 'none';
+    resizeCanvas();
+    if (animationId) cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(drawMatrix);
+  }
+
+  function stopMatrix() {
+    matrixActive = false;
+    canvas.style.display = 'none';
+    if (video) video.style.display = 'block';
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  userField.addEventListener('input', function() {
+    const val = this.value.trim();
+    if (val === '5520967') {
+      if (!matrixActive) {
+        matrixActive = true;
+        charsColor = '#0F0';
+        startMatrix();
+      }
+    } else {
+      stopMatrix();
+    }
+  });
+
+  window.setMatrixRed = function() {
+    if (!matrixActive) return;
+    charsColor = '#F00';
+    impactWave = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      radius: 0,
+      maxRadius: Math.min(canvas.width, canvas.height) * 0.4,
+      alpha: 1,
+      start: Date.now(),
+      duration: 800
+    };
+    setTimeout(() => {
+      if (matrixActive) charsColor = '#0F0';
+    }, 2000);
+  };
+
+  window.addEventListener('resize', () => {
+    if (matrixActive) resizeCanvas();
+  });
+
+  stopMatrix();
+})();
+
 /* ========== CONFIGURAÇÃO E CONEXÃO SUPABASE ========== */
 const DEFAULT_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
 const DEFAULT_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxdm12eGppa2JpdnVic3pvYXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NTQ2NDksImV4cCI6MjA5OTUzMDY0OX0.5EVtA9L0DoKR4kdr_4cP7YtqH-FqsHJc6vpeliUMjN8";
@@ -735,9 +866,9 @@ async function doLogin() {
   try {
     const { data, error } = await sb.from("BD_USER").select("*").ilike("USER", usuario).limit(1);
     if (error) throw error;
-    if (!data || !data.length) { errText.textContent = "Usuário não encontrado."; errBox.classList.add("show"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); return; }
+    if (!data || !data.length) { errText.textContent = "Usuário não encontrado."; errBox.classList.add("show"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); if (typeof setMatrixRed === "function") setMatrixRed(); return; }
     const senhaSalva = String(data[0].PASSWORD ?? "").trim();
-    if (senhaSalva !== senha.trim()) { errText.textContent = "Senha incorreta."; errBox.classList.add("show"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); return; }
+    if (senhaSalva !== senha.trim()) { errText.textContent = "Senha incorreta."; errBox.classList.add("show"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); if (typeof setMatrixRed === "function") setMatrixRed(); return; }
     const level = Number(String(data[0].LEVEL ?? "2").trim()) || 2;
     const state = String(data[0].STATE ?? "1").trim();
     if (state !== "1") { errText.textContent = "Usuário inativo."; errBox.classList.add("show"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); return; }
