@@ -62,7 +62,10 @@ body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;tr
 .topbar .sub{font-size:12px;color:var(--ink-faint);font-weight:500}
 .title-bar{
   height:3px;background:linear-gradient(90deg,transparent,var(--blue-500),transparent);
-  background-size:200% 100%;animation:loadingBar 2s linear infinite;
+  background-size:200% 100%;opacity:0;transition:opacity 0.2s ease;
+}
+.title-bar.loading{
+  opacity:1;animation:loadingBar 2s linear infinite;
 }
 @keyframes loadingBar{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .btn{
@@ -177,6 +180,8 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--blue-600),var(--blue-500));border-radius:99px}
 .bar-row .num{width:38px;text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink-soft)}
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px}
+.cfg-restricted{padding:40px 20px;text-align:center;color:var(--ink-faint)}
+.cfg-restricted .big{font-size:36px;margin-bottom:12px}
 
 /* ===== LOGIN — vídeo de fundo + efeito Matrix ===== */
 .login-overlay{
@@ -269,7 +274,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
-  <video id="loginVideo" autoplay loop muted playsinline>
+  <video id="loginVideo" autoplay loop muted playsinline crossorigin="anonymous">
    <source src="https://raw.githubusercontent.com/PablomLopes797/TriagemVision/61f2e913d78c4bcd2d5b6447ea3f47a728a32a03/background.mp4" type="video/mp4">
   </video>
   <canvas id="matrixCanvas"></canvas>
@@ -302,6 +307,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
     <a href="#" data-view="lojas"><span class="ic">🏬</span><span class="label">Atualizar Lojas</span></a>
     <a href="#" data-view="usuarios"><span class="ic">👤</span><span class="label">USERS</span></a>
     <a href="#" data-view="permissoes" id="menuPermissoes" style="display:none"><span class="ic">🔐</span><span class="label">Permissões</span></a>
+    <a href="#" data-view="donorua" id="menuDonoRua" style="display:none"><span class="ic">🏷</span><span class="label">Dono de Rua</span></a>
     <a href="#" data-view="config"><span class="ic">⚙</span><span class="label">Configurações</span></a>
     <a href="#" data-view="manual"><span class="ic">📖</span><span class="label">Manual</span></a>
   </div>
@@ -325,7 +331,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
       <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌓</button>
     </div>
   </div>
-  <div class="title-bar"></div>
+  <div class="title-bar" id="titleBar"></div>
 
   <div class="content">
     <!-- DASHBOARD -->
@@ -447,6 +453,25 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
     <!-- PERMISSÕES -->
     <div class="view" id="view-permissoes">
       <div class="panel"><div class="panel-head"><h4>Gerenciar Permissões por Nível</h4></div><div class="panel-body"><p class="hint">Marque as funcionalidades permitidas para cada nível de usuário. As alterações são salvas automaticamente no navegador.</p><div id="permissoesContainer"></div><button class="btn" style="margin-top:16px" onclick="salvarPermissoes()">Salvar Permissões</button></div></div>
+    </div>
+
+    <!-- DONO DE RUA (exclusivo 5520967) -->
+    <div class="view" id="view-donorua">
+      <div class="panel">
+        <div class="panel-head">
+          <h4>Mapeamento Rua → Dono</h4>
+          <button class="btn" onclick="abrirModalDonoRua(null)">+ Adicionar Rua</button>
+        </div>
+        <div class="panel-body">
+          <p class="hint" style="margin-bottom:12px">Cadastre aqui o <b>Dono</b> de cada <b>Rua</b>. Quando um produto for lançado e o campo RUA tiver correspondência nesta tabela, o campo DONO será preenchido automaticamente para todos os usuários.</p>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Rua</th><th>Dono</th><th>Ações</th></tr></thead>
+              <tbody id="donoRuaTable"><tr><td colspan="3" class="empty">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- CONFIGURAÇÕES -->
@@ -632,6 +657,23 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
   </div>
 </div>
 
+<!-- Modal Dono de Rua -->
+<div class="overlay" id="overlayDonoRua">
+  <div class="modal" style="width:480px">
+    <div class="modal-header"><h3 id="donoRuaModalTitle">Adicionar Rua</h3><button onclick="fecharModalDonoRua()" class="close-x">✕</button></div>
+    <div class="modal-body">
+      <div class="grid">
+        <div class="field full"><label>Rua</label><input type="text" id="dr_rua" placeholder="Ex: A1, B2, CORREDOR 3..." autocomplete="off"></div>
+        <div class="field full"><label>Dono</label><input type="text" id="dr_dono" placeholder="Nome do responsável pela rua" autocomplete="off"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" onclick="fecharModalDonoRua()">Cancelar</button>
+      <button class="btn" id="btnSalvarDonoRua" onclick="salvarDonoRua()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <script>
 /* ========== EFEITO MATRIX (ativa digitando o usuário 5520967) ========== */
@@ -744,6 +786,19 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
   });
 
   stopMatrix();
+
+  /* Tenta reproduzir o vídeo de fundo; se falhar, usa gradiente como fallback */
+  if (video) {
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        /* Autoplay bloqueado ou CORS: usa gradiente animado como fallback */
+        video.style.display = 'none';
+        const overlay = document.getElementById('loginOverlay');
+        if (overlay) overlay.style.background = 'linear-gradient(135deg,#051339 0%,#0a2472 40%,#1b57e6 100%)';
+      });
+    }
+  }
 })();
 
 /* ========== CONFIGURAÇÃO E CONEXÃO SUPABASE ========== */
@@ -841,6 +896,7 @@ function canExportar() { return temPermissao('exportar'); }
 function canGerenciarUsuarios() { return temPermissao('usuarios'); }
 function canConfig() { return temPermissao('config'); }
 function canEditDelete() { return canEditarLanc(); }
+function canRelatorioPrevencao() { return lvl() === 1 || lvl() === 5; }
 const NIVEL_LABELS = {1:"Acesso Total",2:"Lançar",3:"Editar Lançamentos",4:"Atualizar Base",5:"Relatório Prevenção",6:"Somente Consulta",7:"Lançar e Editar",8:"Lançar e Exportar",9:"Consulta e Relatórios"};
 
 /* ========== LOGIN ========== */
@@ -886,7 +942,7 @@ function applyUserUI() {
   document.getElementById("userName").textContent = currentUser.name || currentUser.user;
   document.getElementById("userAvatar").textContent = (currentUser.name || currentUser.user).slice(0,2).toUpperCase();
   const badge = document.getElementById("userBadge"); badge.textContent = NIVEL_LABELS[lvl()] || ("Nível " + lvl()); badge.className = "badge-level " + (isTotal() ? "master" : "basic");
-  document.querySelectorAll('.menu a[data-view]').forEach(a => { const v = a.dataset.view; if (v === 'permissoes') { a.style.display = (currentUser.user === '5520967' || isTotal()) ? '' : 'none'; } else { a.style.display = temPermissao(v) ? '' : 'none'; } });
+  document.querySelectorAll('.menu a[data-view]').forEach(a => { const v = a.dataset.view; if (v === 'permissoes') { a.style.display = (currentUser.user === '5520967' || isTotal()) ? '' : 'none'; } else if (v === 'donorua') { a.style.display = currentUser.user === '5520967' ? '' : 'none'; } else { a.style.display = temPermissao(v) ? '' : 'none'; } });
   document.querySelectorAll(".lancar-only").forEach(el => { el.style.display = canLancar() ? "" : "none"; });
   refreshActiveView(); checkPendingGaiola();
 }
@@ -898,18 +954,27 @@ function logout() {
 setTimeout(() => document.getElementById("loginUser").focus(), 150);
 
 /* ========== NAVEGAÇÃO ========== */
-const titles = { dashboard:["Dashboard","Visão geral"],lancamentos:["Lançamentos","Registros recentes"],historico:["Histórico","Consulte e filtre"],ultimos:["Últimos Lançamentos","Todos os tipos"],pendentes:["Pendentes","EAN não encontrado"],fefo:["FEFO","Validades próximas"],exportar:["Exportar","Baixe CSV ou Excel"],relatorios:["Relatórios","Indicadores"],lojas:["Atualizar Lojas","BD_LOJA"],usuarios:["Usuários","BD_USER"],permissoes:["Permissões","Configurar acessos"],config:["Configurações","Conexão"],manual:["Manual","Guia de uso"] };
+const titles = { dashboard:["Dashboard","Visão geral"],lancamentos:["Lançamentos","Registros recentes"],historico:["Histórico","Consulte e filtre"],ultimos:["Últimos Lançamentos","Todos os tipos"],pendentes:["Pendentes","EAN não encontrado"],fefo:["FEFO","Validades próximas"],exportar:["Exportar","Baixe CSV ou Excel"],relatorios:["Relatórios","Indicadores"],lojas:["Atualizar Lojas","BD_LOJA"],usuarios:["Usuários","BD_USER"],permissoes:["Permissões","Configurar acessos"],config:["Configurações","Conexão"],manual:["Manual","Guia de uso"],donorua:["Dono de Rua","Mapeamento Rua → Dono"] };
 document.querySelectorAll(".menu a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); switchView(a.dataset.view); }));
+let _loadingBarTimer = null;
 function switchView(name) {
   document.querySelectorAll(".menu a").forEach(a => a.classList.toggle("active", a.dataset.view === name));
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   const el = document.getElementById("view-" + name); if (el) el.classList.add("active");
   document.getElementById("viewTitle").textContent = titles[name][0]; document.getElementById("viewSub").textContent = titles[name][1];
+  /* Animação de loading apenas na troca de página — 2 segundos */
+  const bar = document.getElementById("titleBar");
+  if (bar) {
+    if (_loadingBarTimer) clearTimeout(_loadingBarTimer);
+    bar.classList.add("loading");
+    _loadingBarTimer = setTimeout(() => { bar.classList.remove("loading"); _loadingBarTimer = null; }, 2000);
+  }
   if (name === "dashboard") loadDashboard(); if (name === "lancamentos") loadLancamentos(); if (name === "historico") loadHistorico(); if (name === "ultimos") loadUltimosLancamentos(); if (name === "pendentes") loadPendentes(); if (name === "fefo") loadFefo(); if (name === "relatorios") loadRelatorios();
   if (name === "lojas") { const a = canAtualizarBase(); document.getElementById("lojasPanel").style.display = a ? "" : "none"; document.getElementById("lojasRestricted").style.display = a ? "none" : "block"; }
   if (name === "usuarios") { const a = canGerenciarUsuarios(); document.getElementById("usersPanel").style.display = a ? "" : "none"; document.getElementById("usersRestricted").style.display = a ? "none" : "block"; if (a) loadUsuarios(); }
   if (name === "config") { const a = canConfig(); document.getElementById("cfgPanel").style.display = a ? "" : "none"; document.getElementById("cfgRestricted").style.display = a ? "none" : "block"; }
   if (name === "permissoes" && (currentUser?.user === '5520967' || isTotal())) renderPermissoes();
+  if (name === "donorua" && currentUser?.user === '5520967') renderDonoRua();
 }
 function refreshActiveView() { const a = document.querySelector(".menu a.active"); if (a) switchView(a.dataset.view); }
 
@@ -954,7 +1019,7 @@ document.getElementById("f_ean").addEventListener("keydown", async e => {
   status.textContent = "Buscando…"; status.className = "ean-status";
   try {
     const p = await buscarCadastro(ean);
-    if (p) { document.getElementById("f_plu").value = p.SEQPRODUTO || ""; document.getElementById("f_produto").value = p.DESCCOMPLETA || ""; document.getElementById("f_apanha").value = p.ENDERECO || ""; document.getElementById("f_rua").value = p.RUA || ""; document.getElementById("f_dono").value = p.DONO || ""; document.getElementById("f_categoria").value = p.NM_MERC_N1 || ""; document.getElementById("f_qtd_embalagem").value = p.PADRAOEMBCOMPRA || ""; status.textContent = "✓ encontrado"; status.className = "ean-status found"; document.getElementById("f_motivo").focus(); }
+    if (p) { document.getElementById("f_plu").value = p.SEQPRODUTO || ""; document.getElementById("f_produto").value = p.DESCCOMPLETA || ""; document.getElementById("f_apanha").value = p.ENDERECO || ""; const _rua = p.RUA || ""; document.getElementById("f_rua").value = _rua; const _donoResolvido = resolverDono(_rua) || p.DONO || ""; document.getElementById("f_dono").value = _donoResolvido; document.getElementById("f_categoria").value = p.NM_MERC_N1 || ""; document.getElementById("f_qtd_embalagem").value = p.PADRAOEMBCOMPRA || ""; status.textContent = "✓ encontrado"; status.className = "ean-status found"; document.getElementById("f_motivo").focus(); }
     else { ["f_plu","f_produto","f_apanha","f_rua","f_dono","f_categoria","f_qtd_embalagem"].forEach(id => document.getElementById(id).value = ""); status.textContent = "não encontrado"; status.className = "ean-status notfound"; document.getElementById("f_motivo").focus(); }
   } catch (err) { status.textContent = "erro"; status.className = "ean-status notfound"; showToast("Erro ao buscar EAN: " + err.message, true); }
 });
@@ -984,7 +1049,7 @@ document.getElementById("cs_ean").addEventListener("keydown", async e => {
   status.textContent = "Buscando…"; status.className = "ean-status";
   try {
     const p = await buscarCadastro(ean);
-    if (p) { document.getElementById("cs_plu").value = p.SEQPRODUTO || ""; document.getElementById("cs_produto").value = p.DESCCOMPLETA || ""; document.getElementById("cs_apanha").value = p.ENDERECO || ""; document.getElementById("cs_rua").value = p.RUA || ""; document.getElementById("cs_dono").value = p.DONO || ""; document.getElementById("cs_categoria").value = p.NM_MERC_N1 || ""; document.getElementById("cs_qtd_embalagem").value = p.PADRAOEMBCOMPRA || ""; status.textContent = "✓ encontrado"; status.className = "ean-status found"; }
+    if (p) { document.getElementById("cs_plu").value = p.SEQPRODUTO || ""; document.getElementById("cs_produto").value = p.DESCCOMPLETA || ""; document.getElementById("cs_apanha").value = p.ENDERECO || ""; const _csRua = p.RUA || ""; document.getElementById("cs_rua").value = _csRua; document.getElementById("cs_dono").value = resolverDono(_csRua) || p.DONO || ""; document.getElementById("cs_categoria").value = p.NM_MERC_N1 || ""; document.getElementById("cs_qtd_embalagem").value = p.PADRAOEMBCOMPRA || ""; status.textContent = "✓ encontrado"; status.className = "ean-status found"; }
     else { ["cs_plu","cs_produto","cs_apanha","cs_rua","cs_dono","cs_categoria","cs_qtd_embalagem"].forEach(id => document.getElementById(id).value = ""); status.textContent = "não encontrado"; status.className = "ean-status notfound"; }
   } catch (err) { status.textContent = "erro"; status.className = "ean-status notfound"; showToast("Erro ao buscar EAN: " + err.message, true); }
 });
@@ -1071,10 +1136,46 @@ async function openGaiolaModal(keepBatch) {
   document.getElementById("overlayGaiola").classList.add("show");
   ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("glEanStatus").textContent = "";
-  if (!keepBatch && !gaiolaAtual.gaiola) { document.getElementById("gl_gaiola").value = "Buscando…"; try { gaiolaAtual.gaiola = String(await fetchNextGaiolaNumber()); } catch (err) { gaiolaAtual.gaiola = ""; showToast("Erro ao buscar nº gaiola: " + err.message, true); } document.getElementById("gl_loja").disabled = false; document.getElementById("gl_loja").innerHTML = '<option value="">Escaneie o EAN do 1º item</option>'; document.getElementById("gl_loja").value = ""; document.getElementById("glLojaHint").textContent = "Escaneie o primeiro item para carregar as lojas disponíveis."; }
+  if (!keepBatch && !gaiolaAtual.gaiola) {
+    /* Gaiola nova: busca número e limpa loja */
+    document.getElementById("gl_gaiola").value = "Buscando…";
+    try { gaiolaAtual.gaiola = String(await fetchNextGaiolaNumber()); } catch (err) { gaiolaAtual.gaiola = ""; showToast("Erro ao buscar nº gaiola: " + err.message, true); }
+    document.getElementById("gl_loja").disabled = false;
+    document.getElementById("gl_loja").innerHTML = '<option value="">Escaneie o EAN do 1º item</option>';
+    document.getElementById("gl_loja").value = "";
+    document.getElementById("glLojaHint").textContent = "Escaneie o primeiro item para carregar as lojas disponíveis.";
+  } else if (keepBatch && gaiolaAtual.loja) {
+    /* Retomando gaiola pendente: restaura a loja corretamente no select */
+    const selectLoja = document.getElementById("gl_loja");
+    /* Se a loja já não está nas opções, adiciona ela */
+    const jaExiste = Array.from(selectLoja.options).some(o => o.value === gaiolaAtual.loja);
+    if (!jaExiste) {
+      selectLoja.innerHTML = '';
+      const opt = document.createElement('option');
+      opt.value = gaiolaAtual.loja; opt.textContent = gaiolaAtual.loja;
+      selectLoja.appendChild(opt);
+    }
+    selectLoja.value = gaiolaAtual.loja;
+  }
   document.getElementById("gl_gaiola").value = gaiolaAtual.gaiola;
-  document.getElementById("gl_loja").value = gaiolaAtual.loja;
-  if (gaiolaStaged.length > 0) { document.getElementById("gl_loja").disabled = true; document.getElementById("glLojaHint").textContent = "Loja travada — permanece fixa até salvar ou reiniciar a gaiola."; } else { document.getElementById("gl_loja").disabled = false; }
+  if (gaiolaStaged.length > 0) {
+    /* Itens já adicionados: trava a loja e garante o valor correto */
+    const selectLoja = document.getElementById("gl_loja");
+    if (gaiolaAtual.loja) {
+      const jaExiste = Array.from(selectLoja.options).some(o => o.value === gaiolaAtual.loja);
+      if (!jaExiste) {
+        selectLoja.innerHTML = '';
+        const opt = document.createElement('option');
+        opt.value = gaiolaAtual.loja; opt.textContent = gaiolaAtual.loja;
+        selectLoja.appendChild(opt);
+      }
+      selectLoja.value = gaiolaAtual.loja;
+    }
+    selectLoja.disabled = true;
+    document.getElementById("glLojaHint").textContent = "Loja travada — permanece fixa até salvar ou reiniciar a gaiola.";
+  } else {
+    document.getElementById("gl_loja").disabled = false;
+  }
   renderGaiolaStagedTable(); setTimeout(() => document.getElementById("gl_ean").focus(), 80);
 }
 function closeGaiolaModal() { gaiolaAtual.loja = document.getElementById("gl_loja").value.trim(); saveGaiolaLocal(); document.getElementById("overlayGaiola").classList.remove("show"); }
@@ -1179,6 +1280,143 @@ async function salvarUsuario() {
   } catch (err) { const msg = String(err.message || ""); showToast(msg.includes("duplicate key") ? "Erro: nome de usuário já existe." : "Erro: " + msg, true); } finally { btn.disabled = false; btn.textContent = isEditing ? "Atualizar" : "Salvar"; }
 }
 
+/* ========== DONO DE RUA (exclusivo 5520967) ========== */
+/* Mapa em memória: { RUA_NORMALIZADA: { rua: string, dono: string, id?: number } } */
+let donoRuaMap = {};
+let _donoRuaEditKey = null; /* chave da rua sendo editada */
+
+function _normRua(r) { return String(r || '').trim().toUpperCase(); }
+
+/* Carrega do Supabase (tabela BD_DONO_RUA) e também do localStorage como fallback */
+async function carregarDonoRuaMap() {
+  /* Primeiro tenta localStorage para resposta imediata */
+  const local = localStorage.getItem('tp_dono_rua');
+  if (local) { try { donoRuaMap = JSON.parse(local); } catch(e) { donoRuaMap = {}; } }
+  /* Depois sincroniza com Supabase */
+  try {
+    const { data, error } = await sb.from('BD_DONO_RUA').select('*');
+    if (!error && data) {
+      donoRuaMap = {};
+      data.forEach(row => {
+        const key = _normRua(row.RUA);
+        donoRuaMap[key] = { rua: row.RUA, dono: row.DONO, id: row.id };
+      });
+      localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap));
+    }
+  } catch(e) { /* usa localStorage como fallback */ }
+}
+
+/* Resolve o DONO a partir da RUA usando o mapa */
+function resolverDono(rua) {
+  if (!rua) return '';
+  const key = _normRua(rua);
+  return donoRuaMap[key] ? donoRuaMap[key].dono : '';
+}
+
+function renderDonoRua() {
+  const tbody = document.getElementById('donoRuaTable');
+  if (!tbody) return;
+  const entries = Object.values(donoRuaMap);
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="3" class="empty">Nenhum mapeamento cadastrado</td></tr>';
+    return;
+  }
+  entries.sort((a, b) => _normRua(a.rua).localeCompare(_normRua(b.rua)));
+  tbody.innerHTML = entries.map(e => `
+    <tr>
+      <td><b>${e.rua}</b></td>
+      <td>${e.dono}</td>
+      <td><div class="row-actions">
+        <button class="icon-btn" title="Editar" onclick="abrirModalDonoRua('${_normRua(e.rua)}')">&#9998;</button>
+        <button class="icon-btn" title="Excluir" onclick="excluirDonoRua('${_normRua(e.rua)}')">&#128465;</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function abrirModalDonoRua(key) {
+  _donoRuaEditKey = key || null;
+  const modal = document.getElementById('overlayDonoRua');
+  const title = document.getElementById('donoRuaModalTitle');
+  if (key && donoRuaMap[key]) {
+    title.textContent = 'Editar Rua';
+    document.getElementById('dr_rua').value = donoRuaMap[key].rua;
+    document.getElementById('dr_dono').value = donoRuaMap[key].dono;
+    document.getElementById('dr_rua').readOnly = true;
+  } else {
+    title.textContent = 'Adicionar Rua';
+    document.getElementById('dr_rua').value = '';
+    document.getElementById('dr_dono').value = '';
+    document.getElementById('dr_rua').readOnly = false;
+  }
+  modal.classList.add('show');
+  setTimeout(() => document.getElementById(_donoRuaEditKey ? 'dr_dono' : 'dr_rua').focus(), 80);
+}
+
+function fecharModalDonoRua() {
+  document.getElementById('overlayDonoRua').classList.remove('show');
+  _donoRuaEditKey = null;
+}
+document.getElementById('overlayDonoRua').addEventListener('click', e => { if (e.target.id === 'overlayDonoRua') fecharModalDonoRua(); });
+
+async function salvarDonoRua() {
+  const rua = document.getElementById('dr_rua').value.trim();
+  const dono = document.getElementById('dr_dono').value.trim();
+  if (!rua || !dono) { showToast('Preencha Rua e Dono.', true); return; }
+  const btn = document.getElementById('btnSalvarDonoRua');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  const key = _normRua(rua);
+  try {
+    if (_donoRuaEditKey && donoRuaMap[_donoRuaEditKey] && donoRuaMap[_donoRuaEditKey].id) {
+      /* Atualiza no Supabase */
+      const { error } = await sb.from('BD_DONO_RUA').update({ RUA: rua, DONO: dono }).eq('id', donoRuaMap[_donoRuaEditKey].id);
+      if (error) throw error;
+      delete donoRuaMap[_donoRuaEditKey];
+    } else {
+      /* Insere no Supabase */
+      const { data, error } = await sb.from('BD_DONO_RUA').insert({ RUA: rua, DONO: dono }).select().limit(1);
+      if (error) throw error;
+      const newId = data && data.length ? data[0].id : undefined;
+      donoRuaMap[key] = { rua, dono, id: newId };
+    }
+    donoRuaMap[key] = { rua, dono, id: donoRuaMap[key]?.id };
+    localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap));
+    showToast('Mapeamento salvo!');
+    fecharModalDonoRua();
+    renderDonoRua();
+  } catch(e) {
+    /* Fallback: salva só no localStorage se tabela não existir */
+    if (String(e.message).includes('does not exist') || String(e.message).includes('relation')) {
+      donoRuaMap[key] = { rua, dono };
+      localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap));
+      showToast('Salvo localmente (tabela BD_DONO_RUA não encontrada no Supabase).');
+      fecharModalDonoRua();
+      renderDonoRua();
+    } else {
+      showToast('Erro: ' + e.message, true);
+    }
+  } finally { btn.disabled = false; btn.textContent = 'Salvar'; }
+}
+
+async function excluirDonoRua(key) {
+  if (!confirm('Excluir mapeamento da rua ' + (donoRuaMap[key]?.rua || key) + '?')) return;
+  try {
+    if (donoRuaMap[key] && donoRuaMap[key].id) {
+      const { error } = await sb.from('BD_DONO_RUA').delete().eq('id', donoRuaMap[key].id);
+      if (error) throw error;
+    }
+    delete donoRuaMap[key];
+    localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap));
+    showToast('Mapeamento excluído.');
+    renderDonoRua();
+  } catch(e) {
+    /* Fallback local */
+    delete donoRuaMap[key];
+    localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap));
+    showToast('Removido localmente.');
+    renderDonoRua();
+  }
+}
+
 /* ========== PERMISSÕES (admin) ========== */
 function renderPermissoes() { carregarPermissoes(); const container = document.getElementById("permissoesContainer"); let html = '<table><thead><tr><th>Funcionalidade</th>'; for (let i = 1; i <= 9; i++) html += `<th>Nível ${i}</th>`; html += '</tr></thead><tbody>'; FUNCIONALIDADES.forEach(func => { html += `<tr><td>${func}</td>`; for (let i = 1; i <= 9; i++) { const checked = permissoes[i][func] ? 'checked' : ''; html += `<td><input type="checkbox" onchange="permissoes[${i}]['${func}'] = this.checked" ${checked}></td>`; } html += '</tr>'; }); html += '</tbody></table>'; container.innerHTML = html; }
 
@@ -1276,6 +1514,7 @@ function toggleTheme() { document.body.classList.toggle('dark'); localStorage.se
 
 /* ========== INICIALIZAÇÃO ========== */
 carregarPermissoes();
+carregarDonoRuaMap(); /* Carrega mapeamento Rua → Dono ao iniciar */
 document.getElementById("cfgUrl").value = SUPA_URL;
 document.getElementById("cfgKey").value = SUPA_KEY;
 document.getElementById("cfgGaiolaUrl").value = GAIOLA_SCRIPT_URL;
