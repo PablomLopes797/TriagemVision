@@ -613,7 +613,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
     <div class="modal-body">
       <div class="grid">
         <div class="field"><label>Gaiola Nº</label><input type="text" id="gl_gaiola" readonly></div>
-        <div class="field"><label>Loja</label><select id="gl_loja" disabled><option value="">Escaneie o EAN do 1º item</option></select><p class="hint" id="glLojaHint">Escaneie o primeiro item para carregar as lojas disponíveis.</p></div>
+        <div class="field"><label>Loja</label><select id="gl_loja" disabled><option value="">Aguardando EAN...</option></select><p class="hint" id="glLojaHint">Escaneie um EAN para carregar as lojas disponíveis.</p></div>
       </div>
       <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
       <div class="grid">
@@ -1141,9 +1141,9 @@ async function openGaiolaModal(keepBatch) {
     document.getElementById("gl_gaiola").value = "Buscando…";
     try { gaiolaAtual.gaiola = String(await fetchNextGaiolaNumber()); } catch (err) { gaiolaAtual.gaiola = ""; showToast("Erro ao buscar nº gaiola: " + err.message, true); }
     document.getElementById("gl_loja").disabled = false;
-    document.getElementById("gl_loja").innerHTML = '<option value="">Escaneie o EAN do 1º item</option>';
+    document.getElementById("gl_loja").innerHTML = '<option value="">Aguardando EAN...</option>';
     document.getElementById("gl_loja").value = "";
-    document.getElementById("glLojaHint").textContent = "Escaneie o primeiro item para carregar as lojas disponíveis.";
+    document.getElementById("glLojaHint").textContent = "Escaneie um EAN para carregar as lojas disponíveis.";
   } else if (keepBatch && gaiolaAtual.loja) {
     /* Retomando gaiola pendente: restaura a loja corretamente no select */
     const selectLoja = document.getElementById("gl_loja");
@@ -1188,16 +1188,76 @@ document.getElementById("gl_ean").addEventListener("keydown", async e => {
     const p = await buscarCadastro(ean);
     if (p) {
       document.getElementById("gl_plu").value = p.SEQPRODUTO || ""; document.getElementById("gl_produto").value = p.DESCCOMPLETA || ""; document.getElementById("gl_categoria").value = p.NM_MERC_N1 || ""; status.textContent = "✓ encontrado"; status.className = "ean-status found";
+      /* Buscar lojas disponíveis na BD_LOJA pelo EAN (CODACESSO) — query otimizada com limit */
       try {
-        const { data: lojaData, error: lojaErr } = await sb.from("BD_LOJA").select("NROEMPRESA").eq("CODACESSO", ean); if (lojaErr) throw lojaErr;
-        const lojasSet = new Set(); if (lojaData) { lojaData.forEach(row => { const nro = String(row.NROEMPRESA).trim(); if (nro && nro.toUpperCase() !== "INATIVO") lojasSet.add(nro); }); }
-        const lojas = [...lojasSet].sort(); const selectLoja = document.getElementById("gl_loja");
-        if (gaiolaStaged.length === 0) { selectLoja.innerHTML = '<option value="">Selecione...</option>'; lojas.forEach(loja => { const opt = document.createElement("option"); opt.value = loja; opt.textContent = loja; selectLoja.appendChild(opt); }); selectLoja.disabled = false; document.getElementById("glLojaHint").textContent = lojas.length ? `${lojas.length} loja(s) encontrada(s)` : "Nenhuma loja para este EAN"; }
-        else { if (lojas.length) { const lojaAtual = selectLoja.value; if (!lojaAtual || !lojas.includes(lojaAtual)) { selectLoja.innerHTML = lojas.map(l => `<option value="${l}">${l}</option>`).join(""); } } document.getElementById("glLojaHint").textContent = "Loja travada (adicionei o 1º item)."; }
-      } catch (e) { console.error("Erro ao buscar lojas:", e); }
+        const { data: lojaData, error: lojaErr } = await sb.from("BD_LOJA").select("NROEMPRESA").eq("CODACESSO", ean).limit(500);
+        if (lojaErr) throw lojaErr;
+        /* Extrair lojas únicas e válidas (excluindo "INATIVO") */
+        const lojasSet = new Set();
+        if (lojaData && lojaData.length > 0) {
+          lojaData.forEach(row => {
+            const nro = String(row.NROEMPRESA).trim();
+            if (nro && nro.toUpperCase() !== "INATIVO") {
+              lojasSet.add(nro);
+            }
+          });
+        }
+        const lojas = [...lojasSet].sort((a, b) => Number(a) - Number(b));
+        const selectLoja = document.getElementById("gl_loja");
+
+        if (gaiolaStaged.length === 0) {
+          /* Primeiro item: popular o select com todas as lojas encontradas */
+          if (lojas.length > 0) {
+            selectLoja.innerHTML = '<option value="">Selecione a loja...</option>';
+            lojas.forEach(loja => {
+              const opt = document.createElement("option");
+              opt.value = loja;
+              opt.textContent = loja;
+              selectLoja.appendChild(opt);
+            });
+            /* Auto-selecionar a primeira loja se só houver uma */
+            if (lojas.length === 1) {
+              selectLoja.value = lojas[0];
+            }
+            selectLoja.disabled = false;
+            document.getElementById("glLojaHint").textContent = `${lojas.length} loja(s) encontrada(s) para este EAN.`;
+          } else {
+            selectLoja.innerHTML = '<option value="">Nenhuma loja disponível</option>';
+            selectLoja.disabled = true;
+            document.getElementById("glLojaHint").textContent = "Nenhuma loja encontrada para este EAN na BD_LOJA.";
+          }
+        } else {
+          /* Já existem itens: verificar se a loja atual é compatível com as lojas deste EAN */
+          const lojaAtual = gaiolaAtual.loja || selectLoja.value;
+          if (lojaAtual && lojas.includes(lojaAtual)) {
+            /* Loja atual é válida para este EAN, manter */
+            document.getElementById("glLojaHint").textContent = `Loja ${lojaAtual} válida para este EAN. Loja travada.`;
+            document.getElementById("glLojaHint").style.color = "var(--ink-faint)";
+          } else if (lojaAtual && !lojas.includes(lojaAtual)) {
+            /* Loja atual NÃO é válida para este EAN */
+            showToast(`A loja ${lojaAtual} não possui este EAN habilitado.`, true);
+            document.getElementById("glLojaHint").textContent = `ATENÇÃO: Loja ${lojaAtual} não possui este EAN. Altere a loja ou o EAN.`;
+            document.getElementById("glLojaHint").style.color = "var(--red)";
+          } else {
+            document.getElementById("glLojaHint").textContent = `Loja travada (${gaiolaAtual.loja || selectLoja.value}).`;
+            document.getElementById("glLojaHint").style.color = "var(--ink-faint)";
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao buscar lojas na BD_LOJA:", e);
+        showToast("Erro ao buscar lojas: " + e.message, true);
+      }
       document.getElementById("gl_qtd_unidade").focus();
-    } else { ["gl_plu","gl_produto","gl_categoria"].forEach(id => document.getElementById(id).value = ""); status.textContent = "não encontrado"; status.className = "ean-status notfound"; }
-  } catch (err) { status.textContent = "erro"; status.className = "ean-status notfound"; showToast("Erro ao buscar EAN: " + err.message, true); }
+    } else {
+      ["gl_plu","gl_produto","gl_categoria"].forEach(id => document.getElementById(id).value = "");
+      status.textContent = "não encontrado";
+      status.className = "ean-status notfound";
+    }
+  } catch (err) {
+    status.textContent = "erro";
+    status.className = "ean-status notfound";
+    showToast("Erro ao buscar EAN: " + err.message, true);
+  }
 });
 document.getElementById("gl_qtd_unidade").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9]/g, ""); });
 async function adicionarItemGaiola() {
@@ -1213,7 +1273,7 @@ async function adicionarItemGaiola() {
   ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id => document.getElementById(id).value = ""); document.getElementById("glEanStatus").textContent = ""; document.getElementById("gl_ean").focus();
 }
 function removerItemGaiola(idx) { gaiolaStaged.splice(idx, 1); saveGaiolaLocal(); renderGaiolaStagedTable(); }
-function reiniciarGaiola() { if (!confirm("Apagar todos os itens da gaiola?")) return; gaiolaStaged = []; gaiolaAtual = { gaiola: gaiolaAtual.gaiola, loja: "" }; document.getElementById("gl_loja").value = ""; document.getElementById("gl_loja").disabled = false; document.getElementById("gl_loja").innerHTML = '<option value="">Escaneie o EAN do 1º item</option>'; document.getElementById("glLojaHint").textContent = "Escaneie o primeiro item para carregar as lojas disponíveis."; saveGaiolaLocal(); renderGaiolaStagedTable(); }
+function reiniciarGaiola() { if (!confirm("Apagar todos os itens da gaiola?")) return; gaiolaStaged = []; gaiolaAtual = { gaiola: gaiolaAtual.gaiola, loja: "" }; document.getElementById("gl_loja").value = ""; document.getElementById("gl_loja").disabled = false; document.getElementById("gl_loja").innerHTML = '<option value="">Aguardando EAN...</option>'; document.getElementById("glLojaHint").textContent = "Escaneie um EAN para carregar as lojas disponíveis."; saveGaiolaLocal(); renderGaiolaStagedTable(); }
 function renderGaiolaStagedTable() { const tbody = document.getElementById("glStagedTable"); if (!gaiolaStaged.length) { tbody.innerHTML = '<tr><td colspan="6" class="staged-empty">Nenhum item adicionado</td></tr>'; return; } tbody.innerHTML = gaiolaStaged.map((it, idx) => `<tr><td class="code">${it.ean}</td><td>${it.plu || "—"}</td><td>${it.produto || "—"}</td><td>${it.categoria || "—"}</td><td>${it.qtd}</td><td><button class="icon-btn" onclick="removerItemGaiola(${idx})">🗑</button></td></tr>`).join(""); }
 async function salvarGaiola() {
   if (!canLancar()) { showToast("Acesso negado.", true); return; }
