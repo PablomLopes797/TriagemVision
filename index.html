@@ -1188,64 +1188,67 @@ document.getElementById("gl_ean").addEventListener("keydown", async e => {
     const p = await buscarCadastro(ean);
     if (p) {
       document.getElementById("gl_plu").value = p.SEQPRODUTO || ""; document.getElementById("gl_produto").value = p.DESCCOMPLETA || ""; document.getElementById("gl_categoria").value = p.NM_MERC_N1 || ""; status.textContent = "✓ encontrado"; status.className = "ean-status found";
-      /* Buscar lojas disponíveis na BD_LOJA pelo EAN (CODACESSO) — query otimizada com limit */
-      try {
-        const { data: lojaData, error: lojaErr } = await sb.from("BD_LOJA").select("NROEMPRESA").eq("CODACESSO", ean).limit(500);
-        if (lojaErr) throw lojaErr;
-        /* Extrair lojas únicas e válidas (excluindo "INATIVO") */
-        const lojasSet = new Set();
-        if (lojaData && lojaData.length > 0) {
-          lojaData.forEach(row => {
-            const nro = String(row.NROEMPRESA).trim();
-            if (nro && nro.toUpperCase() !== "INATIVO") {
-              lojasSet.add(nro);
-            }
-          });
-        }
-        const lojas = [...lojasSet].sort((a, b) => Number(a) - Number(b));
-        const selectLoja = document.getElementById("gl_loja");
+      /* Buscar lojas disponíveis na BD_LOJA pelo PLU (SEQPRODUTO) */
+      const pluValue = document.getElementById("gl_plu").value.trim();
+      const selectLoja = document.getElementById("gl_loja");
 
-        if (gaiolaStaged.length === 0) {
-          /* Primeiro item: popular o select com todas as lojas encontradas */
-          if (lojas.length > 0) {
-            selectLoja.innerHTML = '<option value="">Selecione a loja...</option>';
-            lojas.forEach(loja => {
-              const opt = document.createElement("option");
-              opt.value = loja;
-              opt.textContent = loja;
-              selectLoja.appendChild(opt);
+      if (!pluValue) {
+        selectLoja.innerHTML = '<option value="">PLU não encontrado no cadastro</option>';
+        selectLoja.disabled = true;
+        document.getElementById("glLojaHint").textContent = "Não foi possível buscar lojas: PLU não disponível para este EAN.";
+      } else {
+        /* Buscar lojas disponíveis na BD_LOJA pelo PLU (SEQPRODUTO) — query otimizada com limit */
+        try {
+          const { data: lojaData, error: lojaErr } = await sb.from("BD_LOJA").select("NROEMPRESA").eq("SEQPRODUTO", pluValue).limit(500);
+          if (lojaErr) throw lojaErr;
+          const lojasSet = new Set();
+          if (lojaData && lojaData.length > 0) {
+            lojaData.forEach(row => {
+              const nro = String(row.NROEMPRESA).trim();
+              if (nro && nro.toUpperCase() !== "INATIVO") {
+                lojasSet.add(nro);
+              }
             });
-            /* Auto-selecionar a primeira loja se só houver uma */
-            if (lojas.length === 1) {
-              selectLoja.value = lojas[0];
+          }
+          const lojas = [...lojasSet].sort((a, b) => Number(a) - Number(b));
+
+          if (gaiolaStaged.length === 0) {
+            if (lojas.length > 0) {
+              selectLoja.innerHTML = '<option value="">Selecione a loja...</option>';
+              lojas.forEach(loja => {
+                const opt = document.createElement("option");
+                opt.value = loja;
+                opt.textContent = loja;
+                selectLoja.appendChild(opt);
+              });
+              if (lojas.length === 1) {
+                selectLoja.value = lojas[0];
+              }
+              selectLoja.disabled = false;
+              document.getElementById("glLojaHint").textContent = `${lojas.length} loja(s) encontrada(s) para este PLU.`;
+            } else {
+              selectLoja.innerHTML = '<option value="">Nenhuma loja disponível</option>';
+              selectLoja.disabled = true;
+              document.getElementById("glLojaHint").textContent = "Nenhuma loja encontrada para este PLU na BD_LOJA.";
             }
-            selectLoja.disabled = false;
-            document.getElementById("glLojaHint").textContent = `${lojas.length} loja(s) encontrada(s) para este EAN.`;
           } else {
-            selectLoja.innerHTML = '<option value="">Nenhuma loja disponível</option>';
-            selectLoja.disabled = true;
-            document.getElementById("glLojaHint").textContent = "Nenhuma loja encontrada para este EAN na BD_LOJA.";
+            const lojaAtual = gaiolaAtual.loja || selectLoja.value;
+            if (lojaAtual && lojas.includes(lojaAtual)) {
+              document.getElementById("glLojaHint").textContent = `Loja ${lojaAtual} válida para este PLU. Loja travada.`;
+              document.getElementById("glLojaHint").style.color = "var(--ink-faint)";
+            } else if (lojaAtual && !lojas.includes(lojaAtual)) {
+              showToast(`A loja ${lojaAtual} não possui este PLU habilitado.`, true);
+              document.getElementById("glLojaHint").textContent = `ATENÇÃO: Loja ${lojaAtual} não possui este PLU. Altere a loja ou o EAN.`;
+              document.getElementById("glLojaHint").style.color = "var(--red)";
+            } else {
+              document.getElementById("glLojaHint").textContent = `Loja travada (${gaiolaAtual.loja || selectLoja.value}).`;
+              document.getElementById("glLojaHint").style.color = "var(--ink-faint)";
+            }
           }
-        } else {
-          /* Já existem itens: verificar se a loja atual é compatível com as lojas deste EAN */
-          const lojaAtual = gaiolaAtual.loja || selectLoja.value;
-          if (lojaAtual && lojas.includes(lojaAtual)) {
-            /* Loja atual é válida para este EAN, manter */
-            document.getElementById("glLojaHint").textContent = `Loja ${lojaAtual} válida para este EAN. Loja travada.`;
-            document.getElementById("glLojaHint").style.color = "var(--ink-faint)";
-          } else if (lojaAtual && !lojas.includes(lojaAtual)) {
-            /* Loja atual NÃO é válida para este EAN */
-            showToast(`A loja ${lojaAtual} não possui este EAN habilitado.`, true);
-            document.getElementById("glLojaHint").textContent = `ATENÇÃO: Loja ${lojaAtual} não possui este EAN. Altere a loja ou o EAN.`;
-            document.getElementById("glLojaHint").style.color = "var(--red)";
-          } else {
-            document.getElementById("glLojaHint").textContent = `Loja travada (${gaiolaAtual.loja || selectLoja.value}).`;
-            document.getElementById("glLojaHint").style.color = "var(--ink-faint)";
-          }
+        } catch (e) {
+          console.error("Erro ao buscar lojas na BD_LOJA por PLU:", e);
+          showToast("Erro ao buscar lojas: " + e.message, true);
         }
-      } catch (e) {
-        console.error("Erro ao buscar lojas na BD_LOJA:", e);
-        showToast("Erro ao buscar lojas: " + e.message, true);
       }
       document.getElementById("gl_qtd_unidade").focus();
     } else {
