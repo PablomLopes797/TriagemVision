@@ -868,6 +868,25 @@ function carregarPermissoes() {
   const saved = localStorage.getItem('tp_permissoes');
   if (saved) { try { permissoes = JSON.parse(saved); } catch (e) { permissoes = {}; } }
   for (let i = 1; i <= 9; i++) if (!permissoes[i]) permissoes[i] = {};
+
+  /* Perfil padrão do Nível 2, conforme definido pelo administrador:
+     - Vê: Dashboard, Lançamentos, Histórico, FEFO e Manual.
+     - Em Lançamentos: pode lançar e consultar em todos os painéis (Lançamento,
+       Retrabalho, Gaiola, Descarte, Consulta), mas NÃO pode editar/excluir
+       lançamentos já feitos.
+     - Em Histórico: pode acessar e filtrar, mas sem editar.
+     - Em FEFO: acesso completo com filtro.
+     - Não vê nenhum outro menu da aba Gestão (Exportar, Relatórios,
+       Atualizar Lojas, USERS, Configurações).
+     Só é aplicado se o admin ainda não tiver customizado essas chaves na
+     tela de Permissões (o que fica salvo em localStorage). */
+  const nivel2Padrao = {
+    dashboard: true, lancamentos: true, historico: true, ultimos: false, pendentes: false, fefo: true,
+    exportar: false, relatorios: false, lojas: false, usuarios: false, config: false, manual: true, permissoes: false,
+    consulta: true, lancar: true, retrabalho: true, descarte: true, gaiola: true,
+    editar_lanc: false, excluir_lanc: false, alterar_senha: true
+  };
+  Object.keys(nivel2Padrao).forEach(k => { if (permissoes[2][k] === undefined) permissoes[2][k] = nivel2Padrao[k]; });
 }
 function salvarPermissoes() {
   localStorage.setItem('tp_permissoes', JSON.stringify(permissoes));
