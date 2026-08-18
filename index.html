@@ -27,38 +27,39 @@ body.dark{
 body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;transition:background var(--transition),color var(--transition)}
 ::selection{background:var(--blue-100)}
 .sidebar{
-  position:fixed;left:0;top:0;width:270px;height:100vh;
-  background:linear-gradient(155deg,#061b47 0%,#0b3471 42%,#06183d 73%,#020b25 100%);
+  position:fixed;left:0;top:0;width:250px;height:100vh;
+  background:linear-gradient(190deg,var(--navy-800) 0%,var(--navy-900) 100%);
   color:#fff;display:flex;flex-direction:column;z-index:20;transition:var(--transition);overflow:hidden;
-  box-shadow:16px 0 42px rgba(2,11,37,.18);
+  box-shadow:8px 0 30px rgba(5,19,57,.26),inset -1px 0 rgba(99,178,255,.18);
 }
-.sidebar::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 4%,rgba(93,171,255,.28),transparent 32%),linear-gradient(180deg,rgba(255,255,255,.035),transparent 34%);pointer-events:none}
+.sidebar::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 3%,rgba(74,179,255,.30),transparent 28%),radial-gradient(circle at 100% 56%,rgba(47,107,255,.17),transparent 34%),linear-gradient(180deg,rgba(255,255,255,.04),transparent 38%);pointer-events:none}
+.sidebar::after{content:"";position:absolute;left:0;right:0;bottom:78px;height:1px;background:linear-gradient(90deg,transparent,rgba(92,198,255,.7),transparent);box-shadow:0 0 12px rgba(92,198,255,.8);pointer-events:none}
 .sidebar .logo,.sidebar .menu,.sidebar .footer{position:relative;z-index:1}
 .logo{
   padding:22px 22px 18px;font-size:19px;font-weight:800;letter-spacing:.2px;
-  border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:10px;
-  background:rgba(2,11,37,.15);backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,.10);display:flex;align-items:center;gap:10px;
+  text-shadow:0 0 14px rgba(132,213,255,.18);
 }
 .logo .mark{
-  width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#5ebeff,#2461dc 60%,#123aa3);
+  width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue-500),#5ec6ff);
   display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;
-  box-shadow:0 8px 22px rgba(43,125,255,.28);border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 0 0 1px rgba(163,224,255,.25),0 0 18px rgba(47,157,255,.62),inset 0 1px rgba(255,255,255,.35);
 }
-.menu{padding:18px 12px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
-.menu-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.48);padding:14px 13px 7px;font-weight:800}
+.menu{padding:14px 10px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+.menu-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.38);padding:10px 12px 6px}
 .menu a{
-  padding:12px 13px;color:rgba(255,255,255,.78);text-decoration:none;display:flex;align-items:center;gap:11px;
-  border:1px solid transparent;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:4px;transition:var(--transition);
+  padding:11px 12px;color:rgba(255,255,255,.82);text-decoration:none;display:flex;align-items:center;gap:10px;
+  border:1px solid transparent;border-radius:9px;font-size:14px;font-weight:500;margin-bottom:2px;transition:var(--transition);
 }
-.menu a .ic{width:19px;text-align:center;font-size:15px;opacity:.9}
-.menu a:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.08);transform:translateX(2px)}
-.menu a.active{background:linear-gradient(105deg,#2e72e8,#1d4fbc);color:#fff;border-color:rgba(166,210,255,.24);box-shadow:0 8px 18px rgba(5,31,96,.3)}
-.footer{padding:16px 20px;font-size:11px;color:rgba(255,255,255,.52);border-top:1px solid rgba(255,255,255,.12);background:rgba(2,11,37,.18)}
+.menu a .ic{width:18px;text-align:center;font-size:15px;opacity:.9}
+.menu a:hover{background:rgba(92,198,255,.08);color:#fff;border-color:rgba(92,198,255,.18);box-shadow:0 0 15px rgba(47,157,255,.10)}
+.menu a.active{background:linear-gradient(100deg,var(--blue-600),#287dff);color:#fff;border-color:rgba(145,215,255,.45);box-shadow:0 0 0 1px rgba(71,170,255,.16),0 0 20px rgba(27,87,230,.42)}
+.footer{padding:16px 20px;font-size:11px;color:rgba(255,255,255,.43);border-top:1px solid rgba(255,255,255,.08)}
 .footer b{color:rgba(255,255,255,.7)}
 .conn{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
 .dot.off{background:var(--red)}
-.main{margin-left:270px;min-height:100vh;transition:var(--transition)}
+.main{margin-left:250px;min-height:100vh;transition:var(--transition)}
 .topbar{
   height:64px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;
   padding:0 26px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;transition:var(--transition);
@@ -137,6 +138,13 @@ tbody tr:hover{background:rgba(0,0,0,0.02)}
   z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 20px;
 }
 .overlay.show{display:flex}
+.overlay.overlay-confirm{z-index:900;background:rgba(3,11,31,.72);backdrop-filter:blur(7px)}
+.overlay.saldo-layer{z-index:950;background:rgba(3,12,38,.72);backdrop-filter:blur(9px)}
+.confirm-modal{width:470px;max-width:100%}
+.confirm-message{font-size:14px;line-height:1.6;color:var(--ink-soft);white-space:pre-line}
+.confirm-actions{display:flex;justify-content:flex-end;gap:10px}
+.prompt-modal{width:420px;max-width:100%}
+.inline-notice{font-size:12px;color:var(--ink-faint);margin-top:8px}
 .modal{
   width:820px;max-width:100%;background:var(--surface);border-radius:14px;overflow:hidden;
   box-shadow:0 20px 60px rgba(5,19,57,.3);transition:var(--transition);animation:modalIn .32s cubic-bezier(.2,.9,.25,1);
@@ -700,6 +708,22 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 
 <div class="toast" id="toast"></div>
 
+<!-- Confirmações e entrada de dados internas -->
+<div class="overlay overlay-confirm" id="overlayConfirm">
+  <div class="modal confirm-modal">
+    <div class="modal-header"><h3 id="confirmTitle">Confirmação</h3></div>
+    <div class="modal-body"><p class="confirm-message" id="confirmMessage"></p></div>
+    <div class="modal-footer confirm-actions"><button class="btn ghost" id="confirmCancelBtn">Cancelar</button><button class="btn" id="confirmOkBtn">Confirmar</button></div>
+  </div>
+</div>
+<div class="overlay overlay-confirm" id="overlayPrompt">
+  <div class="modal prompt-modal">
+    <div class="modal-header"><h3 id="promptTitle">Informação</h3></div>
+    <div class="modal-body"><p class="confirm-message" id="promptMessage"></p><input type="password" id="promptInput" placeholder="Digite o valor"><p class="inline-notice" id="promptNotice"></p></div>
+    <div class="modal-footer confirm-actions"><button class="btn ghost" id="promptCancelBtn">Cancelar</button><button class="btn" id="promptOkBtn">Salvar</button></div>
+  </div>
+</div>
+
 <script>
 /* ========== EFEITO MATRIX ========== */
 (function() {
@@ -763,10 +787,35 @@ const NIVEL_LABELS = {1:"Acesso Total",2:"Lançar",3:"Editar Lançamentos",4:"At
 /* ========== LOGIN ========== */
 let currentUser = null;
 let saldoFlow = { returnOverlay: null };
-function oferecerAdicionarSaldo(err, overlayId, ean = "") {
+function showConfirm(message, title = "Confirmação", okLabel = "Confirmar") {
+  const overlay = document.getElementById("overlayConfirm");
+  document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("confirmMessage").textContent = message;
+  document.getElementById("confirmOkBtn").textContent = okLabel;
+  overlay.classList.add("show");
+  return new Promise(resolve => {
+    const finish = value => { overlay.classList.remove("show"); resolve(value); };
+    document.getElementById("confirmOkBtn").onclick = () => finish(true);
+    document.getElementById("confirmCancelBtn").onclick = () => finish(false);
+  });
+}
+function showPrompt(message, title = "Informação", placeholder = "Digite o valor") {
+  const overlay = document.getElementById("overlayPrompt"), input = document.getElementById("promptInput");
+  document.getElementById("promptTitle").textContent = title;
+  document.getElementById("promptMessage").textContent = message;
+  input.placeholder = placeholder; input.value = "";
+  overlay.classList.add("show");
+  setTimeout(() => input.focus(), 80);
+  return new Promise(resolve => {
+    const finish = value => { overlay.classList.remove("show"); input.value = ""; resolve(value); };
+    document.getElementById("promptOkBtn").onclick = () => finish(input.value.trim() || null);
+    document.getElementById("promptCancelBtn").onclick = () => finish(null);
+  });
+}
+async function oferecerAdicionarSaldo(err, overlayId, ean = "") {
   const msg = err && err.message ? err.message : String(err || "Saldo insuficiente.");
   if (!msg.toLowerCase().includes("saldo insuficiente")) { showToast(msg, true); return false; }
-  const deseja = confirm(msg + "\n\nDeseja abrir o painel de Lançamento para adicionar saldo?");
+  const deseja = await showConfirm(msg + "\n\nDeseja abrir o painel de Lançamento para adicionar saldo?", "Saldo insuficiente", "Adicionar saldo");
   if (!deseja) { showToast(msg, true); return false; }
   saldoFlow.returnOverlay = overlayId;
   openModal(true);
@@ -861,12 +910,12 @@ async function buscarCadastro(ean) { const { data, error } = await sb.from("BD_C
 function dispatchEnter(fieldId) { setTimeout(() => { const el = document.getElementById(fieldId); if (el) el.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })); }, 150); }
 
 /* ========== ALTERAR SENHA ========== */
-function abrirAlterarSenha() { const nova = prompt("Digite a nova senha:"); if (!nova || !currentUser) return; (async () => { try { const { error } = await sb.from("BD_USER").update({ PASSWORD: nova }).eq("USER", currentUser.user); if (error) throw error; showToast("Senha alterada com sucesso."); } catch (e) { showToast("Erro: " + e.message, true); } })(); }
+async function abrirAlterarSenha() { if (!currentUser) return; const nova = await showPrompt("Digite a nova senha:", "Alterar senha", "Nova senha"); if (!nova) return; try { const { error } = await sb.from("BD_USER").update({ PASSWORD: nova }).eq("USER", currentUser.user); if (error) throw error; showToast("Senha alterada com sucesso."); } catch (e) { showToast("Erro: " + e.message, true); } }
 
 /* ========== LANÇAMENTO ========== */
 let editingId = null;
-function openModal(fromSaldo = false) { if (!canLancar()) { showToast("Acesso negado.", true); return; } editingId = null; document.querySelector("#overlay .modal-header h3").textContent = "Novo Lançamento"; document.getElementById("btnSalvar").textContent = "Salvar"; document.getElementById("overlay").classList.add("show"); resetForm(); setTimeout(() => document.getElementById("f_ean").focus(), 80); }
-function closeModal() { document.getElementById("overlay").classList.remove("show"); editingId = null; retornarAoPainelAnterior(); }
+function openModal(fromSaldo = false) { if (!canLancar()) { showToast("Acesso negado.", true); return; } editingId = null; const overlay = document.getElementById("overlay"); overlay.classList.toggle("saldo-layer", !!fromSaldo); document.querySelector("#overlay .modal-header h3").textContent = "Novo Lançamento"; document.getElementById("btnSalvar").textContent = "Salvar"; overlay.classList.add("show"); resetForm(); setTimeout(() => document.getElementById("f_ean").focus(), 80); }
+function closeModal() { const overlay = document.getElementById("overlay"); overlay.classList.remove("show", "saldo-layer"); editingId = null; retornarAoPainelAnterior(); }
 document.getElementById("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closeModal(); });
 function resetForm() { ["f_ean","f_plu","f_produto","f_apanha","f_rua","f_dono","f_categoria","f_qtd_embalagem","f_qtd_unidade"].forEach(id => document.getElementById(id).value = ""); document.getElementById("f_motivo").value = ""; document.getElementById("f_origem").value = ""; document.getElementById("f_validade").value = ""; document.getElementById("eanStatus").textContent = ""; document.getElementById("f_validadeMsg").style.display = "none"; }
 document.getElementById("f_ean").addEventListener("keydown", async e => { if (e.key !== "Enter") return; e.preventDefault(); const ean = e.target.value.trim(); const status = document.getElementById("eanStatus"); if (!ean) return; status.textContent = "Buscando…"; status.className = "ean-status"; try { const p = await buscarCadastro(ean); if (p) { document.getElementById("f_plu").value = p.SEQPRODUTO || ""; document.getElementById("f_produto").value = p.DESCCOMPLETA || ""; document.getElementById("f_apanha").value = p.ENDERECO || ""; const _rua = p.RUA || ""; document.getElementById("f_rua").value = _rua; document.getElementById("f_dono").value = resolverDono(_rua) || p.DONO || ""; document.getElementById("f_categoria").value = p.NM_MERC_N1 || ""; document.getElementById("f_qtd_embalagem").value = p.PADRAOEMBCOMPRA || ""; status.textContent = "✓ encontrado"; status.className = "ean-status found"; document.getElementById("f_motivo").focus(); } else { ["f_plu","f_produto","f_apanha","f_rua","f_dono","f_categoria","f_qtd_embalagem"].forEach(id => document.getElementById(id).value = ""); status.textContent = "não encontrado"; status.className = "ean-status notfound"; document.getElementById("f_motivo").focus(); } } catch (err) { status.textContent = "erro"; status.className = "ean-status notfound"; showToast("Erro ao buscar EAN: " + err.message, true); } });
@@ -912,7 +961,7 @@ document.getElementById("mip_solicitante").addEventListener("input", e => { e.ta
 function renderMipStagedTable() { const tbody = document.getElementById("mipStagedTable"); const count = document.getElementById("mipCartCount"); const units = document.getElementById("mipCartUnits"); if (count) count.textContent = mipStaged.length; if (units) units.textContent = mipStaged.reduce((sum, item) => sum + item.qtd, 0); if (!mipStaged.length) { tbody.innerHTML = '<tr><td colspan="6" class="staged-empty">Nenhum item adicionado ainda</td></tr>'; return; } tbody.innerHTML = mipStaged.map((item, index) => `<tr><td class="code">${item.ean}</td><td>${item.plu || "—"}</td><td>${item.produto || "—"}</td><td>${item.qtd}</td><td>${item.solicitante}</td><td><button class="icon-btn" title="Remover item" onclick="removerItemMip(${index})">🗑</button></td></tr>`).join(""); }
 async function adicionarItemMip() { if (!canLancar()) { showToast("Acesso negado.", true); return; } const ean = document.getElementById("mip_ean").value.trim(), plu = document.getElementById("mip_plu").value.trim(), produto = document.getElementById("mip_produto").value.trim(), qtd = Number(document.getElementById("mip_qtd").value), solicitante = document.getElementById("mip_solicitante").value.trim(); if (!ean || !qtd || qtd <= 0 || !solicitante) { showToast("Preencha EAN, quantidade e matrícula do solicitante.", true); return; } const jaStaged = mipStaged.filter(item => item.ean === ean).reduce((sum, item) => sum + item.qtd, 0); try { await verificarSaldoSuficiente(ean, jaStaged + qtd); } catch (err) { oferecerAdicionarSaldo(err, "overlayMip", ean); return; } mipStaged.push({ ean, plu, produto, qtd, solicitante }); renderMipStagedTable(); ["mip_ean","mip_plu","mip_produto","mip_qtd"].forEach(id => document.getElementById(id).value = ""); document.getElementById("mipEanStatus").textContent = ""; document.getElementById("mip_ean").focus(); }
 function removerItemMip(index) { mipStaged.splice(index, 1); renderMipStagedTable(); }
-function reiniciarMip() { if (!mipStaged.length || confirm("Limpar todos os itens do carrinho MIP?")) { mipStaged = []; renderMipStagedTable(); } }
+async function reiniciarMip() { if (!mipStaged.length || await showConfirm("Limpar todos os itens do carrinho MIP?", "Limpar carrinho MIP", "Limpar")) { mipStaged = []; renderMipStagedTable(); } }
 async function salvarMip() { if (!canLancar()) { showToast("Acesso negado.", true); return; } if (!mipStaged.length) { showToast("Adicione pelo menos um item ao carrinho.", true); return; } const btn = document.getElementById("btnSalvarMip"); btn.disabled = true; btn.textContent = "Verificando saldo…"; try { const somaPorEan = {}; mipStaged.forEach(item => { somaPorEan[item.ean] = (somaPorEan[item.ean] || 0) + item.qtd; }); for (const ean in somaPorEan) await verificarSaldoSuficiente(ean, somaPorEan[ean]); } catch (err) { oferecerAdicionarSaldo(err, "overlayMip"); btn.disabled = false; btn.textContent = "Salvar MIP"; return; } btn.textContent = "Salvando…"; try { const payloads = mipStaged.map(item => ({ PLU: item.plu || null, PRODUTO: item.produto || null, QTD: item.qtd, SOLICITANTE: item.solicitante })); const { error } = await sb.from("MIP").insert(payloads); if (error) throw error; const somaPorEan = {}; mipStaged.forEach(item => { somaPorEan[item.ean] = (somaPorEan[item.ean] || 0) + item.qtd; }); for (const ean in somaPorEan) await debitarSaldo(ean, somaPorEan[ean]); showToast(`${mipStaged.length} item(ns) MIP salvo(s) e saldo atualizado.`); closeMipModal(); } catch (err) { showToast("Erro ao salvar MIP: " + err.message, true); } finally { btn.disabled = false; btn.textContent = "Salvar MIP"; } }
 
 /* ========== GAIOLA ========== */
@@ -1196,7 +1245,7 @@ async function adicionarItemGaiola() {
 }
 
 function removerItemGaiola(idx) { gaiolaStaged.splice(idx, 1); saveGaiolaLocal(); renderGaiolaStagedTable(); }
-function reiniciarGaiola() { if (!confirm("Apagar todos os itens da gaiola?")) return; gaiolaStaged = []; gaiolaAtual = { gaiola: gaiolaAtual.gaiola, loja: "", reservationId: gaiolaAtual.reservationId }; atualizarReservaGaiola("PENDENTE").catch(err => showToast("Erro ao limpar a loja reservada: " + err.message, true)); document.getElementById("gl_loja").value = ""; document.getElementById("gl_loja").disabled = false; document.getElementById("gl_loja").innerHTML = '<option value="">Aguardando EAN...</option>'; document.getElementById("glLojaHint").textContent = "Escaneie um EAN para carregar as lojas disponíveis."; document.getElementById("glLojaHint").style.color = "var(--ink-faint)"; saveGaiolaLocal(); renderGaiolaStagedTable(); }
+async function reiniciarGaiola() { if (!await showConfirm("Apagar todos os itens da gaiola?", "Reiniciar gaiola", "Reiniciar")) return; gaiolaStaged = []; gaiolaAtual = { gaiola: gaiolaAtual.gaiola, loja: "", reservationId: gaiolaAtual.reservationId }; atualizarReservaGaiola("PENDENTE").catch(err => showToast("Erro ao limpar a loja reservada: " + err.message, true)); document.getElementById("gl_loja").value = ""; document.getElementById("gl_loja").disabled = false; document.getElementById("gl_loja").innerHTML = '<option value="">Aguardando EAN...</option>'; document.getElementById("glLojaHint").textContent = "Escaneie um EAN para carregar as lojas disponíveis."; document.getElementById("glLojaHint").style.color = "var(--ink-faint)"; saveGaiolaLocal(); renderGaiolaStagedTable(); }
 function renderGaiolaStagedTable() { const tbody = document.getElementById("glStagedTable"); if (!gaiolaStaged.length) { tbody.innerHTML = '<tr><td colspan="6" class="staged-empty">Nenhum item adicionado</td></tr>'; return; } tbody.innerHTML = gaiolaStaged.map((it, idx) => `<tr><td class="code">${it.ean}</td><td>${it.plu || "—"}</td><td>${it.produto || "—"}</td><td>${it.categoria || "—"}</td><td>${it.qtd}</td><td><button class="icon-btn" onclick="removerItemGaiola(${idx})">🗑</button></td></tr>`).join(""); }
 
 async function salvarGaiola() { 
@@ -1205,7 +1254,7 @@ async function salvarGaiola() {
   
   // Confirmação se tiver apenas 1 item
   if (gaiolaStaged.length === 1) {
-    const confirmar = confirm("⚠️ ATENÇÃO: Esta gaiola possui apenas 1 item.\n\nDeseja realmente lançar a gaiola com apenas 1 item?");
+    const confirmar = await showConfirm("ATENÇÃO: Esta gaiola possui apenas 1 item.\n\nDeseja realmente lançar a gaiola com apenas 1 item?", "Confirmar gaiola", "Lançar mesmo assim");
     if (!confirmar) return;
   }
   
@@ -1280,13 +1329,13 @@ function abrirModalDonoRua(key) { _donoRuaEditKey = key || null; const modal = d
 function fecharModalDonoRua() { document.getElementById('overlayDonoRua').classList.remove('show'); _donoRuaEditKey = null; }
 document.getElementById('overlayDonoRua').addEventListener('click', e => { if (e.target.id === 'overlayDonoRua') fecharModalDonoRua(); });
 async function salvarDonoRua() { const rua = document.getElementById('dr_rua').value.trim(); const dono = document.getElementById('dr_dono').value.trim(); if (!rua || !dono) { showToast('Preencha Rua e Dono.', true); return; } const btn = document.getElementById('btnSalvarDonoRua'); btn.disabled = true; btn.textContent = 'Salvando...'; const key = _normRua(rua); try { if (_donoRuaEditKey && donoRuaMap[_donoRuaEditKey] && donoRuaMap[_donoRuaEditKey].id) { const { error } = await sb.from('BD_DONO_RUA').update({ RUA: rua, DONO: dono }).eq('id', donoRuaMap[_donoRuaEditKey].id); if (error) throw error; delete donoRuaMap[_donoRuaEditKey]; } else { const { data, error } = await sb.from('BD_DONO_RUA').insert({ RUA: rua, DONO: dono }).select().limit(1); if (error) throw error; const newId = data && data.length ? data[0].id : undefined; donoRuaMap[key] = { rua, dono, id: newId }; } donoRuaMap[key] = { rua, dono, id: donoRuaMap[key]?.id }; localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap)); showToast('Mapeamento salvo!'); fecharModalDonoRua(); renderDonoRua(); } catch(e) { donoRuaMap[key] = { rua, dono }; localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap)); showToast('Salvo localmente.'); fecharModalDonoRua(); renderDonoRua(); } finally { btn.disabled = false; btn.textContent = 'Salvar'; } }
-async function excluirDonoRua(key) { if (!confirm('Excluir mapeamento da rua ' + (donoRuaMap[key]?.rua || key) + '?')) return; try { if (donoRuaMap[key] && donoRuaMap[key].id) { await sb.from('BD_DONO_RUA').delete().eq('id', donoRuaMap[key].id); } delete donoRuaMap[key]; localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap)); showToast('Mapeamento excluído.'); renderDonoRua(); } catch(e) { delete donoRuaMap[key]; localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap)); showToast('Removido localmente.'); renderDonoRua(); } }
+async function excluirDonoRua(key) { if (!await showConfirm('Excluir mapeamento da rua ' + (donoRuaMap[key]?.rua || key) + '?', 'Excluir mapeamento', 'Excluir')) return; try { if (donoRuaMap[key] && donoRuaMap[key].id) { await sb.from('BD_DONO_RUA').delete().eq('id', donoRuaMap[key].id); } delete donoRuaMap[key]; localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap)); showToast('Mapeamento excluído.'); renderDonoRua(); } catch(e) { delete donoRuaMap[key]; localStorage.setItem('tp_dono_rua', JSON.stringify(donoRuaMap)); showToast('Removido localmente.'); renderDonoRua(); } }
 
 /* ========== PERMISSÕES (admin) ========== */
 function renderPermissoes() { carregarPermissoes(); const container = document.getElementById("permissoesContainer"); let html = '<table><thead><tr><th>Funcionalidade</th>'; for (let i = 1; i <= 9; i++) html += `<th>Nível ${i}</th>`; html += '</tr></thead><tbody>'; FUNCIONALIDADES.forEach(func => { html += `<tr><td>${func}</td>`; for (let i = 1; i <= 9; i++) { const checked = permissoes[i][func] ? 'checked' : ''; html += `<td><input type="checkbox" onchange="permissoes[${i}]['${func}'] = this.checked" ${checked}></td>`; } html += '</tr>'; }); html += '</tbody></table>'; container.innerHTML = html; }
 
 /* ========== FEFO ========== */
-async function confirmarFefo(tipo, id, eanEncoded, qtd) { if (!id) { showToast("Registro FEFO sem identificador.", true); return; } if (!confirm("Confirmar OK? Este item será eliminado do FEFO e retirado do saldo.")) return; const ean = decodeURIComponent(eanEncoded || ""); const tabela = tipo === "Lançamento" ? "BD_LANC" : "BD_RETRABALHO"; try { await verificarSaldoSuficiente(ean, Number(qtd) || 0); await debitarSaldo(ean, Number(qtd) || 0); const { error } = await sb.from(tabela).delete().eq("id", id); if (error) { await adicionarSaldo(ean, null, null, Number(qtd) || 0); throw error; } showToast("Item FEFO eliminado e saldo atualizado."); loadFefo(); loadDashboard(); } catch (err) { showToast("Erro ao eliminar item FEFO: " + err.message, true); } }
+async function confirmarFefo(tipo, id, eanEncoded, qtd) { if (!id) { showToast("Registro FEFO sem identificador.", true); return; } if (!await showConfirm("Confirmar OK? Este item será eliminado do FEFO e retirado do saldo.", "Confirmar FEFO", "Confirmar OK")) return; const ean = decodeURIComponent(eanEncoded || ""); const tabela = tipo === "Lançamento" ? "BD_LANC" : "BD_RETRABALHO"; try { await verificarSaldoSuficiente(ean, Number(qtd) || 0); await debitarSaldo(ean, Number(qtd) || 0); const { error } = await sb.from(tabela).delete().eq("id", id); if (error) { await adicionarSaldo(ean, null, null, Number(qtd) || 0); throw error; } showToast("Item FEFO eliminado e saldo atualizado."); loadFefo(); loadDashboard(); } catch (err) { showToast("Erro ao eliminar item FEFO: " + err.message, true); } }
 async function loadFefo() { const tbody = document.getElementById("fefoTable"); tbody.innerHTML = '<tr><td colspan="8" class="empty">Carregando…</td></tr>'; const dias = parseInt(document.getElementById("fefoRange").value); const hoje = new Date(); hoje.setHours(0, 0, 0, 0); const limite = new Date(hoje.getTime() + dias * 86400000); try { const [lanc, retra] = await Promise.all([sb.from("BD_LANC").select("*").not("VALIDADE", "is", null).limit(1000), sb.from("BD_RETRABALHO").select("*").not("VALIDADE", "is", null).limit(1000)]); let rows = []; (lanc.data || []).forEach(r => { const v = new Date(r.VALIDADE + "T00:00:00"); if (v >= hoje && v <= limite) rows.push({ ...r, TIPO: "Lançamento", dias: Math.round((v - hoje) / 86400000) }); }); (retra.data || []).forEach(r => { const v = new Date(r.VALIDADE + "T00:00:00"); if (v >= hoje && v <= limite) rows.push({ ...r, TIPO: "Retrabalho", dias: Math.round((v - hoje) / 86400000) }); }); rows.sort((a, b) => a.dias - b.dias); if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhum produto próximo do vencimento.</td></tr>'; return; } tbody.innerHTML = rows.map(r => `<tr><td>${fmtDate(r.DTA_HORA)}</td><td>${r.TIPO}</td><td class="code">${r.EAN || ""}</td><td>${r.PRODUTO || "—"}</td><td>${r.VALIDADE}</td><td>${r.dias} dias</td><td>${r.QTD_UNIDADE || ""}</td><td><button class="btn ghost" onclick="confirmarFefo('${r.TIPO}','${r.id}','${encodeURIComponent(r.EAN || "")}',${Number(r.QTD_UNIDADE) || 0})">OK</button></td></tr>`).join(""); } catch (e) { tbody.innerHTML = `<tr><td colspan="8" class="empty">Erro: ${e.message}</td></tr>`; } }
 
 /* ========== GRÁFICOS E DASHBOARD ========== */
