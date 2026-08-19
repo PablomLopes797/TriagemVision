@@ -1,12 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
 <title>Triagem Vision</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSI2NCIgeTI9IjY0Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0YzFkOTUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0yMCA0NlYxOGgxMWM1IDAgOSAzLjggOSA4LjhzLTQgOC44LTkgOC44aC02LjVWNDZ6IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNDYiIGN5PSIyMCIgcj0iNCIgZmlsbD0iI2M0YjVmZCIvPjwvc3ZnPg==">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSI2NCIgeTI9IjY0Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0YzFkOTUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0yMCA0NlYxOGgxMWM1IDAgOSAzLjggOSA4LjhzLTQgOC44LTkgOC44aC02LjVWNDZ6IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNDYiIGN5PSIyMCIgcj0iNCIgZmlsbD0iI2M0YjVmZCIvPjwvc3ZnPg==" rel="icon" type="image/svg+xml"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -278,452 +279,504 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
   .main{margin-left:70px}.cards{grid-template-columns:1fr 1fr}.grid,.settings-grid{grid-template-columns:1fr}
   .view{width:calc(100% - 122px)}
 }
+
+/* ===== MÓDULOS EXTERNOS DO INDEX ===== */
+.module-header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.module-header h2{font-size:20px;font-weight:800}
+.module-header p{font-size:12px;color:var(--ink-faint);margin-top:5px}
+.module-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.module-note{padding:12px 14px;border:1px solid var(--blue-100);background:rgba(231,237,255,.5);border-radius:10px;color:var(--ink-soft);font-size:12px;line-height:1.5;margin-bottom:16px}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;flex-wrap:wrap}
+.readonly-field{background:var(--bg)!important;color:var(--ink-soft)!important}
+.table-scroll-x{overflow-x:auto}
+.admin-table{min-width:1350px}
+.admin-table input,.admin-table select{margin-top:0;min-width:110px;padding:7px 8px;font-size:12px}
+.admin-table .wide{min-width:180px}
+.admin-table .nf{width:110px;min-width:110px}
+.audit-table{min-width:950px}
+.audit-input{width:100px;min-width:100px;margin-top:0!important;font-family:var(--mono);font-weight:700}
+.status-pill{display:inline-block;padding:4px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.status-pill.pending{background:#fdf1de;color:var(--amber)}
+.status-pill.done{background:#e5f6ec;color:var(--green)}
+.module-modal{width:460px;max-width:100%}
+.module-modal .modal-body{padding:22px}
+.module-modal .modal-footer{display:flex;justify-content:flex-end;gap:10px}
+.inline-lookup{display:flex;gap:8px;align-items:flex-end}
+.inline-lookup .field{flex:1}
+.lookup-status{font-size:11px;font-weight:700;margin-top:5px;display:block}
+.lookup-status.ok{color:var(--green)}
+.lookup-status.bad{color:var(--red)}
+@media(max-width:900px){.module-header{display:block}.module-actions{margin-top:12px}.admin-table{min-width:1180px}}
+
+/* ===== AJUSTES DO CADASTRO EMBUTIDO ===== */
+.priority-menu{position:relative;z-index:2;margin:8px 0 6px;padding:8px 0 5px;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);background:rgba(5,19,57,.16)}
+.priority-label{font-size:9px;text-transform:uppercase;letter-spacing:1.1px;color:rgba(255,255,255,.42);padding:2px 12px 5px}
+.priority-menu a{padding:10px 12px;color:rgba(255,255,255,.86);text-decoration:none;display:flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:9px;font-size:14px;font-weight:600;margin-bottom:3px;transition:var(--transition)}
+.priority-menu a .ic{width:18px;text-align:center;font-size:15px;opacity:.95}
+.priority-menu a:hover{background:rgba(92,198,255,.12);color:#fff;border-color:rgba(92,198,255,.22)}
+.priority-menu a.active{background:linear-gradient(100deg,var(--blue-600),#287dff);color:#fff;border-color:rgba(145,215,255,.45);box-shadow:0 0 0 1px rgba(71,170,255,.16),0 0 20px rgba(27,87,230,.42)}
+.content{position:relative;display:block;width:100%;max-width:calc(100vw - 250px);min-height:calc(100vh - 67px);overflow-x:hidden;overflow-y:visible}
+.view,.panel,.panel-body{max-width:100%}
+.table-scroll-x{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.cadastro-panel{overflow:hidden}
+.cadastro-filters{display:flex;align-items:center}
+.cadastro-filters input{flex:1;min-width:160px}
+.cadastro-table{min-width:980px;table-layout:auto}
+.cadastro-table th,.cadastro-table td{white-space:nowrap;max-width:280px}
+.cadastro-modal{width:820px;max-width:calc(100vw - 300px)}
+@media(max-width:900px){.content{max-width:100vw}.cadastro-modal{max-width:calc(100vw - 30px)}.sidebar{width:220px}.main{margin-left:220px}}
+
 </style>
 </head>
 <body class="light">
-
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
-  <video id="loginVideo" autoplay loop muted playsinline crossorigin="anonymous">
-   <source src="7020018_Particle_Dot_3840x2160.mp4" type="video/mp4">
-  </video>
-  <canvas id="matrixCanvas"></canvas>
-  <div class="login-card" id="loginCard">
-    <div class="login-mark">TP</div>
-    <div class="login-title">Triagem Vision</div>
-    <div class="login-sub">Acesso restrito — informe suas credenciais</div>
-    <div class="login-field"><label>Usuário</label><input type="text" id="loginUser" placeholder="Seu usuário" autocomplete="off"></div>
-    <div class="login-field"><label>Senha</label><input type="password" id="loginPass" placeholder="Sua senha" autocomplete="off"></div>
-    <button class="login-btn" id="loginBtn" onclick="tentarLogin()"><span id="loginBtnText">Entrar</span></button>
-    <div class="login-error" id="loginError"><span>⚠</span><span id="loginErrorText">Usuário ou senha inválidos</span></div>
-    <div class="login-foot">Triagem Vision · Acesso controlado por nível de permissão</div>
-  </div>
+<video autoplay="" crossorigin="anonymous" id="loginVideo" loop="" muted="" playsinline="">
+<source src="7020018_Particle_Dot_3840x2160.mp4" type="video/mp4"/>
+</video>
+<canvas id="matrixCanvas"></canvas>
+<div class="login-card" id="loginCard">
+<div class="login-mark">TP</div>
+<div class="login-title">Triagem Vision</div>
+<div class="login-sub">Acesso restrito — informe suas credenciais</div>
+<div class="login-field"><label>Usuário</label><input autocomplete="off" id="loginUser" placeholder="Seu usuário" type="text"/></div>
+<div class="login-field"><label>Senha</label><input autocomplete="off" id="loginPass" placeholder="Sua senha" type="password"/></div>
+<button class="login-btn" id="loginBtn" onclick="tentarLogin()"><span id="loginBtnText">Entrar</span></button>
+<div class="login-error" id="loginError"><span>⚠</span><span id="loginErrorText">Usuário ou senha inválidos</span></div>
+<div class="login-foot">Triagem Vision · Acesso controlado por nível de permissão</div>
 </div>
-
+</div>
 <!-- SIDEBAR -->
 <div class="sidebar">
-  <div class="logo"><div class="mark">TP</div><span>Triagem Vision</span></div>
-  <div class="menu">
-    <div class="menu-label">Operação</div>
-    <a href="#" data-view="dashboard" class="active"><span class="ic">▦</span><span class="label">Dashboard</span></a>
-    <a href="#" data-view="lancamentos"><span class="ic">≡</span><span class="label">Lançamentos &amp; Histórico</span></a>
-    <a href="#" data-view="fefo"><span class="ic">⏳</span><span class="label">FEFO (Validades)</span></a>
-    <div class="menu-label">Gestão</div>
-    <a href="#" data-view="exportar"><span class="ic">⭳</span><span class="label">Exportar</span></a>
-    <a href="#" data-view="relatorios"><span class="ic">▤</span><span class="label">Relatórios</span></a>
-    <a href="#" data-view="lojas"><span class="ic">🏬</span><span class="label">Atualizar Lojas</span></a>
-    <a href="#" data-view="usuarios"><span class="ic">👤</span><span class="label">USERS</span></a>
-    <a href="#" data-view="permissoes" id="menuPermissoes" style="display:none"><span class="ic">🔐</span><span class="label">Permissões</span></a>
-    <a href="#" data-view="donorua" id="menuDonoRua" style="display:none"><span class="ic">🏷</span><span class="label">Dono de Rua</span></a>
-    <a href="#" data-view="config"><span class="ic">⚙</span><span class="label">Configurações</span></a>
-    <a href="#" data-view="manual"><span class="ic">📖</span><span class="label">Manual</span></a>
-    <div class="menu-label">FUNÇÕES</div>
-    <a href="https://pablomlopes797.github.io/DESCARTE_TRIAGEMVISION/" target="_blank" rel="noopener">
-      <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.8" y2="15.8"/></svg></span>
-      <span class="label">AUDITORIA DESCARTE</span>
-    </a>
-    <a href="https://pablomlopes797.github.io/INATIVOS-TRIAGEM-VISION/" target="_blank" rel="noopener">
-      <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"/><line x1="18" y1="6" x2="6" y2="18" stroke="#d64545"/><line x1="6" y1="6" x2="18" y2="18" stroke="#d64545"/></svg></span>
-      <span class="label">ITENS INATIVOS</span>
-    </a>
-    <a href="https://pablomlopes797.github.io/DOA-O_TRIAGEMVISION/" target="_blank" rel="noopener">
-      <span class="ic">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="17" r="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="6.5" cy="12" r="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="12" cy="11" r="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="17.5" cy="12" r="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-      <span class="label">DOAÇÃO DE RAÇÃO</span>
-    </a>
-  </div>
-  <div class="footer">
-    <div class="userbox" id="userBox" style="display:none;margin-bottom:12px">
-      <div class="avatar" id="userAvatar">–</div>
-      <div style="flex:1"><div style="color:#fff;font-size:12.5px;font-weight:700" id="userName">–</div><span class="badge-level basic" id="userBadge">Nível 0</span></div>
-      <button class="icon-btn" title="Alterar senha" onclick="abrirAlterarSenha()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff">🔑</button>
-      <button class="icon-btn" title="Sair" onclick="logout()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff">⏻</button>
-    </div>
-    Desenvolvido por<br><b>Pablo Martins Lopes</b>
-    <div class="conn"><span class="dot" id="connDot"></span><span id="connText">Conectando...</span></div>
-  </div>
+<div class="logo"><div class="mark">TP</div><span>Triagem Vision</span></div>
+<div class="menu">
+<div class="menu-label">Operação</div>
+<a class="active" data-view="dashboard" href="#"><span class="ic">▦</span><span class="label">Dashboard</span></a>
+<a data-view="lancamentos" href="#"><span class="ic">≡</span><span class="label">Lançamentos &amp; Histórico</span></a>
+<a data-view="fefo" href="#"><span class="ic">⏳</span><span class="label">FEFO (Validades)</span></a>
+<div class="menu-label">Gestão</div>
+<a data-view="exportar" href="#"><span class="ic">⭳</span><span class="label">Exportar</span></a>
+<a data-view="relatorios" href="#"><span class="ic">▤</span><span class="label">Relatórios</span></a>
+<a data-view="lojas" href="#"><span class="ic">🏬</span><span class="label">Atualizar Lojas</span></a>
+<a data-view="usuarios" href="#"><span class="ic">👤</span><span class="label">USERS</span></a><div class="priority-menu"><div class="priority-label">MÓDULOS</div><a data-view="cadastro-item" href="#"><span class="ic">＋</span><span class="label">CADASTRO DE ITEM</span></a><a data-view="administracao" href="#"><span class="ic">▣</span><span class="label">ADMINISTRAÇÃO</span></a></div>
+<a data-view="permissoes" href="#" id="menuPermissoes" style="display:none"><span class="ic">🔐</span><span class="label">Permissões</span></a>
+<a data-view="donorua" href="#" id="menuDonoRua" style="display:none"><span class="ic">🏷</span><span class="label">Dono de Rua</span></a>
+<a data-view="config" href="#"><span class="ic">⚙</span><span class="label">Configurações</span></a>
+<a data-view="manual" href="#"><span class="ic">📖</span><span class="label">Manual</span></a>
+<div class="menu-label">FUNÇÕES</div>
+<a href="https://pablomlopes797.github.io/DESCARTE_TRIAGEMVISION/" rel="noopener" target="_blank">
+<span class="ic"><svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="21" x2="15.8" y1="21" y2="15.8"></line></svg></span>
+<span class="label">AUDITORIA DESCARTE</span>
+</a>
+<a href="https://pablomlopes797.github.io/INATIVOS-TRIAGEM-VISION/" rel="noopener" target="_blank">
+<span class="ic"><svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M10 2h4"></path><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"></path><line stroke="#d64545" x1="18" x2="6" y1="6" y2="18"></line><line stroke="#d64545" x1="6" x2="18" y1="6" y2="18"></line></svg></span>
+<span class="label">ITENS INATIVOS</span>
+</a>
+<a href="https://pablomlopes797.github.io/DOA-O_TRIAGEMVISION/" rel="noopener" target="_blank">
+<span class="ic">
+<svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16">
+<circle cx="12" cy="17" r="3" stroke-linecap="round" stroke-linejoin="round"></circle>
+<circle cx="6.5" cy="12" r="2.2" stroke-linecap="round" stroke-linejoin="round"></circle>
+<circle cx="12" cy="11" r="2.2" stroke-linecap="round" stroke-linejoin="round"></circle>
+<circle cx="17.5" cy="12" r="2.2" stroke-linecap="round" stroke-linejoin="round"></circle>
+</svg>
+</span>
+<span class="label">DOAÇÃO DE RAÇÃO</span>
+</a>
 </div>
-
+<div class="footer">
+<div class="userbox" id="userBox" style="display:none;margin-bottom:12px">
+<div class="avatar" id="userAvatar">–</div>
+<div style="flex:1"><div id="userName" style="color:#fff;font-size:12.5px;font-weight:700">–</div><span class="badge-level basic" id="userBadge">Nível 0</span></div>
+<button class="icon-btn" onclick="abrirAlterarSenha()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff" title="Alterar senha">🔑</button>
+<button class="icon-btn" onclick="logout()" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff" title="Sair">⏻</button>
+</div>
+    Desenvolvido por<br/><b>Pablo Martins Lopes</b>
+<div class="conn"><span class="dot" id="connDot"></span><span id="connText">Conectando...</span></div>
+</div>
+</div>
 <!-- MAIN -->
 <div class="main">
-  <div class="topbar">
-    <div><h3 id="viewTitle">Dashboard</h3><div class="sub" id="viewSub">Visão geral da triagem</div></div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <button class="theme-toggle" onclick="refreshActiveView()" title="Atualizar Dashboard">🔄</button>
-      <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌓</button>
-    </div>
-  </div>
-  <div class="title-bar" id="titleBar"></div>
-
-  <div class="content">
-    <!-- DASHBOARD -->
-    <div class="view active" id="view-dashboard">
-      <div class="panel" style="margin-bottom:16px">
-        <div class="filters" style="justify-content:center;border:0;padding:12px 20px;background:transparent">
-          <select id="globalTipoFiltro" onchange="aplicarFiltrosDashboard()" style="min-width:200px;font-size:14px;font-weight:600">
-            <option value="">Todos os tipos</option>
-            <option value="Lançamento">Lançamento</option>
-            <option value="Retrabalho">Retrabalho</option>
-            <option value="Descarte">Descarte</option>
-            <option value="Gaiola">Gaiola</option>
-          </select>
-          <button class="btn ghost" onclick="toggleDashFiltros()"><span id="dashFiltroToggleLabel">Mostrar filtros</span></button>
-        </div>
-      </div>
-      <div class="panel" id="dashFiltrosPainel" style="display:none;margin-bottom:16px">
-        <div class="filters" style="border:0;padding:12px 20px;background:var(--surface)">
-          <select id="dfCd"><option value="">Todos os CDs</option></select>
-          <select id="dfTurno"><option value="">Todos os turnos</option><option value="1">1 Turno</option><option value="2">2 Turno</option><option value="3">3 Turno</option></select>
-          <input type="date" id="dfDataIni" title="Data inicial"><input type="date" id="dfDataFim" title="Data final">
-          <input type="text" id="dfUsuario" placeholder="Usuário"><input type="text" id="dfCategoria" placeholder="Categoria">
-          <input type="text" id="dfMotivo" placeholder="Motivo"><input type="text" id="dfOrigem" placeholder="Origem">
-          <input type="text" id="dfRua" placeholder="Rua"><input type="text" id="dfDono" placeholder="Dono">
-          <div style="display:flex;gap:8px;margin-left:auto">
-            <button class="btn" onclick="aplicarFiltrosDashboard()">Filtrar</button>
-            <button class="btn ghost" onclick="cancelarFiltrosDashboard()">Cancelar</button>
-          </div>
-        </div>
-      </div>
-      <div class="cards">
-        <div class="card"><div class="k">Total de Unidades</div><div class="v blue" id="statTotal">–</div></div>
-        <div class="card"><div class="k">Unidades Hoje</div><div class="v green" id="statHoje">–</div></div>
-        <div class="card"><div class="k">Pendentes de Cadastro</div><div class="v amber" id="statPend">–</div></div>
-        <div class="card"><div class="k">Categorias Distintas</div><div class="v purple" id="statCat">–</div></div>
-        <div class="card"><div class="k">Produtos Distintos</div><div class="v blue" id="statProd">–</div></div>
-        <div class="card"><div class="k">Usuários Ativos</div><div class="v green" id="statUser">–</div></div>
-        <div class="card"><div class="k">Média Diária (un.)</div><div class="v amber" id="statMediaDia">–</div></div>
-        <div class="card"><div class="k">Média por Lançamento</div><div class="v purple" id="statMediaLanc">–</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><h4>Controle de Validade (FEFO) – Próximos 30 dias</h4></div>
-        <div style="overflow-x:auto">
-          <table><thead><tr><th>Produto</th><th>Validade</th><th>Dias Restantes</th><th>Qtd. Unidade</th></tr></thead>
-          <tbody id="dashFefoTable"><tr><td colspan="4" class="empty">Carregando…</td></tr></tbody></table>
-        </div>
-      </div>
-      <div id="chartsGrid"></div>
-    </div>
-
-    <!-- LANÇAMENTOS UNIFICADO -->
-    <div class="view" id="view-lancamentos">
-      <div class="launcher-grid" id="launcherGrid">
-        <div class="launcher-card" onclick="openConsultaModal()"><div class="launcher-icon t-consulta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.8" y2="15.8"/></svg></div><div class="launcher-label">Consulta</div></div>
-        <div class="launcher-card lancar-only" onclick="openModal()"><div class="launcher-icon t-lanc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"/><line x1="6.5" y1="14" x2="17.5" y2="14"/></svg></div><div class="launcher-label">Lançamento</div></div>
-        <div class="launcher-card lancar-only" onclick="openRetrabalhoModal()"><div class="launcher-icon t-retrabalho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"/><rect x="8.3" y="13.4" width="7.4" height="4.2" rx=".6" transform="rotate(-18 12 15.5)"/><line x1="9.6" y1="14.6" x2="14.4" y2="16.4"/></svg></div><div class="launcher-label">Retrabalho</div></div>
-        <div class="launcher-card lancar-only" onclick="openGaiolaModal()"><div class="launcher-icon t-gaiola"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10 5 4h14l2 6"/><path d="M3 10v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 20v-5a3 3 0 0 1 6 0v5"/></svg></div><div class="launcher-label">Gaiola</div></div>
-        <div class="launcher-card lancar-only" onclick="openDescarteModal()"><div class="launcher-icon t-descarte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2h4"/><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L8.6 9"/><path d="M9 12.5 6.4 15c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3L14 8"/><line x1="8.6" y1="9" x2="14" y2="8"/><line x1="9" y1="12.5" x2="14.5" y2="12"/></svg></div><div class="launcher-label">Descarte</div></div>
-        <div class="launcher-card lancar-only mip-card" onclick="openMipModal()"><div class="launcher-icon t-mip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9.8 11.2 8.1 9.5a1.7 1.7 0 0 0-2.4 2.4l4.2 4.2a3.5 3.5 0 0 0 2.5 1h3.1a3.5 3.5 0 0 0 3.5-3.5V9.2a1.7 1.7 0 0 0-3.4 0v2.2"/><path d="M15.6 11V7.4a1.7 1.7 0 0 0-3.4 0v3.1"/><path d="M12.2 10.2V6.8a1.7 1.7 0 0 0-3.4 0v5.1"/><path d="M18.9 12.2V10a1.7 1.7 0 0 0-3.3-.6"/><path d="M8.3 6.5c-.7-1.7.2-3.5 1.9-4.1 1.5-.5 3.2.2 3.9 1.6"/><path d="M6.7 16.1 5.3 18a2.2 2.2 0 0 0 1.8 3.5h8.4"/></svg></div><div class="launcher-label">MIP</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <h4>Central de Lançamentos &amp; Histórico</h4>
-          <button class="btn ghost" onclick="toggleFiltrosLancamentos()"><span id="lancFiltroToggleLabel">Mostrar filtros</span></button>
-        </div>
-        <div class="filters" id="lancFiltrosPainel" style="display:none;border-bottom:1px solid var(--line);padding:12px 20px;background:var(--surface)">
-          <input type="text" id="lancFiltroEan" placeholder="EAN">
-          <input type="text" id="lancFiltroProduto" placeholder="Produto">
-          <input type="text" id="lancFiltroMotivo" placeholder="Motivo">
-          <input type="text" id="lancFiltroUsuario" placeholder="Usuário">
-          <input type="text" id="lancFiltroCategoria" placeholder="Categoria">
-          <select id="lancFiltroTipo"><option value="">Todos os tipos</option><option value="Lançamento">Lançamento</option><option value="Retrabalho">Retrabalho</option><option value="Descarte">Descarte</option><option value="Gaiola">Gaiola</option></select>
-          <input type="date" id="lancFiltroData">
-          <div style="display:flex;gap:8px;margin-left:auto">
-            <button class="btn" onclick="loadLancamentosUnificado()">Filtrar</button>
-            <button class="btn ghost" onclick="toggleFiltrosLancamentos()">Cancelar</button>
-          </div>
-        </div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr><th>Data/Hora</th><th>Tipo</th><th>EAN</th><th>Produto</th><th>Motivo</th><th>Origem</th><th>Validade</th><th>Rua</th><th>Dono</th><th>Categoria</th><th>Qtd. Unidade</th><th>Usuário</th><th>Ações</th></tr></thead>
-            <tbody id="lancUnificadoTable"><tr><td colspan="13" class="empty">Carregando…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- FEFO -->
-    <div class="view" id="view-fefo">
-      <div class="panel">
-        <div class="panel-head"><h4>FEFO — Produtos próximos do vencimento</h4></div>
-        <div class="filters">
-          <select id="fefoRange"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30" selected>30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option></select>
-          <button class="btn" onclick="loadFefo()">Atualizar</button>
-        </div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>EAN</th><th>Produto</th><th>Validade</th><th>Dias Restantes</th><th>Qtd Un</th><th>Ação</th></tr></thead><tbody id="fefoTable"><tr><td colspan="8" class="empty">Carregando…</td></tr></tbody></table></div>
-      </div>
-    </div>
-
-    <!-- EXPORTAR -->
-    <div class="view" id="view-exportar">
-      <div class="panel"><div class="panel-head"><h4>Exportar dados</h4></div><div class="panel-body"><div class="grid" style="margin-bottom:16px"><div class="field full"><label>Banco de dados</label><select id="expTable"><option value="BD_LANC">Lançamentos (BD_LANC)</option><option value="BD_RETRABALHO">Retrabalho</option><option value="BD_GAIOLA">Gaiola</option><option value="GAIOLAS_LANC">Gaiolas Lançadas (GAIOLAS_LANC)</option><option value="BD_DESCARTE">Descarte</option><option value="MIP">MIP</option><option value="BD_SALDO">Saldo de Produtos (BD_SALDO)</option><option value="BD_LOJA">Base de Lojas (BD_LOJA)</option></select></div><div class="field"><label>Data inicial</label><input type="date" id="expFrom"></div><div class="field"><label>Data final</label><input type="date" id="expTo"></div></div><div style="display:flex;gap:10px"><button class="btn" onclick="exportData('csv')">⭳ Exportar CSV</button><button class="btn ghost" onclick="exportData('xlsx')">⭳ Exportar Excel (.xlsx)</button></div><p class="hint" style="margin-top:14px" id="expInfo"></p></div></div>
-    </div>
-
-    <!-- RELATÓRIOS -->
-    <div class="view" id="view-relatorios">
-      <div class="panel"><div class="panel-head"><h4>Lançamentos por Motivo</h4></div><div class="panel-body" id="repMotivo"><p class="hint">Carregando…</p></div></div>
-      <div class="panel"><div class="panel-head"><h4>Lançamentos por Origem</h4></div><div class="panel-body" id="repOrigem"><p class="hint">Carregando…</p></div></div>
-      <div class="panel" id="prevReportComingSoon"><div class="panel-head"><h4>Relatório de Prevenção de Perdas</h4></div><div class="panel-body"><p class="hint">Disponível em breve — restrito a usuários de nível 5 (ou 1).</p></div></div>
-    </div>
-
-    <!-- LOJAS -->
-    <div class="view" id="view-lojas">
-      <div class="cfg-restricted" id="lojasRestricted" style="display:none"><div class="big">🔒</div><p><b>Acesso restrito.</b><br>Somente usuários nível 1 ou 4 podem atualizar a base de lojas.</p></div>
-      <div id="lojasPanel"><div class="panel"><div class="panel-head"><h4>Atualizar Base de Lojas (BD_LOJA)</h4></div><div class="panel-body"><p class="hint">Selecione a pasta com os arquivos de lojas. De cada arquivo são extraídas as colunas <b>SEQPRODUTO</b>, <b>DESCCOMPLETA</b> e <b>NROEMPRESA</b>.</p><input type="file" id="lojaFolderInput" webkitdirectory directory multiple style="margin:14px 0;padding:10px;border:1px dashed var(--line);border-radius:9px"><div style="display:flex;gap:10px"><button class="btn" onclick="processarPastaLojas()">Processar e Sincronizar</button></div><div class="sync-log" id="lojaSyncLog">Aguardando seleção de pasta…</div></div></div></div>
-    </div>
-
-    <!-- USUÁRIOS -->
-    <div class="view" id="view-usuarios">
-      <div class="cfg-restricted" id="usersRestricted" style="display:none"><div class="big">🔒</div><p><b>Acesso restrito.</b><br>O gerenciamento de usuários só fica disponível para usuários nível 1 (acesso total).</p></div>
-      <div id="usersPanel"><div class="panel"><div class="panel-head"><h4>Usuários cadastrados</h4><button class="btn" onclick="openUserModal()">＋ Novo usuário</button></div><div style="overflow-x:auto"><table><thead><tr><th>Usuário</th><th>Nome</th><th>Nível</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usersTable"><tr><td colspan="5" class="empty">Carregando…</td></tr></tbody></table></div></div></div>
-    </div>
-
-    <!-- PERMISSÕES -->
-    <div class="view" id="view-permissoes">
-      <div class="panel"><div class="panel-head"><h4>Gerenciar Permissões por Nível</h4></div><div class="panel-body"><p class="hint">Marque as funcionalidades permitidas para cada nível de usuário. As alterações são salvas automaticamente no navegador.</p><div id="permissoesContainer"></div><button class="btn" style="margin-top:16px" onclick="salvarPermissoes()">Salvar Permissões</button></div></div>
-    </div>
-
-    <!-- DONO DE RUA -->
-    <div class="view" id="view-donorua">
-      <div class="panel">
-        <div class="panel-head"><h4>Mapeamento Rua → Dono</h4><button class="btn" onclick="abrirModalDonoRua(null)">+ Adicionar Rua</button></div>
-        <div class="panel-body">
-          <p class="hint" style="margin-bottom:12px">Cadastre aqui o <b>Dono</b> de cada <b>Rua</b>.</p>
-          <div style="overflow-x:auto"><table><thead><tr><th>Rua</th><th>Dono</th><th>Ações</th></tr></thead><tbody id="donoRuaTable"><tr><td colspan="3" class="empty">Carregando...</td></tr></tbody></table></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONFIGURAÇÕES -->
-    <div class="view" id="view-config">
-      <div class="cfg-restricted" id="cfgRestricted" style="display:none"><div class="big">🔒</div><p><b>Acesso restrito.</b><br>As credenciais de conexão só ficam visíveis para usuários nível 1 (acesso total).</p></div>
-      <div id="cfgPanel"><div class="panel"><div class="panel-head"><h4>Conexão Supabase</h4></div><div class="panel-body"><div class="settings-grid"><div class="field full"><label>URL do projeto</label><input type="text" id="cfgUrl"></div><div class="field full"><label>Chave anon (public)</label><input type="text" id="cfgKey"></div><div class="field full"><label>URL da planilha Gaiola (export CSV)</label><input type="text" id="cfgGaiolaUrl"></div></div><div style="margin-top:16px;display:flex;gap:10px"><button class="btn" onclick="saveConfig()">Salvar e reconectar</button><button class="btn ghost" onclick="resetConfig()">Restaurar padrão</button></div><p class="hint" style="margin-top:12px">As credenciais ficam salvas apenas neste navegador (localStorage).</p></div></div></div>
-    </div>
-
-    <!-- MANUAL -->
-    <div class="view" id="view-manual">
-      <div class="panel"><div class="panel-head"><h4>Manual do Sistema</h4></div><div class="panel-body" style="line-height:1.7;max-height:70vh;overflow-y:auto">
-        <h3>Bem-vindo ao Triagem Vision</h3>
-        <p>Este sistema gerencia o fluxo de triagem de produtos em um centro de distribuição.</p>
-        <h4>Painéis:</h4>
-        <ul>
-          <li><b>Dashboard:</b> Visão geral com gráficos e estatísticas.</li>
-          <li><b>Lançamentos &amp; Histórico:</b> Central unificada de auditoria e consulta.</li>
-          <li><b>FEFO:</b> Produtos próximos do vencimento.</li>
-          <li><b>Exportar:</b> Baixar dados em CSV ou Excel.</li>
-          <li><b>Relatórios:</b> Indicadores por motivo e origem.</li>
-          <li><b>Atualizar Lojas:</b> Upload de arquivos para sincronizar a base de lojas.</li>
-          <li><b>USERS:</b> Gerenciamento de usuários (nível 1).</li>
-          <li><b>Permissões:</b> (apenas admin) Configurar o que cada nível pode acessar.</li>
-          <li><b>Configurações:</b> Conexão com Supabase e URL da planilha.</li>
-        </ul>
-      </div></div>
-    </div>
-
-  </div>
+<div class="topbar">
+<div><h3 id="viewTitle">Dashboard</h3><div class="sub" id="viewSub">Visão geral da triagem</div></div>
+<div style="display:flex;gap:10px;align-items:center">
+<button class="theme-toggle" onclick="refreshActiveView()" title="Atualizar Dashboard">🔄</button>
+<button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌓</button>
 </div>
-
+</div>
+<div class="title-bar" id="titleBar"></div>
+<div class="content">
+<!-- DASHBOARD -->
+<div class="view active" id="view-dashboard">
+<div class="panel" style="margin-bottom:16px">
+<div class="filters" style="justify-content:center;border:0;padding:12px 20px;background:transparent">
+<select id="globalTipoFiltro" onchange="aplicarFiltrosDashboard()" style="min-width:200px;font-size:14px;font-weight:600">
+<option value="">Todos os tipos</option>
+<option value="Lançamento">Lançamento</option>
+<option value="Retrabalho">Retrabalho</option>
+<option value="Descarte">Descarte</option>
+<option value="Gaiola">Gaiola</option>
+</select>
+<button class="btn ghost" onclick="toggleDashFiltros()"><span id="dashFiltroToggleLabel">Mostrar filtros</span></button>
+</div>
+</div>
+<div class="panel" id="dashFiltrosPainel" style="display:none;margin-bottom:16px">
+<div class="filters" style="border:0;padding:12px 20px;background:var(--surface)">
+<select id="dfCd"><option value="">Todos os CDs</option></select>
+<select id="dfTurno"><option value="">Todos os turnos</option><option value="1">1 Turno</option><option value="2">2 Turno</option><option value="3">3 Turno</option></select>
+<input id="dfDataIni" title="Data inicial" type="date"/><input id="dfDataFim" title="Data final" type="date"/>
+<input id="dfUsuario" placeholder="Usuário" type="text"/><input id="dfCategoria" placeholder="Categoria" type="text"/>
+<input id="dfMotivo" placeholder="Motivo" type="text"/><input id="dfOrigem" placeholder="Origem" type="text"/>
+<input id="dfRua" placeholder="Rua" type="text"/><input id="dfDono" placeholder="Dono" type="text"/>
+<div style="display:flex;gap:8px;margin-left:auto">
+<button class="btn" onclick="aplicarFiltrosDashboard()">Filtrar</button>
+<button class="btn ghost" onclick="cancelarFiltrosDashboard()">Cancelar</button>
+</div>
+</div>
+</div>
+<div class="cards">
+<div class="card"><div class="k">Total de Unidades</div><div class="v blue" id="statTotal">–</div></div>
+<div class="card"><div class="k">Unidades Hoje</div><div class="v green" id="statHoje">–</div></div>
+<div class="card"><div class="k">Pendentes de Cadastro</div><div class="v amber" id="statPend">–</div></div>
+<div class="card"><div class="k">Categorias Distintas</div><div class="v purple" id="statCat">–</div></div>
+<div class="card"><div class="k">Produtos Distintos</div><div class="v blue" id="statProd">–</div></div>
+<div class="card"><div class="k">Usuários Ativos</div><div class="v green" id="statUser">–</div></div>
+<div class="card"><div class="k">Média Diária (un.)</div><div class="v amber" id="statMediaDia">–</div></div>
+<div class="card"><div class="k">Média por Lançamento</div><div class="v purple" id="statMediaLanc">–</div></div>
+</div>
+<div class="panel">
+<div class="panel-head"><h4>Controle de Validade (FEFO) – Próximos 30 dias</h4></div>
+<div style="overflow-x:auto">
+<table><thead><tr><th>Produto</th><th>Validade</th><th>Dias Restantes</th><th>Qtd. Unidade</th></tr></thead>
+<tbody id="dashFefoTable"><tr><td class="empty" colspan="4">Carregando…</td></tr></tbody></table>
+</div>
+</div>
+<div id="chartsGrid"></div>
+</div>
+<!-- LANÇAMENTOS UNIFICADO -->
+<div class="view" id="view-lancamentos">
+<div class="launcher-grid" id="launcherGrid">
+<div class="launcher-card" onclick="openConsultaModal()"><div class="launcher-icon t-consulta"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="21" x2="15.8" y1="21" y2="15.8"></line></svg></div><div class="launcher-label">Consulta</div></div>
+<div class="launcher-card lancar-only" onclick="openModal()"><div class="launcher-icon t-lanc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M10 2h4"></path><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"></path><line x1="6.5" x2="17.5" y1="14" y2="14"></line></svg></div><div class="launcher-label">Lançamento</div></div>
+<div class="launcher-card lancar-only" onclick="openRetrabalhoModal()"><div class="launcher-icon t-retrabalho"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M10 2h4"></path><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"></path><rect height="4.2" rx=".6" transform="rotate(-18 12 15.5)" width="7.4" x="8.3" y="13.4"></rect><line x1="9.6" x2="14.4" y1="14.6" y2="16.4"></line></svg></div><div class="launcher-label">Retrabalho</div></div>
+<div class="launcher-card lancar-only" onclick="openGaiolaModal()"><div class="launcher-icon t-gaiola"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 10 5 4h14l2 6"></path><path d="M3 10v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9"></path><line x1="3" x2="21" y1="10" y2="10"></line><path d="M9 20v-5a3 3 0 0 1 6 0v5"></path></svg></div><div class="launcher-label">Gaiola</div></div>
+<div class="launcher-card lancar-only" onclick="openDescarteModal()"><div class="launcher-icon t-descarte"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M10 2h4"></path><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L8.6 9"></path><path d="M9 12.5 6.4 15c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3L14 8"></path><line x1="8.6" x2="14" y1="9" y2="8"></line><line x1="9" x2="14.5" y1="12.5" y2="12"></line></svg></div><div class="launcher-label">Descarte</div></div>
+<div class="launcher-card lancar-only mip-card" onclick="openMipModal()"><div class="launcher-icon t-mip"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M9.8 11.2 8.1 9.5a1.7 1.7 0 0 0-2.4 2.4l4.2 4.2a3.5 3.5 0 0 0 2.5 1h3.1a3.5 3.5 0 0 0 3.5-3.5V9.2a1.7 1.7 0 0 0-3.4 0v2.2"></path><path d="M15.6 11V7.4a1.7 1.7 0 0 0-3.4 0v3.1"></path><path d="M12.2 10.2V6.8a1.7 1.7 0 0 0-3.4 0v5.1"></path><path d="M18.9 12.2V10a1.7 1.7 0 0 0-3.3-.6"></path><path d="M8.3 6.5c-.7-1.7.2-3.5 1.9-4.1 1.5-.5 3.2.2 3.9 1.6"></path><path d="M6.7 16.1 5.3 18a2.2 2.2 0 0 0 1.8 3.5h8.4"></path></svg></div><div class="launcher-label">MIP</div></div>
+</div>
+<div class="panel">
+<div class="panel-head">
+<h4>Central de Lançamentos &amp; Histórico</h4>
+<button class="btn ghost" onclick="toggleFiltrosLancamentos()"><span id="lancFiltroToggleLabel">Mostrar filtros</span></button>
+</div>
+<div class="filters" id="lancFiltrosPainel" style="display:none;border-bottom:1px solid var(--line);padding:12px 20px;background:var(--surface)">
+<input id="lancFiltroEan" placeholder="EAN" type="text"/>
+<input id="lancFiltroProduto" placeholder="Produto" type="text"/>
+<input id="lancFiltroMotivo" placeholder="Motivo" type="text"/>
+<input id="lancFiltroUsuario" placeholder="Usuário" type="text"/>
+<input id="lancFiltroCategoria" placeholder="Categoria" type="text"/>
+<select id="lancFiltroTipo"><option value="">Todos os tipos</option><option value="Lançamento">Lançamento</option><option value="Retrabalho">Retrabalho</option><option value="Descarte">Descarte</option><option value="Gaiola">Gaiola</option></select>
+<input id="lancFiltroData" type="date"/>
+<div style="display:flex;gap:8px;margin-left:auto">
+<button class="btn" onclick="loadLancamentosUnificado()">Filtrar</button>
+<button class="btn ghost" onclick="toggleFiltrosLancamentos()">Cancelar</button>
+</div>
+</div>
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>Data/Hora</th><th>Tipo</th><th>EAN</th><th>Produto</th><th>Motivo</th><th>Origem</th><th>Validade</th><th>Rua</th><th>Dono</th><th>Categoria</th><th>Qtd. Unidade</th><th>Usuário</th><th>Ações</th></tr></thead>
+<tbody id="lancUnificadoTable"><tr><td class="empty" colspan="13">Carregando…</td></tr></tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- FEFO -->
+<div class="view" id="view-fefo">
+<div class="panel">
+<div class="panel-head"><h4>FEFO — Produtos próximos do vencimento</h4></div>
+<div class="filters">
+<select id="fefoRange"><option value="7">7 dias</option><option value="15">15 dias</option><option selected="" value="30">30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option></select>
+<button class="btn" onclick="loadFefo()">Atualizar</button>
+</div>
+<div style="overflow-x:auto"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>EAN</th><th>Produto</th><th>Validade</th><th>Dias Restantes</th><th>Qtd Un</th><th>Ação</th></tr></thead><tbody id="fefoTable"><tr><td class="empty" colspan="8">Carregando…</td></tr></tbody></table></div>
+</div>
+</div>
+<!-- EXPORTAR -->
+<div class="view" id="view-exportar">
+<div class="panel"><div class="panel-head"><h4>Exportar dados</h4></div><div class="panel-body"><div class="grid" style="margin-bottom:16px"><div class="field full"><label>Banco de dados</label><select id="expTable"><option value="BD_LANC">Lançamentos (BD_LANC)</option><option value="BD_RETRABALHO">Retrabalho</option><option value="BD_GAIOLA">Gaiola</option><option value="GAIOLAS_LANC">Gaiolas Lançadas (GAIOLAS_LANC)</option><option value="BD_DESCARTE">Descarte</option><option value="MIP">MIP</option><option value="BD_SALDO">Saldo de Produtos (BD_SALDO)</option><option value="BD_LOJA">Base de Lojas (BD_LOJA)</option></select></div><div class="field"><label>Data inicial</label><input id="expFrom" type="date"/></div><div class="field"><label>Data final</label><input id="expTo" type="date"/></div></div><div style="display:flex;gap:10px"><button class="btn" onclick="exportData('csv')">⭳ Exportar CSV</button><button class="btn ghost" onclick="exportData('xlsx')">⭳ Exportar Excel (.xlsx)</button></div><p class="hint" id="expInfo" style="margin-top:14px"></p></div></div>
+</div>
+<!-- RELATÓRIOS -->
+<div class="view" id="view-relatorios">
+<div class="panel"><div class="panel-head"><h4>Lançamentos por Motivo</h4></div><div class="panel-body" id="repMotivo"><p class="hint">Carregando…</p></div></div>
+<div class="panel"><div class="panel-head"><h4>Lançamentos por Origem</h4></div><div class="panel-body" id="repOrigem"><p class="hint">Carregando…</p></div></div>
+<div class="panel" id="prevReportComingSoon"><div class="panel-head"><h4>Relatório de Prevenção de Perdas</h4></div><div class="panel-body"><p class="hint">Disponível em breve — restrito a usuários de nível 5 (ou 1).</p></div></div>
+</div>
+<!-- LOJAS -->
+<div class="view" id="view-lojas">
+<div class="cfg-restricted" id="lojasRestricted" style="display:none"><div class="big">🔒</div><p><b>Acesso restrito.</b><br/>Somente usuários nível 1 ou 4 podem atualizar a base de lojas.</p></div>
+<div id="lojasPanel"><div class="panel"><div class="panel-head"><h4>Atualizar Base de Lojas (BD_LOJA)</h4></div><div class="panel-body"><p class="hint">Selecione a pasta com os arquivos de lojas. De cada arquivo são extraídas as colunas <b>SEQPRODUTO</b>, <b>DESCCOMPLETA</b> e <b>NROEMPRESA</b>.</p><input directory="" id="lojaFolderInput" multiple="" style="margin:14px 0;padding:10px;border:1px dashed var(--line);border-radius:9px" type="file" webkitdirectory=""/><div style="display:flex;gap:10px"><button class="btn" onclick="processarPastaLojas()">Processar e Sincronizar</button></div><div class="sync-log" id="lojaSyncLog">Aguardando seleção de pasta…</div></div></div></div>
+</div>
+<!-- USUÁRIOS -->
+<div class="view" id="view-usuarios">
+<div class="cfg-restricted" id="usersRestricted" style="display:none"><div class="big">🔒</div><p><b>Acesso restrito.</b><br/>O gerenciamento de usuários só fica disponível para usuários nível 1 (acesso total).</p></div>
+<div id="usersPanel"><div class="panel"><div class="panel-head"><h4>Usuários cadastrados</h4><button class="btn" onclick="openUserModal()">＋ Novo usuário</button></div><div style="overflow-x:auto"><table><thead><tr><th>Usuário</th><th>Nome</th><th>Nível</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usersTable"><tr><td class="empty" colspan="5">Carregando…</td></tr></tbody></table></div></div></div>
+</div>
+<!-- PERMISSÕES -->
+<div class="view" id="view-permissoes">
+<div class="panel"><div class="panel-head"><h4>Gerenciar Permissões por Nível</h4></div><div class="panel-body"><p class="hint">Marque as funcionalidades permitidas para cada nível de usuário. As alterações são salvas automaticamente no navegador.</p><div id="permissoesContainer"></div><button class="btn" onclick="salvarPermissoes()" style="margin-top:16px">Salvar Permissões</button></div></div>
+</div>
+<!-- DONO DE RUA -->
+<div class="view" id="view-donorua">
+<div class="panel">
+<div class="panel-head"><h4>Mapeamento Rua → Dono</h4><button class="btn" onclick="abrirModalDonoRua(null)">+ Adicionar Rua</button></div>
+<div class="panel-body">
+<p class="hint" style="margin-bottom:12px">Cadastre aqui o <b>Dono</b> de cada <b>Rua</b>.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>Rua</th><th>Dono</th><th>Ações</th></tr></thead><tbody id="donoRuaTable"><tr><td class="empty" colspan="3">Carregando...</td></tr></tbody></table></div>
+</div>
+</div>
+</div>
+<!-- CONFIGURAÇÕES -->
+<div class="view" id="view-config">
+<div class="cfg-restricted" id="cfgRestricted" style="display:none"><div class="big">🔒</div><p><b>Acesso restrito.</b><br/>As credenciais de conexão só ficam visíveis para usuários nível 1 (acesso total).</p></div>
+<div id="cfgPanel"><div class="panel"><div class="panel-head"><h4>Conexão Supabase</h4></div><div class="panel-body"><div class="settings-grid"><div class="field full"><label>URL do projeto</label><input id="cfgUrl" type="text"/></div><div class="field full"><label>Chave anon (public)</label><input id="cfgKey" type="text"/></div><div class="field full"><label>URL da planilha Gaiola (export CSV)</label><input id="cfgGaiolaUrl" type="text"/></div></div><div style="margin-top:16px;display:flex;gap:10px"><button class="btn" onclick="saveConfig()">Salvar e reconectar</button><button class="btn ghost" onclick="resetConfig()">Restaurar padrão</button></div><p class="hint" style="margin-top:12px">As credenciais ficam salvas apenas neste navegador (localStorage).</p></div></div></div>
+</div>
+<!-- MANUAL -->
+<div class="view" id="view-manual">
+<div class="panel"><div class="panel-head"><h4>Manual do Sistema</h4></div><div class="panel-body" style="line-height:1.7;max-height:70vh;overflow-y:auto">
+<h3>Bem-vindo ao Triagem Vision</h3>
+<p>Este sistema gerencia o fluxo de triagem de produtos em um centro de distribuição.</p>
+<h4>Painéis:</h4>
+<ul>
+<li><b>Dashboard:</b> Visão geral com gráficos e estatísticas.</li>
+<li><b>Lançamentos &amp; Histórico:</b> Central unificada de auditoria e consulta.</li>
+<li><b>FEFO:</b> Produtos próximos do vencimento.</li>
+<li><b>Exportar:</b> Baixar dados em CSV ou Excel.</li>
+<li><b>Relatórios:</b> Indicadores por motivo e origem.</li>
+<li><b>Atualizar Lojas:</b> Upload de arquivos para sincronizar a base de lojas.</li>
+<li><b>USERS:</b> Gerenciamento de usuários (nível 1).</li>
+<li><b>Permissões:</b> (apenas admin) Configurar o que cada nível pode acessar.</li>
+<li><b>Configurações:</b> Conexão com Supabase e URL da planilha.</li>
+</ul>
+</div></div>
+</div>
+<div class="view" id="view-cadastro-item">
+<div class="panel cadastro-panel">
+<div class="panel-head"><div><h4>Cadastro de Item</h4><p class="hint">Itens já cadastrados manualmente na tabela BD_CADASTRO.</p></div><button class="btn" id="btnAbrirCadastroItem" onclick="abrirCadastroItem()">＋ Cadastrar</button></div>
+<div class="filters cadastro-filters"><input id="cadFiltroCodigo" placeholder="EAN / CODACESSO"/><input id="cadFiltroPlu" placeholder="PLU / SEQPRODUTO"/><input id="cadFiltroProduto" placeholder="Produto"/><button class="btn" onclick="carregarCadastroItens()">Atualizar</button></div>
+<div class="panel-body"><div class="table-scroll-x cadastro-table-wrap"><table class="cadastro-table"><thead id="cadastroItensHead"></thead><tbody id="cadastroItensTable"><tr><td class="empty">Clique em Atualizar para consultar os itens.</td></tr></tbody></table></div></div>
+</div>
+</div>
+<div class="overlay" id="overlayCadastroItem">
+<div class="modal cadastro-modal">
+<div class="modal-header"><h3>Cadastrar item na BD_CADASTRO</h3><button class="close-x" onclick="fecharCadastroItem()">✕</button></div>
+<div class="modal-body"><div class="module-note">Somente usuário de <b>nível 1</b> pode cadastrar itens. Preencha todas as colunas disponíveis no cadastro manual.</div>
+<div class="grid">
+<div class="field full"><label>CODACESSO — EAN / Código de acesso</label><input autocomplete="off" id="cad_ean" inputmode="numeric" type="text"/></div>
+<div class="field"><label>SEQPRODUTO — PLU</label><input id="cad_plu" inputmode="numeric" type="text"/></div>
+<div class="field"><label>DESCCOMPLETA — Produto</label><input id="cad_produto" type="text"/></div>
+<div class="field"><label>ENDERECO — Apanha / Endereço</label><input id="cad_apanha" type="text"/></div>
+<div class="field"><label>NM_MERC_N1 — Categoria</label><input id="cad_categoria" type="text"/></div>
+<div class="field"><label>RUA</label><input id="cad_rua" type="text"/></div>
+<div class="field"><label>DONO</label><input id="cad_dono" type="text"/></div>
+<div class="field"><label>PADRAOEMBCOMPRA — Qtd. embalagem</label><input id="cad_qtd_embalagem" inputmode="numeric" type="text"/></div>
+</div>
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="fecharCadastroItem()">Cancelar</button><button class="btn" id="btnSalvarCadastroItem" onclick="salvarCadastroItem()">Salvar cadastro</button></div>
+</div>
+</div>
+<div class="view" id="view-administracao">
+<div class="panel">
+<div class="panel-head"><h4>ADMINISTRAÇÃO — Faturamento de Descarte</h4><div class="module-actions"><button class="btn" onclick="carregarAdministracao()">Atualizar</button></div></div>
+<div class="filters"><input id="admDataIni" title="Data inicial" type="date"/><input id="admDataFim" title="Data final" type="date"/><select id="admTurno"><option value="">Todos os turnos</option><option value="1">1º Turno</option><option value="2">2º Turno</option><option value="3">3º Turno</option></select><select id="admStatus"><option value="">Todos os status</option><option value="PENDENTE">Pendente</option><option value="FATURADO">Faturado</option></select><input id="admPlu" placeholder="PLU"/><input id="admProduto" placeholder="Produto"/><input id="admNf" placeholder="Nº NF"/><button class="btn" onclick="carregarAdministracao()">Filtrar</button></div>
+<div class="panel-body"><div class="module-note">Este painel permite editar somente <b>STATUS FATURAMENTO</b>, <b>Nº NF</b> e <b>CGO DE FATURAMENTO</b>. Ao salvar, a matrícula e o nome do administrador logado são gravados automaticamente.</div><div class="table-scroll-x"><table class="admin-table"><thead><tr><th>Data/Hora</th><th>Turno</th><th>Usuário Prevenção</th><th>PLU</th><th>Produto</th><th>Qtd. Unidade</th><th>Qtd. Auditada</th><th>Gestor Operação</th><th>Status Faturamento</th><th>Nº NF</th><th>CGO Faturamento</th><th>ADM Faturamento</th><th>Ação</th></tr></thead><tbody id="administracaoTable"><tr><td class="empty" colspan="13">Carregando…</td></tr></tbody></table></div></div>
+</div>
+</div>
+</div>
+</div>
 <!-- MODAIS -->
 <!-- Modal Lançamento -->
 <div class="overlay" id="overlay">
-  <div class="modal">
-    <div class="modal-header"><h3>Novo Lançamento</h3><button onclick="closeModal()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <div class="grid">
-        <div class="field full ean-wrap"><label>EAN</label><input type="text" id="f_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off"><span class="ean-status" id="eanStatus"></span></div>
-        <div class="field"><label>PLU</label><input type="text" id="f_plu" readonly></div>
-        <div class="field"><label>Produto</label><input type="text" id="f_produto" readonly></div>
-        <div class="field"><label>Apanha</label><input type="text" id="f_apanha" readonly></div>
-        <div class="field"><label>Motivo</label><select id="f_motivo"><option value="">Selecione...</option><option>Choque Mecânico</option><option>Dejetos de Animais</option><option>Degustação</option><option>Embalagem com Vazamento</option><option>Embalagem Rasgada</option><option>Falta de Produto</option><option>Furto</option><option>Queda de Produto</option><option>Tombamento</option><option>Vencimento</option></select></div>
-        <div class="field"><label>Origem</label><select id="f_origem"><option value="">Selecione...</option><option>Armazenagem</option><option>Expedição</option><option>Fornecedor</option><option>Movimentação</option><option>Qualidade</option><option>Reposição</option><option>Ronda</option><option>Separação</option></select></div>
-        <div class="field"><label>Validade</label><input type="date" id="f_validade"><p class="hint" id="f_validadeMsg" style="display:none;font-weight:600"></p></div>
-        <div class="field"><label>Categoria</label><input type="text" id="f_categoria" readonly></div>
-        <div class="field"><label>Rua</label><input type="text" id="f_rua" readonly></div>
-        <div class="field"><label>Dono</label><input type="text" id="f_dono" readonly></div>
-        <div class="field"><label>Qtd. Embalagem</label><input type="text" id="f_qtd_embalagem" readonly></div>
-        <div class="field"><label>Qtd. Unidade</label><input type="text" id="f_qtd_unidade" inputmode="numeric" placeholder="Somente números"></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn" id="btnSalvar" onclick="salvarLancamento()">Salvar</button></div>
-  </div>
+<div class="modal">
+<div class="modal-header"><h3>Novo Lançamento</h3><button class="close-x" onclick="closeModal()">✕</button></div>
+<div class="modal-body">
+<div class="grid">
+<div class="field full ean-wrap"><label>EAN</label><input autocomplete="off" id="f_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" type="text"/><span class="ean-status" id="eanStatus"></span></div>
+<div class="field"><label>PLU</label><input id="f_plu" readonly="" type="text"/></div>
+<div class="field"><label>Produto</label><input id="f_produto" readonly="" type="text"/></div>
+<div class="field"><label>Apanha</label><input id="f_apanha" readonly="" type="text"/></div>
+<div class="field"><label>Motivo</label><select id="f_motivo"><option value="">Selecione...</option><option>Choque Mecânico</option><option>Dejetos de Animais</option><option>Degustação</option><option>Embalagem com Vazamento</option><option>Embalagem Rasgada</option><option>Falta de Produto</option><option>Furto</option><option>Queda de Produto</option><option>Tombamento</option><option>Vencimento</option></select></div>
+<div class="field"><label>Origem</label><select id="f_origem"><option value="">Selecione...</option><option>Armazenagem</option><option>Expedição</option><option>Fornecedor</option><option>Movimentação</option><option>Qualidade</option><option>Reposição</option><option>Ronda</option><option>Separação</option></select></div>
+<div class="field"><label>Validade</label><input id="f_validade" type="date"/><p class="hint" id="f_validadeMsg" style="display:none;font-weight:600"></p></div>
+<div class="field"><label>Categoria</label><input id="f_categoria" readonly="" type="text"/></div>
+<div class="field"><label>Rua</label><input id="f_rua" readonly="" type="text"/></div>
+<div class="field"><label>Dono</label><input id="f_dono" readonly="" type="text"/></div>
+<div class="field"><label>Qtd. Embalagem</label><input id="f_qtd_embalagem" readonly="" type="text"/></div>
+<div class="field"><label>Qtd. Unidade</label><input id="f_qtd_unidade" inputmode="numeric" placeholder="Somente números" type="text"/></div>
 </div>
-
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn" id="btnSalvar" onclick="salvarLancamento()">Salvar</button></div>
+</div>
+</div>
 <!-- Modal Consulta -->
 <div class="overlay" id="overlayConsulta">
-  <div class="modal">
-    <div class="modal-header"><h3>Consulta de Produto</h3><button onclick="closeConsultaModal()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <div class="grid">
-        <div class="field full ean-wrap"><label>EAN</label><input type="text" id="cs_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off"><span class="ean-status" id="csEanStatus"></span></div>
-        <div class="field"><label>PLU</label><input type="text" id="cs_plu" readonly></div>
-        <div class="field"><label>Produto</label><input type="text" id="cs_produto" readonly></div>
-        <div class="field"><label>Apanha</label><input type="text" id="cs_apanha" readonly></div>
-        <div class="field"><label>Categoria</label><input type="text" id="cs_categoria" readonly></div>
-        <div class="field"><label>Rua</label><input type="text" id="cs_rua" readonly></div>
-        <div class="field"><label>Dono</label><input type="text" id="cs_dono" readonly></div>
-        <div class="field"><label>Qtd. Embalagem</label><input type="text" id="cs_qtd_embalagem" readonly></div>
-      </div>
-    </div>
-    <div class="modal-footer" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn ghost" onclick="goToPanel('lancamento')">📦 Lançamento</button>
-        <button class="btn ghost" onclick="goToPanel('retrabalho')">🩹 Retrabalho</button>
-        <button class="btn ghost" onclick="goToPanel('gaiola')">🏬 Gaiola</button>
-        <button class="btn ghost" onclick="goToPanel('descarte')">💥 Descarte</button>
-        <button class="btn ghost" onclick="goToPanel('mip')">🤲 MIP</button>
-      </div>
-      <button class="btn" onclick="closeConsultaModal()">Fechar</button>
-    </div>
-  </div>
+<div class="modal">
+<div class="modal-header"><h3>Consulta de Produto</h3><button class="close-x" onclick="closeConsultaModal()">✕</button></div>
+<div class="modal-body">
+<div class="grid">
+<div class="field full ean-wrap"><label>EAN</label><input autocomplete="off" id="cs_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" type="text"/><span class="ean-status" id="csEanStatus"></span></div>
+<div class="field"><label>PLU</label><input id="cs_plu" readonly="" type="text"/></div>
+<div class="field"><label>Produto</label><input id="cs_produto" readonly="" type="text"/></div>
+<div class="field"><label>Apanha</label><input id="cs_apanha" readonly="" type="text"/></div>
+<div class="field"><label>Categoria</label><input id="cs_categoria" readonly="" type="text"/></div>
+<div class="field"><label>Rua</label><input id="cs_rua" readonly="" type="text"/></div>
+<div class="field"><label>Dono</label><input id="cs_dono" readonly="" type="text"/></div>
+<div class="field"><label>Qtd. Embalagem</label><input id="cs_qtd_embalagem" readonly="" type="text"/></div>
 </div>
-
+</div>
+<div class="modal-footer" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn ghost" onclick="goToPanel('lancamento')">📦 Lançamento</button>
+<button class="btn ghost" onclick="goToPanel('retrabalho')">🩹 Retrabalho</button>
+<button class="btn ghost" onclick="goToPanel('gaiola')">🏬 Gaiola</button>
+<button class="btn ghost" onclick="goToPanel('descarte')">💥 Descarte</button>
+<button class="btn ghost" onclick="goToPanel('mip')">🤲 MIP</button>
+</div>
+<button class="btn" onclick="closeConsultaModal()">Fechar</button>
+</div>
+</div>
+</div>
 <!-- Modal Retrabalho -->
 <div class="overlay" id="overlayRetrabalho">
-  <div class="modal">
-    <div class="modal-header"><h3>Retrabalho</h3><button onclick="closeRetrabalhoModal()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <div class="grid">
-        <div class="field full ean-wrap"><label>EAN</label><input type="text" id="rt_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off"><span class="ean-status" id="rtEanStatus"></span></div>
-        <div class="field"><label>PLU</label><input type="text" id="rt_plu" readonly></div>
-        <div class="field"><label>Produto</label><input type="text" id="rt_produto" readonly></div>
-        <div class="field"><label>Apanha</label><input type="text" id="rt_apanha" readonly></div>
-        <div class="field"><label>Categoria</label><input type="text" id="rt_categoria" readonly></div>
-        <div class="field"><label>Validade</label><input type="date" id="rt_validade"><p class="hint" id="rt_validadeMsg" style="display:none;font-weight:600"></p></div>
-        <div class="field"><label>Qtd. Embalagem</label><input type="text" id="rt_qtd_embalagem" readonly></div>
-        <div class="field"><label>Qtd. Unidade</label><input type="text" id="rt_qtd_unidade" inputmode="numeric" placeholder="Somente números"><p class="hint" id="rtQtdWarn" style="color:var(--red);font-weight:600;display:none">Quantidade não fecha caixas inteiras da embalagem.</p></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="closeRetrabalhoModal()">Cancelar</button><button class="btn" id="btnSalvarRetrabalho" onclick="salvarRetrabalho()">Salvar</button></div>
-  </div>
+<div class="modal">
+<div class="modal-header"><h3>Retrabalho</h3><button class="close-x" onclick="closeRetrabalhoModal()">✕</button></div>
+<div class="modal-body">
+<div class="grid">
+<div class="field full ean-wrap"><label>EAN</label><input autocomplete="off" id="rt_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" type="text"/><span class="ean-status" id="rtEanStatus"></span></div>
+<div class="field"><label>PLU</label><input id="rt_plu" readonly="" type="text"/></div>
+<div class="field"><label>Produto</label><input id="rt_produto" readonly="" type="text"/></div>
+<div class="field"><label>Apanha</label><input id="rt_apanha" readonly="" type="text"/></div>
+<div class="field"><label>Categoria</label><input id="rt_categoria" readonly="" type="text"/></div>
+<div class="field"><label>Validade</label><input id="rt_validade" type="date"/><p class="hint" id="rt_validadeMsg" style="display:none;font-weight:600"></p></div>
+<div class="field"><label>Qtd. Embalagem</label><input id="rt_qtd_embalagem" readonly="" type="text"/></div>
+<div class="field"><label>Qtd. Unidade</label><input id="rt_qtd_unidade" inputmode="numeric" placeholder="Somente números" type="text"/><p class="hint" id="rtQtdWarn" style="color:var(--red);font-weight:600;display:none">Quantidade não fecha caixas inteiras da embalagem.</p></div>
 </div>
-
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="closeRetrabalhoModal()">Cancelar</button><button class="btn" id="btnSalvarRetrabalho" onclick="salvarRetrabalho()">Salvar</button></div>
+</div>
+</div>
 <!-- Modal Descarte -->
 <div class="overlay" id="overlayDescarte">
-  <div class="modal">
-    <div class="modal-header"><h3>Descarte</h3><button onclick="closeDescarteModal()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <div class="grid">
-        <div class="field full ean-wrap"><label>EAN</label><input type="text" id="ds_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off"><span class="ean-status" id="dsEanStatus"></span></div>
-        <div class="field"><label>PLU</label><input type="text" id="ds_plu" readonly></div>
-        <div class="field"><label>Produto</label><input type="text" id="ds_produto" readonly></div>
-        <div class="field"><label>Apanha</label><input type="text" id="ds_apanha" readonly></div>
-        <div class="field"><label>Categoria</label><input type="text" id="ds_categoria" readonly></div>
-        <div class="field"><label>Motivo</label><select id="ds_motivo"><option value="">Selecione...</option></select></div>
-        <div class="field"><label>Qtd. Unidade</label><input type="text" id="ds_qtd_unidade" inputmode="numeric" placeholder="Somente números"></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="closeDescarteModal()">Cancelar</button><button class="btn" id="btnSalvarDescarte" onclick="salvarDescarte()">Salvar</button></div>
-  </div>
+<div class="modal">
+<div class="modal-header"><h3>Descarte</h3><button class="close-x" onclick="closeDescarteModal()">✕</button></div>
+<div class="modal-body">
+<div class="grid">
+<div class="field full ean-wrap"><label>EAN</label><input autocomplete="off" id="ds_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" type="text"/><span class="ean-status" id="dsEanStatus"></span></div>
+<div class="field"><label>PLU</label><input id="ds_plu" readonly="" type="text"/></div>
+<div class="field"><label>Produto</label><input id="ds_produto" readonly="" type="text"/></div>
+<div class="field"><label>Apanha</label><input id="ds_apanha" readonly="" type="text"/></div>
+<div class="field"><label>Categoria</label><input id="ds_categoria" readonly="" type="text"/></div>
+<div class="field"><label>Motivo</label><select id="ds_motivo"><option value="">Selecione...</option></select></div>
+<div class="field"><label>Qtd. Unidade</label><input id="ds_qtd_unidade" inputmode="numeric" placeholder="Somente números" type="text"/></div>
 </div>
-
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="closeDescarteModal()">Cancelar</button><button class="btn" id="btnSalvarDescarte" onclick="salvarDescarte()">Salvar</button></div>
+</div>
+</div>
 <!-- Modal MIP -->
 <div class="overlay" id="overlayMip">
-  <div class="modal" style="width:940px">
-    <div class="modal-header"><h3>MIP — Consumo interno</h3><button onclick="closeMipModal()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <p class="hint" style="margin-bottom:16px">Adicione os itens ao carrinho. O saldo será conferido antes de cada inclusão e debitado quando o MIP for salvo.</p>
-      <div class="grid">
-        <div class="field full ean-wrap"><label>EAN</label><input type="text" id="mip_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off"><span class="ean-status" id="mipEanStatus"></span></div>
-        <div class="field"><label>PLU</label><input type="text" id="mip_plu" readonly></div>
-        <div class="field"><label>Produto</label><input type="text" id="mip_produto" readonly></div>
-        <div class="field"><label>Quantidade</label><input type="text" id="mip_qtd" inputmode="numeric" placeholder="Somente números"></div>
-        <div class="field"><label>Matrícula do solicitante</label><input type="text" id="mip_solicitante" inputmode="numeric" placeholder="Digite a matrícula" autocomplete="off"></div>
-      </div>
-      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost mip-add-btn" onclick="adicionarItemMip()">＋ Adicionar item ao carrinho</button><button class="btn danger" onclick="reiniciarMip()">↺ Limpar carrinho</button></div>
-      <div class="mip-cart-summary"><span>Itens no carrinho</span><strong id="mipCartCount">0</strong><span>Unidades</span><strong id="mipCartUnits">0</strong></div>
-      <div class="staged-table-wrap mip-cart-table"><table><thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Qtd</th><th>Matrícula</th><th>Ações</th></tr></thead><tbody id="mipStagedTable"><tr><td colspan="6" class="staged-empty">Nenhum item adicionado ainda</td></tr></tbody></table></div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="closeMipModal()">Fechar sem salvar</button><button class="btn" id="btnSalvarMip" onclick="salvarMip()">Salvar MIP</button></div>
-  </div>
+<div class="modal" style="width:940px">
+<div class="modal-header"><h3>MIP — Consumo interno</h3><button class="close-x" onclick="closeMipModal()">✕</button></div>
+<div class="modal-body">
+<p class="hint" style="margin-bottom:16px">Adicione os itens ao carrinho. O saldo será conferido antes de cada inclusão e debitado quando o MIP for salvo.</p>
+<div class="grid">
+<div class="field full ean-wrap"><label>EAN</label><input autocomplete="off" id="mip_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" type="text"/><span class="ean-status" id="mipEanStatus"></span></div>
+<div class="field"><label>PLU</label><input id="mip_plu" readonly="" type="text"/></div>
+<div class="field"><label>Produto</label><input id="mip_produto" readonly="" type="text"/></div>
+<div class="field"><label>Quantidade</label><input id="mip_qtd" inputmode="numeric" placeholder="Somente números" type="text"/></div>
+<div class="field"><label>Matrícula do solicitante</label><input autocomplete="off" id="mip_solicitante" inputmode="numeric" placeholder="Digite a matrícula" type="text"/></div>
 </div>
-
+<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost mip-add-btn" onclick="adicionarItemMip()">＋ Adicionar item ao carrinho</button><button class="btn danger" onclick="reiniciarMip()">↺ Limpar carrinho</button></div>
+<div class="mip-cart-summary"><span>Itens no carrinho</span><strong id="mipCartCount">0</strong><span>Unidades</span><strong id="mipCartUnits">0</strong></div>
+<div class="staged-table-wrap mip-cart-table"><table><thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Qtd</th><th>Matrícula</th><th>Ações</th></tr></thead><tbody id="mipStagedTable"><tr><td class="staged-empty" colspan="6">Nenhum item adicionado ainda</td></tr></tbody></table></div>
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="closeMipModal()">Fechar sem salvar</button><button class="btn" id="btnSalvarMip" onclick="salvarMip()">Salvar MIP</button></div>
+</div>
+</div>
 <div class="overlay" id="overlayGaiola">
-  <div class="modal" style="width:960px">
-    <div class="modal-header"><h3>Gaiola</h3><button onclick="closeGaiolaModal()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <div class="grid">
-        <div class="field"><label>Gaiola Nº</label><input type="text" id="gl_gaiola" readonly></div>
-        <div class="field"><label>Loja</label><select id="gl_loja" disabled><option value="">Aguardando EAN...</option></select><p class="hint" id="glLojaHint">Escaneie um EAN para carregar as lojas disponíveis.</p></div>
-      </div>
-      <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
-      <div class="grid">
-        <div class="field full ean-wrap"><label>EAN</label><input type="text" id="gl_ean" placeholder="Escaneie ou digite o EAN (ENTER ou TAB)" autocomplete="off"><span class="ean-status" id="glEanStatus"></span></div>
-        <div class="field"><label>PLU</label><input type="text" id="gl_plu" readonly></div>
-        <div class="field"><label>Produto</label><input type="text" id="gl_produto" readonly></div>
-        <div class="field"><label>Categoria</label><input type="text" id="gl_categoria" readonly></div>
-        <div class="field"><label>Qtd. Unidade</label><input type="text" id="gl_qtd_unidade" inputmode="numeric" placeholder="Somente números"></div>
-      </div>
-      <p class="hint" id="glBlockedMsg" style="color:var(--red);font-weight:600;display:none"></p>
-      <div style="margin-top:12px;display:flex;gap:10px"><button class="btn ghost" onclick="adicionarItemGaiola()">＋ Adicionar item à lista</button><button class="btn danger" onclick="reiniciarGaiola()">↺ Reiniciar Gaiola</button></div>
-      <div class="staged-table-wrap"><table><thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Categoria</th><th>Qtd</th><th></th></tr></thead><tbody id="glStagedTable"><tr><td colspan="6" class="staged-empty">Nenhum item adicionado ainda</td></tr></tbody></table></div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="closeGaiolaModal()">Fechar sem enviar</button><button class="btn" id="btnSalvarGaiola" onclick="salvarGaiola()">Salvar Gaiola (enviar tudo)</button></div>
-  </div>
+<div class="modal" style="width:960px">
+<div class="modal-header"><h3>Gaiola</h3><button class="close-x" onclick="closeGaiolaModal()">✕</button></div>
+<div class="modal-body">
+<div class="grid">
+<div class="field"><label>Gaiola Nº</label><input id="gl_gaiola" readonly="" type="text"/></div>
+<div class="field"><label>Loja</label><select disabled="" id="gl_loja"><option value="">Aguardando EAN...</option></select><p class="hint" id="glLojaHint">Escaneie um EAN para carregar as lojas disponíveis.</p></div>
 </div>
-
+<hr style="border:none;border-top:1px solid var(--line);margin:16px 0"/>
+<div class="grid">
+<div class="field full ean-wrap"><label>EAN</label><input autocomplete="off" id="gl_ean" placeholder="Escaneie ou digite o EAN (ENTER ou TAB)" type="text"/><span class="ean-status" id="glEanStatus"></span></div>
+<div class="field"><label>PLU</label><input id="gl_plu" readonly="" type="text"/></div>
+<div class="field"><label>Produto</label><input id="gl_produto" readonly="" type="text"/></div>
+<div class="field"><label>Categoria</label><input id="gl_categoria" readonly="" type="text"/></div>
+<div class="field"><label>Qtd. Unidade</label><input id="gl_qtd_unidade" inputmode="numeric" placeholder="Somente números" type="text"/></div>
+</div>
+<p class="hint" id="glBlockedMsg" style="color:var(--red);font-weight:600;display:none"></p>
+<div style="margin-top:12px;display:flex;gap:10px"><button class="btn ghost" onclick="adicionarItemGaiola()">＋ Adicionar item à lista</button><button class="btn danger" onclick="reiniciarGaiola()">↺ Reiniciar Gaiola</button></div>
+<div class="staged-table-wrap"><table><thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Categoria</th><th>Qtd</th><th></th></tr></thead><tbody id="glStagedTable"><tr><td class="staged-empty" colspan="6">Nenhum item adicionado ainda</td></tr></tbody></table></div>
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="closeGaiolaModal()">Fechar sem enviar</button><button class="btn" id="btnSalvarGaiola" onclick="salvarGaiola()">Salvar Gaiola (enviar tudo)</button></div>
+</div>
+</div>
 <!-- Modal Gaiola Pendente -->
 <div class="overlay" id="overlayGaiolaPendente">
-  <div class="modal" style="width:440px">
-    <div class="modal-header"><h3>Gaiola pendente encontrada</h3></div>
-    <div class="modal-body"><p style="font-size:14px;color:var(--ink-soft)" id="pendGaiolaMsg">Você tem itens não enviados de uma gaiola anterior.</p></div>
-    <div class="modal-footer"><button class="btn danger" onclick="apagarGaiolaPendente()">Apagar lançamentos pendentes</button><button class="btn" onclick="continuarGaiolaPendente()">Continuar lançando</button></div>
-  </div>
+<div class="modal" style="width:440px">
+<div class="modal-header"><h3>Gaiola pendente encontrada</h3></div>
+<div class="modal-body"><p id="pendGaiolaMsg" style="font-size:14px;color:var(--ink-soft)">Você tem itens não enviados de uma gaiola anterior.</p></div>
+<div class="modal-footer"><button class="btn danger" onclick="apagarGaiolaPendente()">Apagar lançamentos pendentes</button><button class="btn" onclick="continuarGaiolaPendente()">Continuar lançando</button></div>
 </div>
-
+</div>
 <!-- Modal Usuário -->
 <div class="overlay" id="overlayUser">
-  <div class="modal">
-    <div class="modal-header"><h3 id="userModalTitle">Novo Usuário</h3><button onclick="closeUserModal()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <div class="grid">
-        <div class="field"><label>Usuário</label><input type="text" id="us_user" placeholder="login do usuário" autocomplete="off"></div>
-        <div class="field"><label>Senha</label><input type="text" id="us_password" placeholder="senha" autocomplete="off"></div>
-        <div class="field full"><label>Nome completo</label><input type="text" id="us_name" placeholder="Nome do usuário"></div>
-        <div class="field full"><label>Nível</label><select id="us_level"><option value="1">1 - Acesso Total</option><option value="2">2 - Lançar (padrão)</option><option value="3">3 - Editar Lançamentos</option><option value="4">4 - Atualizar Base (Lojas)</option><option value="5">5 - Relatório de Prevenção</option><option value="6">6 - Somente Consulta</option><option value="7">7 - Lançar e Editar</option><option value="8">8 - Lançar e Exportar</option><option value="9">9 - Consulta e Relatórios</option></select></div>
-        <div class="field"><label>Status</label><select id="us_state"><option value="1">Ativo</option><option value="0">Inativo</option></select></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="closeUserModal()">Cancelar</button><button class="btn" id="btnSalvarUser" onclick="salvarUsuario()">Salvar</button></div>
-  </div>
+<div class="modal">
+<div class="modal-header"><h3 id="userModalTitle">Novo Usuário</h3><button class="close-x" onclick="closeUserModal()">✕</button></div>
+<div class="modal-body">
+<div class="grid">
+<div class="field"><label>Usuário</label><input autocomplete="off" id="us_user" placeholder="login do usuário" type="text"/></div>
+<div class="field"><label>Senha</label><input autocomplete="off" id="us_password" placeholder="senha" type="text"/></div>
+<div class="field full"><label>Nome completo</label><input id="us_name" placeholder="Nome do usuário" type="text"/></div>
+<div class="field full"><label>Nível</label><select id="us_level"><option value="1">1 - Acesso Total</option><option value="2">2 - Lançar (padrão)</option><option value="3">3 - Editar Lançamentos</option><option value="4">4 - Atualizar Base (Lojas)</option><option value="5">5 - Relatório de Prevenção</option><option value="6">6 - Somente Consulta</option><option value="7">7 - Lançar e Editar</option><option value="8">8 - Lançar e Exportar</option><option value="9">9 - Consulta e Relatórios</option></select></div>
+<div class="field"><label>Status</label><select id="us_state"><option value="1">Ativo</option><option value="0">Inativo</option></select></div>
 </div>
-
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="closeUserModal()">Cancelar</button><button class="btn" id="btnSalvarUser" onclick="salvarUsuario()">Salvar</button></div>
+</div>
+</div>
 <!-- Modal Dono de Rua -->
 <div class="overlay" id="overlayDonoRua">
-  <div class="modal" style="width:480px">
-    <div class="modal-header"><h3 id="donoRuaModalTitle">Adicionar Rua</h3><button onclick="fecharModalDonoRua()" class="close-x">✕</button></div>
-    <div class="modal-body">
-      <div class="grid">
-        <div class="field full"><label>Rua</label><input type="text" id="dr_rua" placeholder="Ex: A1, B2, CORREDOR 3..." autocomplete="off"></div>
-        <div class="field full"><label>Dono</label><input type="text" id="dr_dono" placeholder="Nome do responsável pela rua" autocomplete="off"></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="fecharModalDonoRua()">Cancelar</button><button class="btn" id="btnSalvarDonoRua" onclick="salvarDonoRua()">Salvar</button></div>
-  </div>
+<div class="modal" style="width:480px">
+<div class="modal-header"><h3 id="donoRuaModalTitle">Adicionar Rua</h3><button class="close-x" onclick="fecharModalDonoRua()">✕</button></div>
+<div class="modal-body">
+<div class="grid">
+<div class="field full"><label>Rua</label><input autocomplete="off" id="dr_rua" placeholder="Ex: A1, B2, CORREDOR 3..." type="text"/></div>
+<div class="field full"><label>Dono</label><input autocomplete="off" id="dr_dono" placeholder="Nome do responsável pela rua" type="text"/></div>
 </div>
-
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="fecharModalDonoRua()">Cancelar</button><button class="btn" id="btnSalvarDonoRua" onclick="salvarDonoRua()">Salvar</button></div>
+</div>
+</div>
 <div class="toast" id="toast"></div>
-
 <!-- Confirmações e entrada de dados internas -->
 <div class="overlay overlay-confirm" id="overlayConfirm">
-  <div class="modal confirm-modal">
-    <div class="modal-header"><h3 id="confirmTitle">Confirmação</h3></div>
-    <div class="modal-body"><p class="confirm-message" id="confirmMessage"></p></div>
-    <div class="modal-footer confirm-actions"><button class="btn ghost" id="confirmCancelBtn">Cancelar</button><button class="btn" id="confirmOkBtn">Confirmar</button></div>
-  </div>
+<div class="modal confirm-modal">
+<div class="modal-header"><h3 id="confirmTitle">Confirmação</h3></div>
+<div class="modal-body"><p class="confirm-message" id="confirmMessage"></p></div>
+<div class="modal-footer confirm-actions"><button class="btn ghost" id="confirmCancelBtn">Cancelar</button><button class="btn" id="confirmOkBtn">Confirmar</button></div>
+</div>
 </div>
 <div class="overlay overlay-confirm" id="overlayPrompt">
-  <div class="modal prompt-modal">
-    <div class="modal-header"><h3 id="promptTitle">Informação</h3></div>
-    <div class="modal-body"><p class="confirm-message" id="promptMessage"></p><input type="password" id="promptInput" placeholder="Digite o valor"><p class="inline-notice" id="promptNotice"></p></div>
-    <div class="modal-footer confirm-actions"><button class="btn ghost" id="promptCancelBtn">Cancelar</button><button class="btn" id="promptOkBtn">Salvar</button></div>
-  </div>
+<div class="modal prompt-modal">
+<div class="modal-header"><h3 id="promptTitle">Informação</h3></div>
+<div class="modal-body"><p class="confirm-message" id="promptMessage"></p><input id="promptInput" placeholder="Digite o valor" type="password"/><p class="inline-notice" id="promptNotice"></p></div>
+<div class="modal-footer confirm-actions"><button class="btn ghost" id="promptCancelBtn">Cancelar</button><button class="btn" id="promptOkBtn">Salvar</button></div>
 </div>
-
+</div>
 <script>
 /* ========== EFEITO MATRIX ========== */
 (function() {
@@ -1425,5 +1478,90 @@ function saveConfig() { SUPA_URL = document.getElementById("cfgUrl").value.trim(
 function resetConfig() { localStorage.removeItem("tp_url"); localStorage.removeItem("tp_key"); SUPA_URL = DEFAULT_URL; SUPA_KEY = DEFAULT_KEY; GAIOLA_SCRIPT_URL = "https://docs.google.com/spreadsheets/d/1byJ_HxofPZr1tLar2rvssPZIu_RbRLS-CYUFbAbkC40/export?format=csv"; document.getElementById("cfgUrl").value = SUPA_URL; document.getElementById("cfgKey").value = SUPA_KEY; document.getElementById("cfgGaiolaUrl").value = GAIOLA_SCRIPT_URL; connect(); showToast("Configuração padrão restaurada"); }
 loadDashboard();
 </script>
-</body>
+<script>
+/* ===== CADASTRO DE ITEM — SOMENTE NIVEL 1 ===== */
+const CADASTRO_COLS = ['id','CODACESSO','SEQPRODUTO','DESCCOMPLETA','ENDERECO','NM_MERC_N1','RUA','DONO','PADRAOEMBCOMPRA'];
+function podeCadastrarItem(){ return !!currentUser && Number(currentUser.level) === 1; }
+function limparCadastroFormulario(){ ['cad_ean','cad_plu','cad_produto','cad_apanha','cad_categoria','cad_rua','cad_dono','cad_qtd_embalagem'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); }
+function abrirCadastroItem(){ if(!podeCadastrarItem()){showToast('Acesso negado. Somente usuários nível 1 podem cadastrar itens.',true);return;} limparCadastroFormulario(); document.getElementById('overlayCadastroItem').classList.add('show'); setTimeout(()=>document.getElementById('cad_ean').focus(),80); }
+function fecharCadastroItem(){const e=document.getElementById('overlayCadastroItem');if(e)e.classList.remove('show');}
+function escaparCadastro(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+function cadastroFiltros(){return {codigo:document.getElementById('cadFiltroCodigo')?.value.trim()||'',plu:document.getElementById('cadFiltroPlu')?.value.trim()||'',produto:document.getElementById('cadFiltroProduto')?.value.trim()||''};}
+function renderCabecalhoCadastro(){const h=document.getElementById('cadastroItensHead');if(!h)return;h.innerHTML='<tr>'+CADASTRO_COLS.map(c=>'<th>'+escaparCadastro(c)+'</th>').join('')+'</tr>';}
+function renderCadastroItens(rows){const tbody=document.getElementById('cadastroItensTable');if(!tbody)return;renderCabecalhoCadastro();if(!rows||!rows.length){tbody.innerHTML='<tr><td class="empty" colspan="'+CADASTRO_COLS.length+'">Nenhum item cadastrado encontrado.</td></tr>';return;}tbody.innerHTML=rows.map(r=>'<tr>'+CADASTRO_COLS.map(c=>'<td class="'+(c==='CODACESSO'||c==='SEQPRODUTO'?'code':'')+'">'+escaparCadastro(r[c])+'</td>').join('')+'</tr>').join('');}
+async function carregarCadastroItens(){const tbody=document.getElementById('cadastroItensTable');if(!tbody)return;tbody.innerHTML='<tr><td class="empty" colspan="9">Carregando itens…</td></tr>';renderCabecalhoCadastro();const f=cadastroFiltros();try{let q=sb.from('BD_CADASTRO').select('*').order('id',{ascending:false}).limit(1000);if(f.codigo)q=q.ilike('CODACESSO','%'+f.codigo+'%');if(f.plu)q=q.ilike('SEQPRODUTO','%'+f.plu+'%');if(f.produto)q=q.ilike('DESCCOMPLETA','%'+f.produto+'%');const {data,error}=await q;if(error)throw error;renderCadastroItens(data||[]);}catch(err){tbody.innerHTML='<tr><td class="empty" colspan="9">Erro ao carregar cadastro: '+escaparCadastro(err.message)+'</td></tr>';showToast('Erro ao consultar BD_CADASTRO: '+err.message,true);}}
+async function salvarCadastroItem(){if(!podeCadastrarItem()){showToast('Acesso negado. Somente usuários nível 1 podem cadastrar itens.',true);return;}const ean=document.getElementById('cad_ean').value.trim();if(!ean){showToast('Informe o CODACESSO/EAN.',true);return;}const btn=document.getElementById('btnSalvarCadastroItem');btn.disabled=true;btn.textContent='Salvando…';const payload={CODACESSO:ean,SEQPRODUTO:document.getElementById('cad_plu').value.trim()||null,DESCCOMPLETA:document.getElementById('cad_produto').value.trim()||null,ENDERECO:document.getElementById('cad_apanha').value.trim()||null,NM_MERC_N1:document.getElementById('cad_categoria').value.trim()||null,RUA:document.getElementById('cad_rua').value.trim()||null,DONO:document.getElementById('cad_dono').value.trim()||null,PADRAOEMBCOMPRA:document.getElementById('cad_qtd_embalagem').value.trim()||null};try{const {data:dup,error:dupError}=await sb.from('BD_CADASTRO').select('id').eq('CODACESSO',ean).limit(1);if(dupError)throw dupError;if(dup&&dup.length){showToast('Este CODACESSO/EAN já está cadastrado.',true);return;}const {error}=await sb.from('BD_CADASTRO').insert(payload);if(error)throw error;showToast('Item cadastrado com sucesso.');fecharCadastroItem();await carregarCadastroItens();}catch(err){showToast('Erro ao cadastrar item: '+err.message,true);}  finally{btn.disabled=false;btn.textContent='Salvar cadastro';}}
+
+/* ===== ADMINISTRAÇÃO / BD_PREV_RELAT ===== */
+let adminCache=[];
+function podeVisualizarAdministracao(){return !!currentUser && [1,5,9].includes(lvl());} function podeEditarAdministracao(){return !!currentUser && [1,9].includes(lvl());} function canAdministrarPrev(){return podeEditarAdministracao();}
+async function carregarAdministracao(){const tbody=document.getElementById('administracaoTable');if(!tbody)return;if(!podeVisualizarAdministracao()){tbody.innerHTML='<tr><td colspan="13" class="empty">Acesso restrito ao administrador.</td></tr>';return;}tbody.innerHTML='<tr><td colspan="13" class="empty">Carregando…</td></tr>';let q=sb.from('BD_PREV_RELAT').select('*').order('DTA_HORA',{ascending:false}).limit(5000);const ini=document.getElementById('admDataIni').value,fim=document.getElementById('admDataFim').value,turno=document.getElementById('admTurno').value,status=document.getElementById('admStatus').value,plu=document.getElementById('admPlu').value.trim(),produto=document.getElementById('admProduto').value.trim(),nf=document.getElementById('admNf').value.trim();if(ini)q=q.gte('DTA_HORA',new Date(ini+'T00:00:00').toISOString());if(fim)q=q.lte('DTA_HORA',new Date(fim+'T23:59:59').toISOString());if(turno)q=q.eq('TURNO_LANC',Number(turno));if(status)q=q.eq('STATUS FATURAMENTO',status);if(plu)q=q.ilike('PLU','%'+plu+'%');if(produto)q=q.ilike('PRODUTO','%'+produto+'%');if(nf)q=q.ilike('Nº NF','%'+nf+'%');try{let result=await q;if(result.error&&/DTA_HORA|column|schema cache/i.test(result.error.message||'')){result=await sb.from('BD_PREV_RELAT').select('*').limit(5000);}if(result.error)throw result.error;adminCache=result.data||[];renderAdministracao(adminCache);if(!podeEditarAdministracao()) travarAdministracaoSomenteVisualizacao();}catch(err){tbody.innerHTML='<tr><td colspan="13" class="empty">Erro: '+err.message+'</td></tr>';showToast('Erro ao carregar administração: '+err.message,true);}}
+function renderAdministracao(rows){const tbody=document.getElementById('administracaoTable');if(!rows.length){tbody.innerHTML='<tr><td colspan="13" class="empty">Nenhum registro encontrado.</td></tr>';return;}tbody.innerHTML=rows.map((r,i)=>'<tr><td>'+fmtDate(r.DTA_HORA)+'</td><td>'+ (r.TURNO_LANC??'—')+'</td><td>'+ (r['USER PREVENÇÃO']??'—')+'</td><td>'+ (r.PLU??'—')+'</td><td class="wide">'+(r.PRODUTO??'—')+'</td><td>'+ (r.QTD_UNIDADE??0)+'</td><td>'+ (r.QTD_AUDITADA??0)+'</td><td class="wide">'+(r['NAME GESTOR OPERAÇÃO']??'—')+'</td><td><select data-admin-index="'+i+'" data-admin-field="status"><option value="PENDENTE" '+(String(r['STATUS FATURAMENTO']||'PENDENTE').toUpperCase()==='PENDENTE'?'selected':'')+'>Pendente</option><option value="FATURADO" '+(String(r['STATUS FATURAMENTO']||'').toUpperCase()==='FATURADO'?'selected':'')+'>Faturado</option></select></td><td><input class="nf" data-admin-index="'+i+'" data-admin-field="nf" inputmode="numeric" value="'+String(r['Nº NF']??'').replace(/[^0-9]/g,'')+'" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"></td><td><select data-admin-index="'+i+'" data-admin-field="cgo"><option value="">Selecione</option><option value="571 - DESCARTE" '+(r['CGO DE FATURAMENTO']==='571 - DESCARTE'?'selected':'')+'>571 - DESCARTE</option><option value="337 - DEGUSTAÇÃO" '+(r['CGO DE FATURAMENTO']==='337 - DEGUSTAÇÃO'?'selected':'')+'>337 - DEGUSTAÇÃO</option><option value="338 - VENCIMENTO" '+(r['CGO DE FATURAMENTO']==='338 - VENCIMENTO'?'selected':'')+'>338 - VENCIMENTO</option></select></td><td>'+ (r['ADM FATURAMENTO']??'—')+'</td><td><button class="btn" onclick="salvarAdministracaoRow('+i+')">Salvar</button></td></tr>').join('');}
+async function salvarAdministracaoRow(index){if(!canAdministrarPrev()){showToast('Acesso restrito ao administrador.',true);return;}const row=adminCache[index];if(!row||row.id===undefined){showToast('Registro sem identificador para atualização.',true);return;}const status=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="status"]').value,nf=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="nf"]').value.replace(/[^0-9]/g,''),cgo=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="cgo"]').value;const payload={'STATUS FATURAMENTO':status,'ADM FATURAMENTO':currentUser.user,'Nº NF':nf||null,'CGO DE FATURAMENTO':cgo||null,'NAME ADM':currentUser.fullName||currentUser.name};try{const {error}=await sb.from('BD_PREV_RELAT').update(payload).eq('id',row.id);if(error)throw error;Object.assign(row,payload);showToast('Registro administrativo atualizado.');renderAdministracao(adminCache);}catch(err){showToast('Erro ao atualizar registro: '+err.message,true);}}
+
+
+function travarAdministracaoSomenteVisualizacao(){document.querySelectorAll('#administracaoTable [data-admin-field]').forEach(el=>el.disabled=true);document.querySelectorAll('#administracaoTable button').forEach(btn=>btn.style.display='none');}
+
+
+/* ===== MÓDULOS EMBUTIDOS — SEM FETCH ===== */
+const SINGLE_MODULE_TITLES = {
+  'cadastro-item': ['Cadastro de Item', 'Cadastro manual na tabela BD_CADASTRO'],
+  'administracao': ['ADMINISTRAÇÃO', 'Faturamento de descarte na tabela BD_PREV_RELAT']
+};
+function switchView(name) {
+  if (name === 'cadastro-item' && !podeCadastrarItem()) { showToast('Acesso negado. Somente usuários nível 1 podem acessar o Cadastro de Item.', true); return; }
+  if (name === 'administracao' && !podeVisualizarAdministracao()) { showToast('Acesso negado. Administração disponível para níveis 1, 5 e 9.', true); return; }
+  document.querySelectorAll('.menu a[data-view]').forEach(a => a.classList.toggle('active', a.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if (view) view.classList.add('active');
+  const title = SINGLE_MODULE_TITLES[name] || (typeof titles !== 'undefined' && titles[name]) || [name, ''];
+  document.getElementById('viewTitle').textContent = title[0];
+  document.getElementById('viewSub').textContent = title[1];
+  const bar = document.getElementById('titleBar');
+  if (bar) { bar.classList.add('loading'); setTimeout(() => bar.classList.remove('loading'), 700); }
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'lancamentos') loadLancamentosUnificado();
+  if (name === 'fefo') loadFefo();
+  if (name === 'relatorios') loadRelatorios();
+  if (name === 'lojas') { const a = canAtualizarBase(); const p = document.getElementById('lojasPanel'); const r = document.getElementById('lojasRestricted'); if (p) p.style.display = a ? '' : 'none'; if (r) r.style.display = a ? 'none' : 'block'; }
+  if (name === 'usuarios') { const a = canGerenciarUsuarios(); const p = document.getElementById('usersPanel'); const r = document.getElementById('usersRestricted'); if (p) p.style.display = a ? '' : 'none'; if (r) r.style.display = a ? 'none' : 'block'; if (a) loadUsuarios(); }
+  if (name === 'config') { const a = canConfig(); const p = document.getElementById('cfgPanel'); const r = document.getElementById('cfgRestricted'); if (p) p.style.display = a ? '' : 'none'; if (r) r.style.display = a ? 'none' : 'block'; }
+  if (name === 'permissoes' && (currentUser?.user === '5520967' || isTotal())) renderPermissoes();
+  if (name === 'donorua' && currentUser?.user === '5520967') renderDonoRua();
+  if (name === 'cadastro-item') { renderCabecalhoCadastro(); carregarCadastroItens(); }
+  if (name === 'administracao') carregarAdministracao();
+}
+function applyUserUI() {
+  if (!currentUser) return;
+  document.getElementById('userBox').style.display = 'flex';
+  document.getElementById('userName').textContent = currentUser.name || currentUser.user;
+  document.getElementById('userAvatar').textContent = (currentUser.name || currentUser.user).slice(0, 2).toUpperCase();
+  const badge = document.getElementById('userBadge');
+  badge.textContent = NIVEL_LABELS[lvl()] || ('Nível ' + lvl());
+  badge.className = 'badge-level ' + (isTotal() ? 'master' : 'basic');
+  document.querySelectorAll('.menu a[data-view]').forEach(a => {
+    const v = a.dataset.view;
+    let allowed = true;
+    if (v === 'permissoes') allowed = currentUser.user === '5520967' || isTotal();
+    else if (v === 'donorua') allowed = currentUser.user === '5520967';
+    else if (v === 'administracao') allowed = podeVisualizarAdministracao();
+    else if (v === 'cadastro-item') allowed = podeCadastrarItem();
+    else allowed = temPermissao(v);
+    a.style.display = allowed ? '' : 'none';
+  });
+  document.querySelectorAll('.lancar-only').forEach(el => el.style.display = canLancar() ? '' : 'none');
+  refreshActiveView();
+  checkPendingGaiola();
+}
+
+function bindSingleModuleEvents() {
+  const overlay = document.getElementById('overlayCadastroItem');
+  if (overlay && !overlay.dataset.bound) {
+    overlay.addEventListener('click', e => { if (e.target.id === 'overlayCadastroItem') fecharCadastroItem(); });
+    overlay.dataset.bound = '1';
+  }
+}
+bindSingleModuleEvents();
+</script></body>
 </html>
