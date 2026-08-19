@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Doação · Triagem Vision</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSI2NCIgeTI9IjY0Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNjMDg0ZmMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0yMCA0NlYxOGgxMWM1IDAgOSAzLjggOSA4LjhzLTQgOC44LTkgOC44aC02LjVWNDZ6IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNDYiIGN5PSIyMCIgcj0iNCIgZmlsbD0iI2M0YjVmZCIvPjwvc3ZnPg==">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <style>
+        :root {
+            --bg: #f0f4ff;
+            --surface: #ffffff;
+            --glass: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --line: #e2e6f0;
+            --ink: #0f172a;
+            --ink-soft: #475569;
+            --ink-faint: #94a3b8;
+            --blue-600: #4f46e5;
+            --blue-500: #6366f1;
+            --blue-100: #e0e7ff;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --radius: 18px;
+            --mono: 'JetBrains Mono', monospace;
+            --transition: 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
+        }
+        body.dark {
+            --bg: #0b1121;
+            --surface: #1e293b;
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --line: #334155;
+            --ink: #e2e8f0;
+            --ink-soft: #94a3b8;
+            --ink-faint: #64748b;
+            --blue-100: #1e3a5f;
+            --blue-600: #6366f1;
+            --blue-500: #818cf8;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --purple: #a78bfa;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+            transition: background var(--transition), color var(--transition);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        ::selection {
+            background: var(--blue-100);
+        }
+
+        /* ===== PARTÍCULAS DE FUNDO ===== */
+        #particlesCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* ===== LOGIN OVERLAY ===== */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            overflow: hidden;
+            transition: opacity 0.5s ease;
+        }
+        .login-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loginVideo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+        #matrixCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: none;
+        }
+        .login-card {
+            position: relative;
+            width: 420px;
+            max-width: 92%;
+            background: rgba(15, 25, 60, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 24px;
+            padding: 40px 36px 32px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            animation: loginIn 0.5s cubic-bezier(.2, .9, .25, 1);
+            z-index: 2;
+        }
+        @keyframes loginIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .login-card.shake {
+            animation: shake .4s;
+        }
+        @keyframes shake {
+            10%,
+            90% {
+                transform: translateX(-2px);
+            }
+            20%,
+            80% {
+                transform: translateX(4px);
+            }
+            30%,
+            50%,
+            70% {
+                transform: translateX(-8px);
+            }
+            40%,
+            60% {
+                transform: translateX(8px);
+            }
+        }
+        .login-mark {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #c084fc, #818cf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.5);
+        }
+        .login-title {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 900;
+            text-align: center;
+            letter-spacing: .2px;
+        }
+        .login-sub {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            text-align: center;
+            margin-top: 6px;
+            margin-bottom: 28px;
+        }
+        .login-field {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .login-field label {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            font-weight: 700;
+        }
+        .login-field input {
+            width: 100%;
+            padding: 13px 16px;
+            margin-top: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+        .login-field input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .login-field input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2);
+        }
+        .login-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 14px;
+            border: 0;
+            border-radius: 14px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 40px rgba(99, 102, 241, 0.5);
+        }
+        .login-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .login-error {
+            margin-top: 16px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ffb4b4;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .login-error.show {
+            display: flex;
+        }
+        .login-foot {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #fff;
+            animation: spin .7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            transition: var(--transition);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .logo {
+            padding: 24px 24px 20px;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: .2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo .mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #c084fc, #818cf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+        .menu {
+            padding: 16px 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .menu a {
+            padding: 12px 14px;
+            color: rgba(255, 255, 255, 0.82);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: var(--transition);
+        }
+        .menu a .ic {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+            opacity: .85;
+        }
+        .menu a:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+        .menu a.active {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.4));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        .footer {
+            padding: 20px 24px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .footer b {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .userbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .userbox .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: #fff;
+        }
+        .badge-level {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 99px;
+            letter-spacing: .3px;
+        }
+        .badge-level.master {
+            background: #2a1b06;
+            color: #ffcf7a;
+            border: 1px solid rgba(255, 207, 122, .3);
+        }
+        .badge-level.basic {
+            background: rgba(255, 255, 255, .08);
+            color: rgba(255, 255, 255, .6);
+        }
+        .icon-btn {
+            border: 1px solid rgba(255, 255, 255, .15);
+            background: rgba(255, 255, 255, .08);
+            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: #fff;
+        }
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, .18);
+        }
+        .conn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+        .dot.off {
+            background: var(--red);
+            box-shadow: 0 0 10px var(--red);
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+        }
+        .topbar {
+            height: 68px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            transition: var(--transition);
+        }
+        .topbar h3 {
+            font-size: 20px;
+            font-weight: 800;
+        }
+        .topbar .sub {
+            font-size: 12px;
+            color: var(--ink-faint);
+            font-weight: 500;
+        }
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ink);
+            transition: var(--transition);
+        }
+        .theme-toggle:hover {
+            background: var(--bg);
+        }
+        .content {
+            padding: 28px 28px 60px;
+            transition: var(--transition);
+            max-width: 1100px;
+        }
+
+        /* ===== CARDS ===== */
+        .donation-panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            animation: fadeSlideUp 0.5s ease;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .panel-head {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+        .panel-head h4 {
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .panel-body {
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        /* ===== FORM GRID ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .field.full {
+            grid-column: 1/-1;
+        }
+        label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            margin-top: 6px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--ink);
+            background: var(--surface);
+            transition: var(--transition);
+        }
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+        input[readonly] {
+            background: var(--bg);
+            color: var(--ink-soft);
+        }
+        .ean-wrap {
+            position: relative;
+        }
+        .ean-wrap input {
+            font-family: var(--mono);
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding-right: 80px;
+        }
+        .ean-status {
+            position: absolute;
+            right: 14px;
+            top: 42px;
+            font-size: 11px;
+            font-weight: 700;
+            pointer-events: none;
+        }
+        .ean-status.found {
+            color: var(--green);
+        }
+        .ean-status.notfound {
+            color: var(--red);
+        }
+        .hint {
+            font-size: 12px;
+            color: var(--ink-faint);
+            margin-top: 5px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff;
+            border: 0;
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(99, 102, 241, 0.4);
+        }
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn.ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
+            box-shadow: none;
+        }
+        .btn.ghost:hover {
+            background: var(--bg);
+            color: var(--ink);
+            box-shadow: none;
+        }
+        .btn.danger {
+            background: #fdecec;
+            color: var(--red);
+            box-shadow: none;
+        }
+        .btn.danger:hover {
+            background: var(--red);
+            color: #fff;
+        }
+
+        /* ===== STAGED TABLE ===== */
+        .staged-table-wrap {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            background: var(--surface);
+            color: var(--ink-faint);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: .4px;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        tbody tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+        .code {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--purple);
+            font-weight: 600;
+        }
+        .staged-empty {
+            padding: 28px;
+            text-align: center;
+            color: var(--ink-faint);
+            font-size: 14px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: #1e1b4b;
+            color: #fff;
+            padding: 16px 22px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: var(--transition);
+            max-width: 420px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.err {
+            background: #7f1d1d;
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .logo span,
+            .menu a span.label,
+            .footer {
+                display: none;
+            }
+            .main {
+                margin-left: 70px;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="light">
+
+    <!-- PARTÍCULAS DE FUNDO -->
+    <canvas id="particlesCanvas"></canvas>
+
+    <!-- LOGIN OVERLAY -->
+    <div class="login-overlay" id="loginOverlay">
+        <video id="loginVideo" autoplay loop muted playsinline crossorigin="anonymous">
+            <source src="7020018_Particle_Dot_3840x2160.mp4" type="video/mp4">
+        </video>
+        <canvas id="matrixCanvas"></canvas>
+        <div class="login-card" id="loginCard">
+            <div class="login-mark">❤️</div>
+            <div class="login-title">Painel de Doação</div>
+            <div class="login-sub">Registro de doações · Acesso restrito</div>
+            <div class="login-field"><label>Usuário</label><input type="text" id="loginUser" placeholder="Seu usuário" autocomplete="off"></div>
+            <div class="login-field"><label>Senha</label><input type="password" id="loginPass" placeholder="Sua senha" autocomplete="off"></div>
+            <button class="login-btn" id="loginBtn" onclick="tentarLogin()"><span id="loginBtnText">Entrar</span></button>
+            <div class="login-error" id="loginError"><span>⚠</span><span id="loginErrorText">Usuário ou senha inválidos</span></div>
+            <div class="login-foot">Triagem Vision · Módulo Doação</div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo"><div class="mark">❤️</div><span>Doação</span></div>
+        <div class="menu">
+            <a href="#" data-view="doacao" class="active"><span class="ic">📦</span><span class="label">Registro de Doação</span></a>
+        </div>
+        <div class="footer">
+            <div class="userbox" id="userBox" style="display:none;margin-bottom:14px">
+                <div class="avatar" id="userAvatar">–</div>
+                <div style="flex:1"><div style="color:#fff;font-size:13px;font-weight:700" id="userName">–</div><span class="badge-level basic" id="userBadge">Nível 0</span></div>
+                <button class="icon-btn" title="Sair" onclick="logout()">⏻</button>
+            </div>
+            Desenvolvido por<br><b>Pablo Martins Lopes</b>
+            <div class="conn"><span class="dot" id="connDot"></span><span id="connText">Conectando...</span></div>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div><h3>Registro de Doação</h3><div class="sub">Adicione itens e salve a doação</div></div>
+            <div style="display:flex;gap:10px;align-items:center">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌓</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- PAINEL DE DOAÇÃO -->
+            <div class="donation-panel">
+                <div class="panel-head">
+                    <h4>➕ Novo Item</h4>
+                    <span class="sub" style="font-size:12px;color:var(--ink-faint)">Escaneie o EAN e informe a quantidade</span>
+                </div>
+                <div class="panel-body">
+                    <div class="grid">
+                        <div class="field full ean-wrap">
+                            <label>EAN</label>
+                            <input type="text" id="doa_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+                            <span class="ean-status" id="doaEanStatus"></span>
+                        </div>
+                        <div class="field">
+                            <label>PLU</label>
+                            <input type="text" id="doa_plu" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Produto</label>
+                            <input type="text" id="doa_produto" readonly>
+                        </div>
+                        <div class="field">
+                            <label>Qtd Unidade</label>
+                            <input type="text" id="doa_qtd_unidade" inputmode="numeric" placeholder="Somente números">
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;display:flex;gap:10px">
+                        <button class="btn ghost" onclick="adicionarItemDoacao()">＋ Adicionar item à lista</button>
+                        <button class="btn danger" onclick="reiniciarDoacao()">↺ Limpar lista</button>
+                    </div>
+
+                    <!-- TABELA DE ITENS -->
+                    <div class="staged-table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Qtd Un</th><th></th></tr>
+                            </thead>
+                            <tbody id="doaStagedTable">
+                                <tr><td colspan="5" class="staged-empty">Nenhum item adicionado ainda</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- BOTÃO SALVAR -->
+                    <div style="margin-top:20px;display:flex;justify-content:flex-end">
+                        <button class="btn" id="btnSalvarDoacao" onclick="salvarDoacao()">
+                            💾 Salvar Doação (enviar tudo)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ========== PARTÍCULAS DE FUNDO ========== */
+        (function() {
+            const canvas = document.getElementById('particlesCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                initParticles();
+            }
+
+            function initParticles() {
+                particles = [];
+                const count = Math.floor((canvas.width * canvas.height) / 15000);
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        r: Math.random() * 2 + 0.5,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        alpha: Math.random() * 0.5 + 0.1
+                    });
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const isDark = document.body.classList.contains('dark');
+                ctx.fillStyle = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(99,102,241,0.25)';
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                });
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            animate();
+        })();
+
+        /* ========== EFEITO MATRIX ========== */
+        (function() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            const video = document.getElementById('loginVideo');
+            const userField = document.getElementById('loginUser');
+            const chars =
+                'ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890'.split(
+                    '');
+            const fontSize = 32;
+            let columns, drops, animationId, matrixActive = false,
+                charsColor = '#0F0';
+
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                columns = Math.floor(canvas.width / fontSize);
+                drops = Array(columns).fill(1);
+            }
+
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = fontSize + 'px monospace';
+                ctx.fillStyle = charsColor;
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i] += 0.3;
+                }
+                animationId = requestAnimationFrame(drawMatrix);
+            }
+
+            function startMatrix() {
+                if (!matrixActive) return;
+                canvas.style.display = 'block';
+                if (video) video.style.display = 'none';
+                resizeCanvas();
+                if (animationId) cancelAnimationFrame(animationId);
+                animationId = requestAnimationFrame(drawMatrix);
+            }
+
+            function stopMatrix() {
+                matrixActive = false;
+                canvas.style.display = 'none';
+                if (video) video.style.display = 'block';
+                if (animationId) { cancelAnimationFrame(animationId);
+                    animationId = null; }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            userField.addEventListener('input', function() {
+                if (this.value.trim() === '5520967') {
+                    if (!matrixActive) { matrixActive = true;
+                        charsColor = '#0F0';
+                        startMatrix(); }
+                } else { stopMatrix(); }
+            });
+            window.addEventListener('resize', () => { if (matrixActive) resizeCanvas(); });
+            stopMatrix();
+            if (video) video.play().catch(() => {
+                video.style.display = 'none';
+                document.getElementById('loginOverlay').style.background =
+                    'linear-gradient(135deg,#0b1121 0%,#1e1b4b 50%,#4f46e5 100%)';
+            });
+        })();
+
+        /* ========== CONFIGURAÇÃO SUPABASE ========== */
+        const SUPABASE_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
+        const SUPABASE_KEY =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxdm12eGppa2JpdnVic3pvYXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NTQ2NDksImV4cCI6MjA5OTUzMDY0OX0.5EVtA9L0DoKR4kdr_4cP7YtqH-FqsHJc6vpeliUMjN8";
+        let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        document.getElementById("connDot").classList.remove("off");
+        document.getElementById("connText").textContent = "Conectado";
+
+        /* ========== TURNO ========== */
+        function calcularTurno(date) {
+            const d = date || new Date();
+            const minutos = d.getHours() * 60 + d.getMinutes();
+            if (minutos >= 7 * 60 && minutos < 15 * 60 + 20) return 1;
+            if (minutos >= 15 * 60 + 20 && minutos < 23 * 60) return 2;
+            return 3;
+        }
+
+        /* ========== USUÁRIO ========== */
+        let currentUser = null;
+        async function doLogin() {
+            const userField = document.getElementById("loginUser");
+            const passField = document.getElementById("loginPass");
+            const errBox = document.getElementById("loginError");
+            const errText = document.getElementById("loginErrorText");
+            const card = document.getElementById("loginCard");
+            const btn = document.getElementById("loginBtn");
+            const btnText = document.getElementById("loginBtnText");
+            const usuario = userField.value.trim();
+            const senha = passField.value;
+            errBox.classList.remove("show");
+            if (!usuario || !senha) {
+                errText.textContent = "Informe usuário e senha.";
+                errBox.classList.add("show");
+                card.classList.remove("shake");
+                void card.offsetWidth;
+                card.classList.add("shake");
+                return;
+            }
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span>';
+            try {
+                const { data, error } = await sb.from("BD_USER").select("*").ilike("USER", usuario).limit(1);
+                if (error) throw error;
+                if (!data || !data.length) {
+                    errText.textContent = "Usuário não encontrado.";
+                    errBox.classList.add("show");
+                    card.classList.remove("shake");
+                    void card.offsetWidth;
+                    card.classList.add("shake");
+                    return;
+                }
+                if (String(data[0].PASSWORD ?? "").trim() !== senha.trim()) {
+                    errText.textContent = "Senha incorreta.";
+                    errBox.classList.add("show");
+                    card.classList.remove("shake");
+                    void card.offsetWidth;
+                    card.classList.add("shake");
+                    return;
+                }
+                if (String(data[0].STATE ?? "1").trim() !== "1") {
+                    errText.textContent = "Usuário inativo.";
+                    errBox.classList.add("show");
+                    card.classList.remove("shake");
+                    void card.offsetWidth;
+                    card.classList.add("shake");
+                    return;
+                }
+                const nomeCompleto = String(data[0].NAME_USER ?? data[0].USER ?? "").trim();
+                const primeiroNome = nomeCompleto.split(" ")[0] || data[0].USER;
+                currentUser = { user: data[0].USER, name: primeiroNome, fullName: nomeCompleto };
+                document.getElementById("loginOverlay").classList.add("fade-out");
+                setTimeout(() => {
+                    document.getElementById("loginOverlay").style.display = "none";
+                }, 500);
+                applyUserUI();
+                showToast("Bem-vindo, " + primeiroNome + "!");
+            } catch (e) {
+                errText.textContent = "Erro: " + e.message;
+                errBox.classList.add("show");
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = "Entrar";
+            }
+        }
+        function tentarLogin() { return doLogin(); }
+        ["loginUser", "loginPass"].forEach(id => document.getElementById(id).addEventListener("keydown", e => {
+            if (e.key === "Enter") { e.preventDefault();
+                doLogin(); }
+        }));
+
+        function applyUserUI() {
+            if (!currentUser) return;
+            document.getElementById("userBox").style.display = "flex";
+            document.getElementById("userName").textContent = currentUser.name || currentUser.user;
+            document.getElementById("userAvatar").textContent = (currentUser.name || currentUser.user).slice(0, 2)
+                .toUpperCase();
+            const badge = document.getElementById("userBadge");
+            badge.textContent = "Doação";
+            badge.className = "badge-level basic";
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById("loginPass").value = "";
+            document.getElementById("loginUser").value = "";
+            document.getElementById("userBox").style.display = "none";
+            document.getElementById("loginOverlay").style.display = "flex";
+            document.getElementById("loginOverlay").classList.remove("fade-out");
+            setTimeout(() => document.getElementById("loginUser").focus(), 80);
+        }
+        setTimeout(() => document.getElementById("loginUser").focus(), 150);
+
+        /* ========== TOAST ========== */
+        function showToast(msg, isErr) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.classList.toggle("err", !!isErr);
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 3800);
+        }
+
+        /* ========== BUSCA CADASTRO ========== */
+        async function buscarCadastro(ean) {
+            const { data, error } = await sb.from("BD_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
+            if (error) throw error;
+            return (data && data.length) ? data[0] : null;
+        }
+
+        /* ========== CARRINHO DE DOAÇÃO ========== */
+        let doacaoStaged = [];
+
+        function doacaoStorageKey() { return "tp_doacao_pending_" + (currentUser ? currentUser.user : "anon"); }
+
+        function salvarLocal() { localStorage.setItem(doacaoStorageKey(), JSON.stringify(doacaoStaged)); }
+
+        function carregarLocal() {
+            try { return JSON.parse(localStorage.getItem(doacaoStorageKey()) || "[]"); } catch (e) { return []; }
+        }
+
+        function limparLocal() { localStorage.removeItem(doacaoStorageKey()); }
+
+        function renderTabela() {
+            const tbody = document.getElementById("doaStagedTable");
+            if (!doacaoStaged.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="staged-empty">Nenhum item adicionado ainda</td></tr>';
+                return;
+            }
+            tbody.innerHTML = doacaoStaged.map((it, idx) => `
+            <tr>
+              <td class="code">${it.ean}</td>
+              <td>${it.plu || "—"}</td>
+              <td>${it.produto || "—"}</td>
+              <td><b>${it.qtd}</b></td>
+              <td><button class="icon-btn" onclick="removerItem(${idx})" style="color:var(--red);border-color:var(--red)">🗑</button></td>
+            </tr>`).join("");
+        }
+
+        function adicionarItemDoacao() {
+            if (!currentUser) { showToast("Faça login primeiro.", true); return; }
+            const ean = document.getElementById("doa_ean").value.trim();
+            const plu = document.getElementById("doa_plu").value.trim();
+            const produto = document.getElementById("doa_produto").value.trim();
+            const qtdRaw = document.getElementById("doa_qtd_unidade").value.trim();
+
+            if (!ean) { showToast("Escaneie ou digite o EAN.", true); return; }
+            if (!plu) { showToast("EAN não encontrado no cadastro.", true); return; }
+            if (!qtdRaw || isNaN(qtdRaw) || Number(qtdRaw) <= 0) { showToast("Informe uma quantidade válida.", true); return; }
+
+            const qtd = Number(qtdRaw);
+            doacaoStaged.push({ ean, plu, produto, qtd });
+            salvarLocal();
+            renderTabela();
+            // limpa campos
+            ["doa_ean", "doa_plu", "doa_produto", "doa_qtd_unidade"].forEach(id => document.getElementById(id).value =
+                "");
+            document.getElementById("doaEanStatus").textContent = "";
+            document.getElementById("doa_ean").focus();
+        }
+
+        function removerItem(idx) {
+            doacaoStaged.splice(idx, 1);
+            salvarLocal();
+            renderTabela();
+        }
+
+        function reiniciarDoacao() {
+            if (!confirm("Apagar todos os itens da lista?")) return;
+            doacaoStaged = [];
+            limparLocal();
+            renderTabela();
+            showToast("Lista limpa.");
+        }
+
+        async function salvarDoacao() {
+            if (!currentUser) { showToast("Faça login primeiro.", true); return; }
+            if (!doacaoStaged.length) { showToast("Adicione pelo menos um item.", true); return; }
+            const btn = document.getElementById("btnSalvarDoacao");
+            btn.disabled = true;
+            btn.textContent = "Salvando...";
+            const turno = calcularTurno();
+            const registros = doacaoStaged.map(it => ({
+                DTA_HORA: new Date().toISOString(),
+                PLU: it.plu,
+                PRODUTO: it.produto,
+                QTD_UN: it.qtd,
+                USER: currentUser.user,
+                TURNO_LANC: turno
+            }));
+            try {
+                const { error } = await sb.from("BD_DOAÇÃO").insert(registros);
+                if (error) throw error;
+                showToast(`Doação salva com sucesso! ${doacaoStaged.length} item(ns).`);
+                doacaoStaged = [];
+                limparLocal();
+                renderTabela();
+            } catch (err) {
+                showToast("Erro ao salvar: " + err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "💾 Salvar Doação (enviar tudo)";
+            }
+        }
+
+        /* ========== EVENTO EAN ========== */
+        document.getElementById("doa_ean").addEventListener("keydown", async function(e) {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            const ean = this.value.trim();
+            const status = document.getElementById("doaEanStatus");
+            if (!ean) return;
+            status.textContent = "Buscando...";
+            status.className = "ean-status";
+            try {
+                const p = await buscarCadastro(ean);
+                if (p) {
+                    document.getElementById("doa_plu").value = p.SEQPRODUTO || "";
+                    document.getElementById("doa_produto").value = p.DESCCOMPLETA || "";
+                    status.textContent = "✓ encontrado";
+                    status.className = "ean-status found";
+                    document.getElementById("doa_qtd_unidade").focus();
+                } else {
+                    document.getElementById("doa_plu").value = "";
+                    document.getElementById("doa_produto").value = "";
+                    status.textContent = "não encontrado";
+                    status.className = "ean-status notfound";
+                }
+            } catch (err) {
+                status.textContent = "erro";
+                status.className = "ean-status notfound";
+                showToast("Erro ao buscar EAN: " + err.message, true);
+            }
+        });
+        document.getElementById("doa_qtd_unidade").addEventListener("input", e => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, "");
+        });
+        document.getElementById("doa_qtd_unidade").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                adicionarItemDoacao();
+            }
+        });
+
+        /* ========== TEMA ========== */
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('tp_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+        if (localStorage.getItem('tp_theme') === 'dark') document.body.classList.add('dark');
+
+        /* ========== RESTAURAR CARRINHO LOCAL ========== */
+        if (currentUser) {
+            doacaoStaged = carregarLocal();
+            renderTabela();
+        }
+    </script>
+</body>
+</html>
