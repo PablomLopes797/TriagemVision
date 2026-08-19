@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Triagem Vision · Itens Inativos</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSI2NCIgeTI9IjY0Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0YzFkOTUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0yMCA0NlYxOGgxMWM1IDAgOSAzLjggOSA4LjhzLTQgOC44LTkgOC44aC02LjVWNDZ6IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNDYiIGN5PSIyMCIgcj0iNCIgZmlsbD0iI2M0YjVmZCIvPjwvc3ZnPg==">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --navy-900: #051339;
+            --navy-800: #0a2472;
+            --blue-600: #1b57e6;
+            --blue-500: #2f6bff;
+            --blue-100: #e7edff;
+            --bg: #f2f4fa;
+            --surface: #ffffff;
+            --line: #e2e6f0;
+            --ink: #111629;
+            --ink-soft: #5b6070;
+            --ink-faint: #8b90a3;
+            --green: #0f9d58;
+            --amber: #e5972a;
+            --red: #d64545;
+            --purple: #7c3aed;
+            --radius: 12px;
+            --mono: 'JetBrains Mono', monospace;
+            --transition: 0.25s cubic-bezier(0.2, 0.9, 0.25, 1);
+        }
+        body.dark {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --line: #334155;
+            --ink: #e2e8f0;
+            --ink-soft: #94a3b8;
+            --ink-faint: #64748b;
+            --blue-100: #1e3a5f;
+            --navy-800: #1e293b;
+            --navy-900: #0f172a;
+            --blue-600: #3b82f6;
+            --blue-500: #60a5fa;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --purple: #a855f7;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; transition: background var(--transition), color var(--transition); }
+        ::selection { background: var(--blue-100); }
+
+        /* LOGIN OVERLAY */
+        .login-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #000; overflow: hidden; transition: opacity 0.5s ease; }
+        .login-overlay.fade-out { opacity: 0; pointer-events: none; }
+        #loginVideo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+        #matrixCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; display: none; }
+        .login-card { position: relative; width: 400px; max-width: 92%; background: rgba(15, 25, 60, .55); border: 1px solid rgba(255, 255, 255, .14); border-radius: 20px; padding: 36px 34px 30px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 30px 80px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08); animation: loginIn .5s cubic-bezier(.2, .9, .25, 1); z-index: 2; }
+        @keyframes loginIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .login-card.shake { animation: shake .4s; }
+        @keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-8px); } 40%, 60% { transform: translateX(8px); } }
+        .login-mark { width: 52px; height: 52px; border-radius: 14px; margin: 0 auto 18px; background: linear-gradient(135deg, var(--blue-500), #5ec6ff); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 700; font-size: 18px; color: #fff; box-shadow: 0 10px 30px rgba(47, 107, 255, .5); }
+        .login-title { color: #fff; font-size: 19px; font-weight: 800; text-align: center; letter-spacing: .2px; }
+        .login-sub { color: rgba(255, 255, 255, .5); font-size: 12.5px; text-align: center; margin-top: 5px; margin-bottom: 26px; }
+        .login-field { margin-bottom: 14px; position: relative; }
+        .login-field label { color: rgba(255, 255, 255, .55); font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; font-weight: 700; }
+        .login-field input { width: 100%; padding: 12px 14px; margin-top: 6px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .16); background: rgba(255, 255, 255, .06); color: #fff; font-size: 14.5px; }
+        .login-field input::placeholder { color: rgba(255, 255, 255, .3); }
+        .login-field input:focus { outline: none; border-color: var(--blue-500); background: rgba(255, 255, 255, .1); box-shadow: 0 0 0 3px rgba(47, 107, 255, .25); }
+        .login-btn { width: 100%; margin-top: 8px; padding: 12px; border: 0; border-radius: 10px; cursor: pointer; background: linear-gradient(135deg, var(--blue-600), #4472ff); color: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); box-shadow: 0 12px 30px rgba(27, 87, 230, .4); }
+        .login-btn:hover { transform: translateY(-1px); box-shadow: 0 16px 36px rgba(27, 87, 230, .5); }
+        .login-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+        .login-error { margin-top: 14px; padding: 10px 12px; border-radius: 9px; background: rgba(214, 69, 69, .15); border: 1px solid rgba(214, 69, 69, .4); color: #ffb4b4; font-size: 12.5px; font-weight: 600; display: none; align-items: center; gap: 8px; }
+        .login-error.show { display: flex; }
+        .login-foot { margin-top: 22px; text-align: center; font-size: 11px; color: rgba(255, 255, 255, .35); }
+
+        /* MAIN CONTENT */
+        .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .topbar { background: var(--surface); display: flex; align-items: center; justify-content: space-between; padding: 16px 26px; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 12px; }
+        .topbar h1 { font-size: 22px; font-weight: 800; }
+        .topbar .user-area { display: flex; align-items: center; gap: 12px; }
+        .userbox { display: flex; align-items: center; gap: 8px; }
+        .userbox .avatar { width: 32px; height: 32px; border-radius: 8px; background: var(--blue-100); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: var(--blue-600); }
+        .badge-level { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 99px; letter-spacing: .3px; }
+        .badge-level.master { background: #2a1b06; color: #ffcf7a; border: 1px solid rgba(255, 207, 122, .3); }
+        .badge-level.basic { background: rgba(0, 0, 0, .05); color: var(--ink-soft); }
+        .btn { background: var(--blue-600); color: #fff; border: 0; padding: 10px 16px; border-radius: 9px; cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 7px; transition: var(--transition); }
+        .btn:hover { background: var(--navy-800); }
+        .btn.ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--line); }
+        .btn.ghost:hover { background: var(--bg); color: var(--ink); }
+        .btn.danger { background: #fdecec; color: var(--red); }
+        .btn.danger:hover { background: var(--red); color: #fff; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .theme-toggle { background: none; border: 1px solid var(--line); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--ink); }
+
+        .dev-credit { text-align: center; font-size: 12px; color: var(--ink-faint); margin-bottom: 16px; font-weight: 500; letter-spacing: 0.2px; }
+
+        /* Cards */
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .card { background: var(--surface); padding: 18px 20px; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(15, 23, 55, .03); }
+        .card .k { font-size: 12px; color: var(--ink-faint); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+        .card .v { font-size: 30px; font-weight: 800; margin-top: 8px; font-family: var(--mono); }
+        .card .v.blue { color: var(--blue-600); }
+        .card .v.green { color: var(--green); }
+        .card .v.amber { color: var(--amber); }
+
+        /* Panel & Table */
+        .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+        .panel-head { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .panel-head h2 { font-size: 16px; font-weight: 700; }
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+        .filters input { padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: var(--surface); color: var(--ink); min-width: 180px; }
+        .filters input:focus { outline: 2px solid var(--blue-100); border-color: var(--blue-500); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 11px 14px; background: var(--surface); color: var(--ink-faint); font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: .4px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+        td { padding: 11px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+        tbody tr { transition: background .2s ease; }
+        tbody tr:hover { background: rgba(0, 0, 0, 0.02); }
+        tbody tr.row-on { background: rgba(15, 157, 88, .10); }
+        tbody tr.row-on:hover { background: rgba(15, 157, 88, .16); }
+        .code { font-family: var(--mono); font-size: 12.5px; color: var(--navy-800); font-weight: 600; }
+        .empty { padding: 50px 20px; text-align: center; color: var(--ink-faint); }
+
+        /* Check toggle */
+        .check-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 2px solid var(--line);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            color: transparent;
+            font-weight: 800;
+            font-size: 18px;
+        }
+        .check-toggle.checked {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+        .check-toggle.checked::after {
+            content: '✓';
+        }
+        .check-toggle.locked {
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Modal */
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(5, 19, 57, .55); backdrop-filter: blur(3px); z-index: 100; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 20px; }
+        .overlay.show { display: flex; }
+        .modal { width: 560px; max-width: 100%; background: var(--surface); border-radius: 14px; overflow: hidden; box-shadow: 0 20px 60px rgba(5, 19, 57, .3); }
+        .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 16px; font-weight: 700; }
+        .close-x { background: none; border: 0; font-size: 18px; cursor: pointer; color: var(--ink-faint); width: 30px; height: 30px; border-radius: 8px; }
+        .close-x:hover { color: var(--red); background: rgba(214, 69, 69, 0.1); }
+        .modal-body { padding: 22px; }
+        .modal-footer { padding: 16px 22px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .field.full { grid-column: 1/-1; }
+        label { font-size: 11.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .3px; }
+        input { width: 100%; padding: 10px 12px; margin-top: 5px; border: 1px solid var(--line); border-radius: 9px; font-size: 14px; color: var(--ink); background: var(--surface); }
+        input:focus { outline: none; border-color: var(--blue-500); box-shadow: 0 0 0 3px var(--blue-100); }
+        .ean-wrap { position: relative; }
+        .ean-wrap input { font-family: var(--mono); font-weight: 700; letter-spacing: 1px; padding-right: 70px; }
+        .ean-status { position: absolute; right: 10px; top: 38px; font-size: 11px; font-weight: 700; }
+        .ean-status.found { color: var(--green); }
+        .ean-status.notfound { color: var(--red); }
+        .hint { font-size: 11.5px; color: var(--ink-faint); margin-top: 10px; }
+        .toast { position: fixed; bottom: 26px; right: 26px; background: var(--navy-800); color: #fff; padding: 14px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 600; box-shadow: 0 10px 30px rgba(5, 19, 57, .35); z-index: 200; display: flex; align-items: center; gap: 10px; transform: translateY(20px); opacity: 0; transition: var(--transition); max-width: 420px; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.err { background: var(--red); }
+        .spinner { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff; animation: spin .7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="light">
+
+    <!-- LOGIN OVERLAY -->
+    <div class="login-overlay" id="loginOverlay">
+        <video id="loginVideo" autoplay loop muted playsinline crossorigin="anonymous">
+            <source src="7020018_Particle_Dot_3840x2160.mp4" type="video/mp4">
+        </video>
+        <canvas id="matrixCanvas"></canvas>
+        <div class="login-card" id="loginCard">
+            <div class="login-mark">TP</div>
+            <div class="login-title">Triagem Vision · Itens Inativos</div>
+            <div class="login-sub">Acesso restrito — informe suas credenciais</div>
+            <div class="login-field"><label>Usuário</label><input type="text" id="loginUser" placeholder="Seu usuário" autocomplete="off"></div>
+            <div class="login-field"><label>Senha</label><input type="password" id="loginPass" placeholder="Sua senha" autocomplete="off"></div>
+            <button class="login-btn" id="loginBtn" onclick="tentarLogin()"><span id="loginBtnText">Entrar</span></button>
+            <div class="login-error" id="loginError"><span>⚠</span><span id="loginErrorText">Usuário ou senha inválidos</span></div>
+            <div class="login-foot">Triagem Vision · Acesso controlado por nível de permissão</div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="app-container" id="appContainer" style="display: none;">
+        <div class="topbar">
+            <h1>Itens Inativos</h1>
+            <div class="user-area">
+                <div class="userbox" id="userBox">
+                    <div class="avatar" id="userAvatar">–</div>
+                    <div>
+                        <div style="font-weight:700;font-size:14px" id="userName">–</div>
+                        <span class="badge-level basic" id="userBadge">Nível 0</span>
+                    </div>
+                </div>
+                <button class="btn ghost" onclick="logout()" title="Sair">⏻ Sair</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌓</button>
+            </div>
+        </div>
+        <div class="dev-credit">Desenvolvido por <strong>Pablo Martins Lopes</strong></div>
+
+        <div style="margin-bottom:20px">
+            <button class="btn" onclick="openNovoItemModal()" style="padding:12px 20px;font-size:14px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Novo Item Inativo
+            </button>
+            <span style="margin-left:12px;font-size:12px;color:var(--ink-faint)" id="permHint"></span>
+        </div>
+
+        <div class="cards">
+            <div class="card"><div class="k">Total Cadastrado</div><div class="v blue" id="statTotal">–</div></div>
+            <div class="card"><div class="k">Ativados (✓)</div><div class="v green" id="statOn">–</div></div>
+            <div class="card"><div class="k">Inativos</div><div class="v amber" id="statOff">–</div></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head"><h2>Registros</h2></div>
+            <div class="filters">
+                <input type="text" id="fSearchEan" placeholder="Buscar por EAN" oninput="filtrarTabelaInativos()">
+                <input type="text" id="fSearchProduto" placeholder="Buscar por Produto" oninput="filtrarTabelaInativos()">
+                <button class="btn ghost" onclick="document.getElementById('fSearchEan').value='';document.getElementById('fSearchProduto').value='';filtrarTabelaInativos()">Limpar</button>
+                <button class="btn" onclick="loadInativos()">Atualizar</button>
+            </div>
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>EAN</th>
+                            <th>PLU</th>
+                            <th>Produto</th>
+                            <th>Usuário</th>
+                            <th>Nome</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inativosTable">
+                        <tr><td colspan="7" class="empty">Carregando…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOVO ITEM -->
+    <div class="overlay" id="overlayNovoItem">
+        <div class="modal">
+            <div class="modal-header"><h3>Novo Item Inativo</h3><button onclick="closeNovoItemModal()" class="close-x">✕</button></div>
+            <div class="modal-body">
+                <div class="grid">
+                    <div class="field full ean-wrap">
+                        <label>EAN</label>
+                        <input type="text" id="ni_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+                        <span class="ean-status" id="niEanStatus"></span>
+                    </div>
+                    <div class="field"><label>PLU</label><input type="text" id="ni_plu" placeholder="PLU do produto"></div>
+                    <div class="field"><label>Produto</label><input type="text" id="ni_produto" placeholder="Descrição do produto"></div>
+                </div>
+                <p class="hint">O item será salvo com status <b>desmarcado</b>. Somente Nível 1 pode ativar.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn ghost" onclick="closeNovoItemModal()">Cancelar</button>
+                <button class="btn" id="btnSalvarNovoItem" onclick="salvarNovoItem()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ========== EFEITO MATRIX ========== */
+        (function() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            const video = document.getElementById('loginVideo');
+            const userField = document.getElementById('loginUser');
+            const chars = 'ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890'.split('');
+            const fontSize = 32;
+            let columns, drops, animationId, matrixActive = false, charsColor = '#0F0', impactWave = null;
+
+            function resizeCanvas() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; columns = Math.floor(canvas.width / fontSize); drops = Array(columns).fill(1); }
+
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = fontSize + 'px monospace';
+                ctx.fillStyle = charsColor;
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i] += 0.3;
+                }
+                if (impactWave) {
+                    const elapsed = Date.now() - impactWave.start;
+                    const progress = Math.min(elapsed / impactWave.duration, 1);
+                    impactWave.radius = impactWave.maxRadius * progress;
+                    impactWave.alpha = 1 - progress;
+                    ctx.beginPath();
+                    ctx.arc(impactWave.x, impactWave.y, impactWave.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(255, 0, 0, ${impactWave.alpha})`;
+                    ctx.lineWidth = 3 * (1 - progress);
+                    ctx.stroke();
+                    if (progress >= 1) impactWave = null;
+                }
+                animationId = requestAnimationFrame(drawMatrix);
+            }
+
+            function startMatrix() {
+                if (!matrixActive) return;
+                canvas.style.display = 'block';
+                if (video) video.style.display = 'none';
+                resizeCanvas();
+                if (animationId) cancelAnimationFrame(animationId);
+                animationId = requestAnimationFrame(drawMatrix);
+            }
+
+            function stopMatrix() {
+                matrixActive = false;
+                canvas.style.display = 'none';
+                if (video) video.style.display = 'block';
+                if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            userField.addEventListener('input', function() {
+                if (this.value.trim() === '5520967') {
+                    if (!matrixActive) { matrixActive = true; charsColor = '#0F0'; startMatrix(); }
+                } else { stopMatrix(); }
+            });
+
+            window.setMatrixRed = function() {
+                if (!matrixActive) return;
+                charsColor = '#F00';
+                impactWave = { x: canvas.width / 2, y: canvas.height / 2, radius: 0, maxRadius: Math.min(canvas.width, canvas.height) * 0.4, alpha: 1, start: Date.now(), duration: 800 };
+                setTimeout(() => { if (matrixActive) charsColor = '#0F0'; }, 2000);
+            };
+
+            window.addEventListener('resize', () => { if (matrixActive) resizeCanvas(); });
+            stopMatrix();
+            if (video) {
+                const p = video.play();
+                if (p !== undefined) p.catch(() => {
+                    video.style.display = 'none';
+                    const overlay = document.getElementById('loginOverlay');
+                    if (overlay) overlay.style.background = 'linear-gradient(135deg,#051339 0%,#0a2472 40%,#1b57e6 100%)';
+                });
+            }
+        })();
+
+        /* ========== CONEXÃO SUPABASE ========== */
+        const SUPABASE_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxdm12eGppa2JpdnVic3pvYXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NTQ2NDksImV4cCI6MjA5OTUzMDY0OX0.5EVtA9L0DoKR4kdr_4cP7YtqH-FqsHJc6vpeliUMjN8";
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        /* ========== ESTADO GLOBAL ========== */
+        let currentUser = null;
+        let inativosCache = [];
+
+        function lvl() { return currentUser ? Number(currentUser.level) : 0; }
+        function isTotal() { return lvl() === 1; }
+        function canLancarInativo() { return lvl() === 1 || lvl() === 2; }
+        function canAlternarStatus() { return lvl() === 1; }
+        const NIVEL_LABELS = { 1: "Acesso Total", 2: "Lançar", 3: "Editar Lançamentos", 4: "Atualizar Base", 5: "Relatório Prevenção", 6: "Somente Consulta", 7: "Lançar e Editar", 8: "Lançar e Exportar", 9: "Consulta e Relatórios" };
+
+        /* ========== LOGIN ========== */
+        async function doLogin() {
+            const userField = document.getElementById("loginUser");
+            const passField = document.getElementById("loginPass");
+            const errBox = document.getElementById("loginError");
+            const errText = document.getElementById("loginErrorText");
+            const card = document.getElementById("loginCard");
+            const btn = document.getElementById("loginBtn");
+            const btnText = document.getElementById("loginBtnText");
+            const usuario = userField.value.trim();
+            const senha = passField.value;
+            errBox.classList.remove("show");
+            if (!usuario || !senha) { errText.textContent = "Informe usuário e senha."; errBox.classList.add("show"); card.classList.add("shake"); setTimeout(() => card.classList.remove("shake"), 400); return; }
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span>';
+            try {
+                const { data, error } = await sb.from("BD_USER").select("*").ilike("USER", usuario).limit(1);
+                if (error) throw error;
+                if (!data || !data.length) { errText.textContent = "Usuário não encontrado."; errBox.classList.add("show"); card.classList.add("shake"); setTimeout(() => card.classList.remove("shake"), 400); if (typeof setMatrixRed === "function") setMatrixRed(); return; }
+                const senhaSalva = String(data[0].PASSWORD ?? "").trim();
+                if (senhaSalva !== senha.trim()) { errText.textContent = "Senha incorreta."; errBox.classList.add("show"); card.classList.add("shake"); setTimeout(() => card.classList.remove("shake"), 400); if (typeof setMatrixRed === "function") setMatrixRed(); return; }
+                const level = Number(String(data[0].LEVEL ?? "2").trim()) || 2;
+                const state = String(data[0].STATE ?? "1").trim();
+                if (state !== "1") { errText.textContent = "Usuário inativo."; errBox.classList.add("show"); card.classList.add("shake"); setTimeout(() => card.classList.remove("shake"), 400); return; }
+                const nomeCompleto = String(data[0].NAME_USER ?? data[0].USER ?? "").trim();
+                const primeiroNome = nomeCompleto.split(" ")[0] || data[0].USER;
+                currentUser = { user: data[0].USER, level, name: primeiroNome, fullName: nomeCompleto };
+                document.getElementById("loginOverlay").classList.add("fade-out");
+                setTimeout(() => {
+                    document.getElementById("loginOverlay").style.display = "none";
+                    document.getElementById("appContainer").style.display = "block";
+                }, 500);
+                applyUserUI();
+                showToast("Login efetuado — " + (NIVEL_LABELS[level] || "Nível " + level));
+            } catch (e) { errText.textContent = "Erro: " + e.message; errBox.classList.add("show"); } finally { btn.disabled = false; btnText.textContent = "Entrar"; }
+        }
+
+        function tentarLogin() { return doLogin(); }
+        ["loginUser", "loginPass"].forEach(id => document.getElementById(id).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); doLogin(); } }));
+
+        function applyUserUI() {
+            if (!currentUser) return;
+            document.getElementById("userName").textContent = currentUser.fullName || currentUser.name || currentUser.user;
+            document.getElementById("userAvatar").textContent = (currentUser.name || currentUser.user).slice(0, 2).toUpperCase();
+            const badge = document.getElementById("userBadge");
+            badge.textContent = NIVEL_LABELS[lvl()] || ("Nível " + lvl());
+            badge.className = "badge-level " + (isTotal() ? "master" : "basic");
+            document.getElementById("permHint").textContent = canAlternarStatus() ? "Você pode ativar/desativar itens." : "Somente Nível 1 pode alternar o status.";
+            loadInativos();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById("loginPass").value = "";
+            document.getElementById("loginUser").value = "";
+            document.getElementById("appContainer").style.display = "none";
+            document.getElementById("loginOverlay").style.display = "flex";
+            document.getElementById("loginOverlay").classList.remove("fade-out");
+            setTimeout(() => document.getElementById("loginUser").focus(), 80);
+        }
+
+        /* ========== TOAST ========== */
+        function showToast(msg, isErr) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.classList.toggle("err", !!isErr);
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 3800);
+        }
+
+        /* ========== BUSCA CADASTRO ========== */
+        async function buscarCadastro(ean) {
+            const { data, error } = await sb.from("BD_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
+            if (error) throw error;
+            return (data && data.length) ? data[0] : null;
+        }
+
+        /* ========== MODAL NOVO ITEM ========== */
+        function openNovoItemModal() {
+            if (!canLancarInativo()) { showToast("Acesso negado. Somente Nível 1 ou 2 podem lançar.", true); return; }
+            ["ni_ean", "ni_plu", "ni_produto"].forEach(id => document.getElementById(id).value = "");
+            document.getElementById("niEanStatus").textContent = "";
+            document.getElementById("overlayNovoItem").classList.add("show");
+            setTimeout(() => document.getElementById("ni_ean").focus(), 80);
+        }
+
+        function closeNovoItemModal() { document.getElementById("overlayNovoItem").classList.remove("show"); }
+        document.getElementById("overlayNovoItem").addEventListener("click", e => { if (e.target.id === "overlayNovoItem") closeNovoItemModal(); });
+
+        document.getElementById("ni_ean").addEventListener("keydown", async e => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            const ean = e.target.value.trim();
+            const status = document.getElementById("niEanStatus");
+            if (!ean) return;
+            status.textContent = "Buscando…";
+            status.className = "ean-status";
+            try {
+                const p = await buscarCadastro(ean);
+                if (p) {
+                    document.getElementById("ni_plu").value = p.SEQPRODUTO || "";
+                    document.getElementById("ni_produto").value = p.DESCCOMPLETA || "";
+                    status.textContent = "✓ encontrado";
+                    status.className = "ean-status found";
+                } else {
+                    status.textContent = "não encontrado — preencha manualmente";
+                    status.className = "ean-status notfound";
+                }
+                document.getElementById("ni_plu").focus();
+            } catch (err) { status.textContent = "erro"; status.className = "ean-status notfound"; showToast("Erro ao buscar EAN: " + err.message, true); }
+        });
+
+        async function salvarNovoItem() {
+            if (!canLancarInativo()) { showToast("Acesso negado.", true); return; }
+            const ean = document.getElementById("ni_ean").value.trim();
+            const plu = document.getElementById("ni_plu").value.trim();
+            const produto = document.getElementById("ni_produto").value.trim();
+            if (!ean) { showToast("Informe o EAN.", true); return; }
+            if (!currentUser) { showToast("Sessão expirada.", true); return; }
+            const btn = document.getElementById("btnSalvarNovoItem");
+            btn.disabled = true;
+            btn.textContent = "Salvando…";
+            
+            const payload = {
+                DTA_HR: new Date().toISOString(),
+                EAN: ean,
+                PLU: plu || null,
+                PRODUTO: produto || null,
+                USER: currentUser.user,
+                NAME_USER: currentUser.fullName || currentUser.name,
+                STATUS: false   // sempre OFF ao cadastrar
+            };
+            
+            try {
+                // 1. Insere e obtém o ID
+                const { data: inserted, error: insertError } = await sb
+                    .from("BD_ITENS_INATIVOS")
+                    .insert(payload)
+                    .select("id")
+                    .single();
+                if (insertError) throw insertError;
+
+                // 2. Força STATUS = false (garantia extra)
+                if (inserted && inserted.id) {
+                    const { error: updateError } = await sb
+                        .from("BD_ITENS_INATIVOS")
+                        .update({ STATUS: false })
+                        .eq("id", inserted.id);
+                    if (updateError) throw updateError;
+                }
+
+                showToast("Item inativo cadastrado (desmarcado).");
+                closeNovoItemModal();
+                loadInativos();
+            } catch (err) {
+                showToast("Erro ao salvar: " + err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Salvar";
+            }
+        }
+
+        /* ========== TABELA ========== */
+        async function loadInativos() {
+            const tbody = document.getElementById("inativosTable");
+            tbody.innerHTML = '<tr><td colspan="7" class="empty">Carregando…</td></tr>';
+            try {
+                const { data, error } = await sb.from("BD_ITENS_INATIVOS").select("*").order("DTA_HR", { ascending: false }).limit(1000);
+                if (error) throw error;
+                inativosCache = data || [];
+                atualizarStats();
+                renderInativosTable(inativosCache);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty">Erro: ${err.message}</td></tr>`;
+            }
+        }
+
+        function atualizarStats() {
+            const total = inativosCache.length;
+            const on = inativosCache.filter(r => !!r.STATUS).length;
+            document.getElementById("statTotal").textContent = total;
+            document.getElementById("statOn").textContent = on;
+            document.getElementById("statOff").textContent = total - on;
+        }
+
+        function renderInativosTable(rows) {
+            const tbody = document.getElementById("inativosTable");
+            if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum item cadastrado</td></tr>'; return; }
+            const podeAlternar = canAlternarStatus();
+            tbody.innerHTML = rows.map(r => {
+                const on = !!r.STATUS;
+                const lockClass = podeAlternar ? '' : 'locked';
+                const clickHandler = podeAlternar ? `onclick="handleCheckClick(this)"` : '';
+                return `<tr class="${on ? 'row-on' : ''}" id="row-${r.id}">
+                    <td>${fmtDate(r.DTA_HR)}</td>
+                    <td class="code">${r.EAN || "—"}</td>
+                    <td>${r.PLU || "—"}</td>
+                    <td>${r.PRODUTO || "—"}</td>
+                    <td>${r.USER || "—"}</td>
+                    <td>${r.NAME_USER || "—"}</td>
+                    <td>
+                        <span class="check-toggle ${on ? 'checked' : ''} ${lockClass}" 
+                              role="checkbox" 
+                              aria-checked="${on}" 
+                              data-id="${r.id}" 
+                              data-status="${on}" 
+                              ${clickHandler}
+                              title="${podeAlternar ? 'Clique para alternar' : 'Apenas nível 1 pode alterar'}">
+                        </span>
+                    </td>
+                </tr>`;
+            }).join("");
+        }
+
+        function handleCheckClick(element) {
+            if (!canAlternarStatus()) {
+                showToast("Somente Nível 1 pode alterar o status.", true);
+                return;
+            }
+            const id = element.getAttribute("data-id");
+            const statusAtual = element.getAttribute("data-status") === "true";
+            const novoValor = !statusAtual;
+            
+            // Feedback imediato
+            element.classList.toggle("checked", novoValor);
+            element.setAttribute("data-status", novoValor);
+            element.setAttribute("aria-checked", novoValor);
+            
+            alternarStatus(id, novoValor, element);
+        }
+
+        async function alternarStatus(id, novoValor, checkElement = null) {
+            if (!canAlternarStatus()) {
+                showToast("Somente Nível 1 pode alternar o status.", true);
+                loadInativos();
+                return;
+            }
+            try {
+                const { error } = await sb.from("BD_ITENS_INATIVOS").update({ STATUS: novoValor }).eq("id", id);
+                if (error) throw error;
+
+                const item = inativosCache.find(r => String(r.id) === String(id));
+                if (item) item.STATUS = novoValor;
+                
+                const row = document.getElementById("row-" + id);
+                if (row) row.classList.toggle("row-on", novoValor);
+                
+                if (checkElement) {
+                    checkElement.classList.toggle("checked", novoValor);
+                    checkElement.setAttribute("data-status", novoValor);
+                    checkElement.setAttribute("aria-checked", novoValor);
+                }
+                atualizarStats();
+                showToast(novoValor ? "Item ativado (✓)." : "Item desativado.");
+            } catch (err) {
+                showToast("Erro ao atualizar status: " + err.message, true);
+                // Reverte visualmente se necessário
+                if (checkElement) {
+                    const statusOriginal = !novoValor;
+                    checkElement.classList.toggle("checked", statusOriginal);
+                    checkElement.setAttribute("data-status", statusOriginal);
+                    checkElement.setAttribute("aria-checked", statusOriginal);
+                }
+                loadInativos(); // recarrega para garantir integridade
+            }
+        }
+
+        function filtrarTabelaInativos() {
+            const ean = document.getElementById("fSearchEan").value.trim().toLowerCase();
+            const produto = document.getElementById("fSearchProduto").value.trim().toLowerCase();
+            const filtrados = inativosCache.filter(r => {
+                const okEan = !ean || String(r.EAN || "").toLowerCase().includes(ean);
+                const okProd = !produto || String(r.PRODUTO || "").toLowerCase().includes(produto);
+                return okEan && okProd;
+            });
+            renderInativosTable(filtrados);
+        }
+
+        function fmtDate(iso) {
+            if (!iso) return "—";
+            const d = new Date(iso);
+            if (isNaN(d)) return String(iso);
+            return d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        }
+
+        /* ========== TEMA ========== */
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('tp_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+        (function() { if (localStorage.getItem('tp_theme') === 'dark') document.body.classList.add('dark'); })();
+
+        setTimeout(() => document.getElementById("loginUser").focus(), 150);
+    </script>
+</body>
+</html>
