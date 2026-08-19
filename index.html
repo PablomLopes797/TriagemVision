@@ -364,15 +364,15 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <a data-view="config" href="#"><span class="ic">⚙</span><span class="label">Configurações</span></a>
 <a data-view="manual" href="#"><span class="ic">📖</span><span class="label">Manual</span></a>
 <div class="menu-label">FUNÇÕES</div>
-<a href="https://pablomlopes797.github.io/DESCARTE_TRIAGEMVISION/" rel="noopener" target="_blank">
+<a href="relatorio-descarte.html" rel="noopener" target="_blank">
 <span class="ic"><svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="21" x2="15.8" y1="21" y2="15.8"></line></svg></span>
 <span class="label">AUDITORIA DESCARTE</span>
 </a>
-<a href="https://pablomlopes797.github.io/INATIVOS-TRIAGEM-VISION/" rel="noopener" target="_blank">
+<a href="INATIVOS.HTML" rel="noopener" target="_blank">
 <span class="ic"><svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M10 2h4"></path><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"></path><line stroke="#d64545" x1="18" x2="6" y1="6" y2="18"></line><line stroke="#d64545" x1="6" x2="18" y1="6" y2="18"></line></svg></span>
 <span class="label">ITENS INATIVOS</span>
 </a>
-<a href="https://pablomlopes797.github.io/DOA-O_TRIAGEMVISION/" rel="noopener" target="_blank">
+<a href="PET.HTML" rel="noopener" target="_blank">
 <span class="ic">
 <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16">
 <circle cx="12" cy="17" r="3" stroke-linecap="round" stroke-linejoin="round"></circle>
@@ -586,8 +586,8 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="view" id="view-administracao">
 <div class="panel">
 <div class="panel-head"><h4>ADMINISTRAÇÃO — Faturamento de Descarte</h4><div class="module-actions"><button class="btn" onclick="carregarAdministracao()">Atualizar</button></div></div>
-<div class="filters"><input id="admDataIni" title="Data inicial" type="date"/><input id="admDataFim" title="Data final" type="date"/><select id="admTurno"><option value="">Todos os turnos</option><option value="1">1º Turno</option><option value="2">2º Turno</option><option value="3">3º Turno</option></select><select id="admStatus"><option value="">Todos os status</option><option value="PENDENTE">Pendente</option><option value="FATURADO">Faturado</option></select><input id="admPlu" placeholder="PLU"/><input id="admProduto" placeholder="Produto"/><input id="admNf" placeholder="Nº NF"/><button class="btn" onclick="carregarAdministracao()">Filtrar</button></div>
-<div class="panel-body"><div class="module-note">Este painel permite editar somente <b>STATUS FATURAMENTO</b>, <b>Nº NF</b> e <b>CGO DE FATURAMENTO</b>. Ao salvar, a matrícula e o nome do administrador logado são gravados automaticamente.</div><div class="table-scroll-x"><table class="admin-table"><thead><tr><th>Data/Hora</th><th>Turno</th><th>Usuário Prevenção</th><th>PLU</th><th>Produto</th><th>Qtd. Unidade</th><th>Qtd. Auditada</th><th>Gestor Operação</th><th>Status Faturamento</th><th>Nº NF</th><th>CGO Faturamento</th><th>ADM Faturamento</th><th>Ação</th></tr></thead><tbody id="administracaoTable"><tr><td class="empty" colspan="13">Carregando…</td></tr></tbody></table></div></div>
+<div class="filters"><input id="admDataIni" title="Data inicial" type="date"/><input id="admDataFim" title="Data final" type="date"/><select id="admTurno"><option value="">Todos os turnos</option><option value="1">1º Turno</option><option value="2">2º Turno</option><option value="3">3º Turno</option></select><select id="admStatus"><option value="">Todos os status</option><option value="PENDENTE">Pendente</option><option value="FATURADO">Faturado</option></select><input id="admPlu" placeholder="PLU"/><input id="admProduto" placeholder="Produto"/><input id="admNf" placeholder="Nº NF" inputmode="numeric"/><button class="btn" onclick="carregarAdministracao()">Filtrar</button></div>
+<div class="panel-body"><div class="module-note">Este painel permite editar somente <b>STATUS FATURAMENTO</b> e <b>Nº NF</b>. Os níveis 1 e 9 podem preencher e salvar; o nível 5 pode apenas visualizar. A matrícula e o nome do administrador logado são gravados automaticamente.</div><div class="table-scroll-x"><table class="admin-table"><thead><tr><th>Data/Hora</th><th>Turno</th><th>Usuário Prevenção</th><th>PLU</th><th>Produto</th><th>Qtd. Unidade</th><th>QTD_UN DESCARTE</th><th>QTD_UN VENCIMENTO</th><th>QTD_UN DEGUSTAÇÃO</th><th>QTD_AUDITADA</th><th>Gestor Operação</th><th>Status Faturamento</th><th>Nº NF</th><th>ADM Faturamento</th><th>NAME ADM</th><th>Ação</th></tr></thead><tbody id="administracaoTable"><tr><td class="empty" colspan="16">Carregando…</td></tr></tbody></table></div></div>
 </div>
 </div>
 </div>
@@ -1494,14 +1494,46 @@ async function salvarCadastroItem(){if(!podeCadastrarItem()){showToast('Acesso n
 
 /* ===== ADMINISTRAÇÃO / BD_PREV_RELAT ===== */
 let adminCache=[];
-function podeVisualizarAdministracao(){return !!currentUser && [1,5,9].includes(lvl());} function podeEditarAdministracao(){return !!currentUser && [1,9].includes(lvl());} function canAdministrarPrev(){return podeEditarAdministracao();}
-async function carregarAdministracao(){const tbody=document.getElementById('administracaoTable');if(!tbody)return;if(!podeVisualizarAdministracao()){tbody.innerHTML='<tr><td colspan="13" class="empty">Acesso restrito ao administrador.</td></tr>';return;}tbody.innerHTML='<tr><td colspan="13" class="empty">Carregando…</td></tr>';let q=sb.from('BD_PREV_RELAT').select('*').order('DTA_HORA',{ascending:false}).limit(5000);const ini=document.getElementById('admDataIni').value,fim=document.getElementById('admDataFim').value,turno=document.getElementById('admTurno').value,status=document.getElementById('admStatus').value,plu=document.getElementById('admPlu').value.trim(),produto=document.getElementById('admProduto').value.trim(),nf=document.getElementById('admNf').value.trim();if(ini)q=q.gte('DTA_HORA',new Date(ini+'T00:00:00').toISOString());if(fim)q=q.lte('DTA_HORA',new Date(fim+'T23:59:59').toISOString());if(turno)q=q.eq('TURNO_LANC',Number(turno));if(status)q=q.eq('STATUS FATURAMENTO',status);if(plu)q=q.ilike('PLU','%'+plu+'%');if(produto)q=q.ilike('PRODUTO','%'+produto+'%');if(nf)q=q.ilike('Nº NF','%'+nf+'%');try{let result=await q;if(result.error&&/DTA_HORA|column|schema cache/i.test(result.error.message||'')){result=await sb.from('BD_PREV_RELAT').select('*').limit(5000);}if(result.error)throw result.error;adminCache=result.data||[];renderAdministracao(adminCache);if(!podeEditarAdministracao()) travarAdministracaoSomenteVisualizacao();}catch(err){tbody.innerHTML='<tr><td colspan="13" class="empty">Erro: '+err.message+'</td></tr>';showToast('Erro ao carregar administração: '+err.message,true);}}
-function renderAdministracao(rows){const tbody=document.getElementById('administracaoTable');if(!rows.length){tbody.innerHTML='<tr><td colspan="13" class="empty">Nenhum registro encontrado.</td></tr>';return;}tbody.innerHTML=rows.map((r,i)=>'<tr><td>'+fmtDate(r.DTA_HORA)+'</td><td>'+ (r.TURNO_LANC??'—')+'</td><td>'+ (r['USER PREVENÇÃO']??'—')+'</td><td>'+ (r.PLU??'—')+'</td><td class="wide">'+(r.PRODUTO??'—')+'</td><td>'+ (r.QTD_UNIDADE??0)+'</td><td>'+ (r.QTD_AUDITADA??0)+'</td><td class="wide">'+(r['NAME GESTOR OPERAÇÃO']??'—')+'</td><td><select data-admin-index="'+i+'" data-admin-field="status"><option value="PENDENTE" '+(String(r['STATUS FATURAMENTO']||'PENDENTE').toUpperCase()==='PENDENTE'?'selected':'')+'>Pendente</option><option value="FATURADO" '+(String(r['STATUS FATURAMENTO']||'').toUpperCase()==='FATURADO'?'selected':'')+'>Faturado</option></select></td><td><input class="nf" data-admin-index="'+i+'" data-admin-field="nf" inputmode="numeric" value="'+String(r['Nº NF']??'').replace(/[^0-9]/g,'')+'" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"></td><td><select data-admin-index="'+i+'" data-admin-field="cgo"><option value="">Selecione</option><option value="571 - DESCARTE" '+(r['CGO DE FATURAMENTO']==='571 - DESCARTE'?'selected':'')+'>571 - DESCARTE</option><option value="337 - DEGUSTAÇÃO" '+(r['CGO DE FATURAMENTO']==='337 - DEGUSTAÇÃO'?'selected':'')+'>337 - DEGUSTAÇÃO</option><option value="338 - VENCIMENTO" '+(r['CGO DE FATURAMENTO']==='338 - VENCIMENTO'?'selected':'')+'>338 - VENCIMENTO</option></select></td><td>'+ (r['ADM FATURAMENTO']??'—')+'</td><td><button class="btn" onclick="salvarAdministracaoRow('+i+')">Salvar</button></td></tr>').join('');}
-async function salvarAdministracaoRow(index){if(!canAdministrarPrev()){showToast('Acesso restrito ao administrador.',true);return;}const row=adminCache[index];if(!row||row.id===undefined){showToast('Registro sem identificador para atualização.',true);return;}const status=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="status"]').value,nf=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="nf"]').value.replace(/[^0-9]/g,''),cgo=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="cgo"]').value;const payload={'STATUS FATURAMENTO':status,'ADM FATURAMENTO':currentUser.user,'Nº NF':nf||null,'CGO DE FATURAMENTO':cgo||null,'NAME ADM':currentUser.fullName||currentUser.name};try{const {error}=await sb.from('BD_PREV_RELAT').update(payload).eq('id',row.id);if(error)throw error;Object.assign(row,payload);showToast('Registro administrativo atualizado.');renderAdministracao(adminCache);}catch(err){showToast('Erro ao atualizar registro: '+err.message,true);}}
-
-
+function podeVisualizarAdministracao(){return !!currentUser && [1,5,9].includes(lvl());}
+function podeEditarAdministracao(){return !!currentUser && [1,9].includes(lvl());}
+function canAdministrarPrev(){return podeEditarAdministracao();}
+async function carregarAdministracao(){
+  const tbody=document.getElementById('administracaoTable');
+  if(!tbody)return;
+  if(!podeVisualizarAdministracao()){tbody.innerHTML='<tr><td colspan="16" class="empty">Acesso restrito aos níveis 1, 5 e 9.</td></tr>';return;}
+  tbody.innerHTML='<tr><td colspan="16" class="empty">Carregando…</td></tr>';
+  let q=sb.from('BD_PREV_RELAT').select('*').order('DTA_HORA',{ascending:false}).limit(5000);
+  const ini=document.getElementById('admDataIni').value,fim=document.getElementById('admDataFim').value,turno=document.getElementById('admTurno').value,status=document.getElementById('admStatus').value,plu=document.getElementById('admPlu').value.trim(),produto=document.getElementById('admProduto').value.trim(),nf=document.getElementById('admNf').value.trim();
+  if(ini)q=q.gte('DTA_HORA',new Date(ini+'T00:00:00').toISOString());
+  if(fim)q=q.lte('DTA_HORA',new Date(fim+'T23:59:59').toISOString());
+  if(turno)q=q.eq('TURNO_LANC',Number(turno));
+  if(status)q=q.eq('STATUS FATURAMENTO',status);
+  if(plu){if(/^\d+$/.test(plu))q=q.eq('PLU',Number(plu));else q=q.ilike('PLU','%'+plu+'%');}
+  if(produto)q=q.ilike('PRODUTO','%'+produto+'%');
+  if(nf)q=q.ilike('Nº NF','%'+nf+'%');
+  try{
+    const result=await q;
+    if(result.error)throw result.error;
+    adminCache=result.data||[];
+    renderAdministracao(adminCache);
+    if(!podeEditarAdministracao())travarAdministracaoSomenteVisualizacao();
+  }catch(err){tbody.innerHTML='<tr><td colspan="16" class="empty">Erro: '+err.message+'</td></tr>';showToast('Erro ao carregar administração: '+err.message,true);}
+}
+function renderAdministracao(rows){
+  const tbody=document.getElementById('administracaoTable');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="16" class="empty">Nenhum registro encontrado.</td></tr>';return;}
+  tbody.innerHTML=rows.map((r,i)=>'<tr><td>'+fmtDate(r.DTA_HORA)+'</td><td>'+ (r.TURNO_LANC??'—')+'</td><td>'+ (r['USER PREVENÇÃO']??'—')+'</td><td>'+ (r.PLU??'—')+'</td><td class="wide">'+(r.PRODUTO??'—')+'</td><td>'+ (r.QTD_UNIDADE??0)+'</td><td>'+ (r['QTD_UN DESCARTE']??0)+'</td><td>'+ (r['QTD_UN VENCIMENTO']??0)+'</td><td>'+ (r['QTD_UN DEGUSTAÇÃO']??0)+'</td><td><b>'+(r.QTD_AUDITADA??0)+'</b></td><td class="wide">'+(r['NAME GESTOR OPERAÇÃO']??'—')+'</td><td><select data-admin-index="'+i+'" data-admin-field="status"><option value="PENDENTE" '+(String(r['STATUS FATURAMENTO']||'PENDENTE').toUpperCase()==='PENDENTE'?'selected':'')+'>Pendente</option><option value="FATURADO" '+(String(r['STATUS FATURAMENTO']||'').toUpperCase()==='FATURADO'?'selected':'')+'>Faturado</option></select></td><td><input class="nf" data-admin-index="'+i+'" data-admin-field="nf" inputmode="numeric" value="'+String(r['Nº NF']??'').replace(/[^0-9]/g,'')+'" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"></td><td>'+ (r['ADM FATURAMENTO']??'—')+'</td><td>'+ (r['NAME ADM']??'—')+'</td><td><button class="btn" onclick="salvarAdministracaoRow('+i+')">Salvar</button></td></tr>').join('');
+}
+async function salvarAdministracaoRow(index){
+  if(!canAdministrarPrev()){showToast('Acesso restrito. Nível 5 possui apenas visualização.',true);return;}
+  const row=adminCache[index];
+  if(!row||row.id===undefined){showToast('Registro sem identificador para atualização.',true);return;}
+  const status=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="status"]').value;
+  const nf=document.querySelector('[data-admin-index="'+index+'"][data-admin-field="nf"]').value.replace(/[^0-9]/g,'');
+  const payload={'STATUS FATURAMENTO':status,'ADM FATURAMENTO':currentUser.user,'Nº NF':nf||null,'NAME ADM':currentUser.fullName||currentUser.name};
+  try{const {error}=await sb.from('BD_PREV_RELAT').update(payload).eq('id',row.id);if(error)throw error;Object.assign(row,payload);showToast('Registro administrativo atualizado.');renderAdministracao(adminCache);if(!podeEditarAdministracao())travarAdministracaoSomenteVisualizacao();}catch(err){showToast('Erro ao atualizar registro: '+err.message,true);}
+}
 function travarAdministracaoSomenteVisualizacao(){document.querySelectorAll('#administracaoTable [data-admin-field]').forEach(el=>el.disabled=true);document.querySelectorAll('#administracaoTable button').forEach(btn=>btn.style.display='none');}
-
 
 /* ===== MÓDULOS EMBUTIDOS — SEM FETCH ===== */
 const SINGLE_MODULE_TITLES = {
