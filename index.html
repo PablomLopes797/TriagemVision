@@ -969,12 +969,36 @@ let gaiolaStaged = []; let gaiolaAtual = { gaiola: "", loja: "", reservationId: 
 function gaiolaStorageKey() { return "tp_gaiola_pending_" + (currentUser ? currentUser.user : "anon"); }
 function saveGaiolaLocal() { localStorage.setItem(gaiolaStorageKey(), JSON.stringify({ gaiola: gaiolaAtual.gaiola, loja: gaiolaAtual.loja, reservationId: gaiolaAtual.reservationId, items: gaiolaStaged })); }
 function loadGaiolaLocal() { try { const raw = localStorage.getItem(gaiolaStorageKey()); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
-function clearGaiolaLocal() { localStorage.removeItem(gaiolaStorageKey()); }
+function clearGaiolaLocal() {
+  // A pendência é identificada pelo usuário logado. Remova-a somente depois
+  // que todos os registros da gaiola forem salvos com sucesso.
+  localStorage.removeItem(gaiolaStorageKey());
+}
+function finalizarGaiolaSalva() {
+  // Limpa a pendência local imediatamente após o salvamento concluído.
+  clearGaiolaLocal();
+  const pendingOverlay = document.getElementById("overlayGaiolaPendente");
+  if (pendingOverlay) pendingOverlay.classList.remove("show");
+  gaiolaStaged = [];
+  gaiolaAtual = { gaiola: "", loja: "", reservationId: null };
+  document.getElementById("overlayGaiola").classList.remove("show");
+  renderGaiolaStagedTable();
+}
 async function reservarGaiolaNoBanco() { const gaiola = String(await fetchNextGaiolaNumber()); const registro = { DTA_HORA: new Date().toISOString(), GAIOLA: gaiola, LOJA: "PENDENTE", TURNO_LANC: calcularTurno(), USER: currentUser ? currentUser.user : "" }; const { data, error } = await sb.from("GAIOLAS_LANC").insert(registro).select("id").limit(1); if (error) throw error; return { gaiola, reservationId: data && data.length ? data[0].id : null }; }
 async function atualizarReservaGaiola(loja) { if (!gaiolaAtual.reservationId || !loja) return; const { error } = await sb.from("GAIOLAS_LANC").update({ LOJA: loja }).eq("id", gaiolaAtual.reservationId); if (error) throw error; }
 async function excluirReservaGaiola() { const id = gaiolaAtual.reservationId; if (!id) return; const { error } = await sb.from("GAIOLAS_LANC").delete().eq("id", id); if (error) throw error; gaiolaAtual.reservationId = null; }
 async function cancelarGaiolaSemEnviar() { try { await excluirReservaGaiola(); } catch (err) { showToast("Não foi possível excluir a gaiola pendente: " + err.message, true); return; } gaiolaStaged = []; gaiolaAtual = { gaiola: "", loja: "", reservationId: null }; clearGaiolaLocal(); document.getElementById("overlayGaiola").classList.remove("show"); showToast("Gaiola pendente excluída."); }
-function checkPendingGaiola() { if (!canLancar()) return; const pending = loadGaiolaLocal(); if (pending && pending.items && pending.items.length) { document.getElementById("pendGaiolaMsg").textContent = `Gaiola nº ${pending.gaiola} — Loja ${pending.loja} — ${pending.items.length} item(ns) pendentes.`; document.getElementById("overlayGaiolaPendente").classList.add("show"); } }
+function checkPendingGaiola() {
+  if (!canLancar()) return;
+  const pending = loadGaiolaLocal();
+  if (pending && Array.isArray(pending.items) && pending.items.length) {
+    document.getElementById("pendGaiolaMsg").textContent = `Gaiola nº ${pending.gaiola} — Loja ${pending.loja} — ${pending.items.length} item(ns) pendentes.`;
+    document.getElementById("overlayGaiolaPendente").classList.add("show");
+  } else if (pending) {
+    // Não exiba registros vazios ou antigos como se fossem pendências reais.
+    clearGaiolaLocal();
+  }
+}
 function continuarGaiolaPendente() { const pending = loadGaiolaLocal(); if (pending) { gaiolaAtual = { gaiola: pending.gaiola, loja: pending.loja, reservationId: pending.reservationId || null }; gaiolaStaged = pending.items || []; } document.getElementById("overlayGaiolaPendente").classList.remove("show"); openGaiolaModal(true); }
 async function apagarGaiolaPendente() { try { await excluirReservaGaiola(); } catch (err) { showToast("Erro ao apagar pendência: " + err.message, true); return; } clearGaiolaLocal(); gaiolaStaged = []; gaiolaAtual = { gaiola: "", loja: "", reservationId: null }; document.getElementById("overlayGaiolaPendente").classList.remove("show"); showToast("Pendentes da gaiola apagados"); }
 
@@ -1288,11 +1312,9 @@ async function salvarGaiola() {
       try { await debitarSaldo(it.ean, it.qtd); } 
       catch (e) { console.error("Erro ao debitar saldo do EAN " + it.ean, e); } 
     } 
-    showToast(`Gaiola ${gaiolaAtual.gaiola} salva com sucesso!`); 
-    gaiolaStaged = []; 
-    gaiolaAtual = { gaiola: "", loja: "", reservationId: null }; 
-    clearGaiolaLocal(); 
-    closeGaiolaModal(); 
+    const gaiolaSalva = gaiolaAtual.gaiola;
+    finalizarGaiolaSalva();
+    showToast(`Gaiola ${gaiolaSalva} salva com sucesso!`); 
   } catch (err) { 
     showToast("Erro ao salvar gaiola: " + err.message, true); 
   } finally { 
