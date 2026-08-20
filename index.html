@@ -526,7 +526,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <!-- USUÁRIOS -->
 <div class="view" id="view-usuarios">
 <div class="cfg-restricted" id="usersRestricted" style="display:none"><div class="big">🔒</div><p><b>Acesso restrito.</b><br/>O gerenciamento de usuários só fica disponível para usuários nível 1 (acesso total).</p></div>
-<div id="usersPanel"><div class="panel"><div class="panel-head"><h4>Usuários cadastrados</h4><button class="btn" onclick="openUserModal()">＋ Novo usuário</button></div><div style="overflow-x:auto"><table><thead><tr><th>Usuário</th><th>Nome</th><th>Nível</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usersTable"><tr><td class="empty" colspan="5">Carregando…</td></tr></tbody></table></div></div></div>
+<div id="usersPanel"><div class="panel"><div class="panel-head"><h4>Usuários cadastrados</h4><button class="btn" onclick="openUserModal()">＋ Novo usuário</button></div><div class="filters" id="usersFilters"><input autocomplete="off" id="usersSearch" oninput="filtrarUsuarios()" placeholder="Pesquisar matrícula ou nome..." type="search"/><select id="usersLevelFilter" onchange="filtrarUsuarios()"><option value="">Todos os níveis</option><option value="1">Nível 1</option><option value="2">Nível 2</option><option value="3">Nível 3</option><option value="4">Nível 4</option><option value="5">Nível 5</option><option value="6">Nível 6</option><option value="7">Nível 7</option><option value="8">Nível 8</option><option value="9">Nível 9</option></select></div><div style="overflow-x:auto"><table><thead><tr><th>Usuário</th><th>Nome</th><th>Nível</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usersTable"><tr><td class="empty" colspan="5">Carregando…</td></tr></tbody></table></div></div></div>
 </div>
 <!-- PERMISSÕES -->
 <div class="view" id="view-permissoes">
@@ -1477,7 +1477,49 @@ async function processarPastaLojas() { if (!canAtualizarBase()) { showToast("Ace
 
 /* ========== USUÁRIOS ========== */
 let usersCache = []; let editingOriginalUser = null;
-async function loadUsuarios() { const tbody = document.getElementById("usersTable"); tbody.innerHTML = '<tr><td colspan="5" class="empty">Carregando…</td></tr>'; try { const { data, error } = await sb.from("BD_USER").select("*").order("USER", { ascending: true }); if (error) throw error; usersCache = data || []; if (!usersCache.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum usuário</td></tr>'; return; } tbody.innerHTML = usersCache.map((u, idx) => { const nivelNum = Number(u.LEVEL) || 2; const isAtivo = String(u.STATE ?? "1") === "1"; const isProtected = u.USER === "5520967"; const userActions = isProtected ? '<span class="hint" style="color:var(--ink-faint)">🔒 Protegido</span>' : `<div class="row-actions"><button class="icon-btn" onclick="editarUsuario(${idx})">✎</button></div>`; return `<tr><td class="code">${u.USER || ""}</td><td>${u.NAME_USER || "—"}</td><td><span class="tag ${nivelNum === 1 ? 'ok' : ''}">${NIVEL_LABELS[nivelNum] || ('Nível ' + nivelNum)}</span></td><td><span class="tag ${isAtivo ? 'ok' : 'warn'}">${isAtivo ? 'Ativo' : 'Inativo'}</span></td><td>${userActions}</td></tr>`; }).join(""); } catch (err) { tbody.innerHTML = `<tr><td colspan="5" class="empty">Erro: ${err.message}</td></tr>`; } }
+function atualizarFiltroNiveis(){
+  const select=document.getElementById('usersLevelFilter');
+  if(!select)return;
+  const valorAtual=select.value;
+  select.innerHTML='<option value="">Todos os níveis</option>'+Array.from({length:9},(_,i)=>{const n=i+1;return '<option value="'+n+'">'+(NIVEL_LABELS[n]||('Nível '+n))+'</option>';}).join('');
+  if(Array.from(select.options).some(option=>option.value===valorAtual))select.value=valorAtual;
+}
+function obterUsuariosFiltrados(){
+  const busca=(document.getElementById('usersSearch')?.value||'').trim().toLocaleLowerCase();
+  const nivel=document.getElementById('usersLevelFilter')?.value||'';
+  return usersCache.filter(u=>{
+    const usuario=String(u.USER??'').toLocaleLowerCase();
+    const nome=String(u.NAME_USER??'').toLocaleLowerCase();
+    const nivelUsuario=String(Number(u.LEVEL)||2);
+    return (!busca||usuario.includes(busca)||nome.includes(busca))&&(!nivel||nivelUsuario===nivel);
+  });
+}
+function renderUsuarios(rows){
+  const tbody=document.getElementById('usersTable');
+  if(!tbody)return;
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="5" class="empty">Nenhum usuário encontrado</td></tr>';return;}
+  tbody.innerHTML=rows.map(u=>{
+    const originalIndex=usersCache.indexOf(u);
+    const nivelNum=Number(u.LEVEL)||2;
+    const isAtivo=String(u.STATE??'1')==='1';
+    const isProtected=u.USER==='5520967';
+    const userActions=isProtected?'<span class="hint" style="color:var(--ink-faint)">🔒 Protegido</span>':`<div class="row-actions"><button class="icon-btn" onclick="editarUsuario(${originalIndex})">✎</button></div>`;
+    return `<tr><td class="code">${u.USER||''}</td><td>${u.NAME_USER||'—'}</td><td><span class="tag ${nivelNum===1?'ok':''}">${NIVEL_LABELS[nivelNum]||('Nível '+nivelNum)}</span></td><td><span class="tag ${isAtivo?'ok':'warn'}">${isAtivo?'Ativo':'Inativo'}</span></td><td>${userActions}</td></tr>`;
+  }).join('');
+}
+function filtrarUsuarios(){atualizarFiltroNiveis();renderUsuarios(obterUsuariosFiltrados());}
+async function loadUsuarios(){
+  const tbody=document.getElementById('usersTable');
+  if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="5" class="empty">Carregando…</td></tr>';
+  try{
+    const {data,error}=await sb.from('BD_USER').select('*').order('USER',{ascending:true});
+    if(error)throw error;
+    usersCache=data||[];
+    atualizarFiltroNiveis();
+    renderUsuarios(obterUsuariosFiltrados());
+  }catch(err){tbody.innerHTML='<tr><td colspan="5" class="empty">Erro: '+err.message+'</td></tr>';}
+}
 function openUserModal() { if (!canGerenciarUsuarios()) { showToast("Apenas nível 1.", true); return; } editingOriginalUser = null; document.getElementById("userModalTitle").textContent = "Novo Usuário"; document.getElementById("btnSalvarUser").textContent = "Salvar"; ["us_user","us_password","us_name"].forEach(id => document.getElementById(id).value = ""); document.getElementById("us_level").value = "2"; document.getElementById("us_state").value = "1"; document.getElementById("overlayUser").classList.add("show"); setTimeout(() => document.getElementById("us_user").focus(), 80); }
 function closeUserModal() { document.getElementById("overlayUser").classList.remove("show"); editingOriginalUser = null; }
 document.getElementById("overlayUser").addEventListener("click", e => { if (e.target.id === "overlayUser") closeUserModal(); });
