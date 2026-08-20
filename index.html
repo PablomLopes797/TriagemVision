@@ -320,6 +320,33 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 .table-scroll-x{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
 .admin-table-scroll-top{width:100%;height:16px;max-width:100%;overflow-x:auto;overflow-y:hidden;margin:0 0 5px;border:1px solid var(--line);border-radius:7px;background:var(--bg);-webkit-overflow-scrolling:touch}
 .admin-table-scroll-top>div{height:1px}
+.report-layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:580px;height:calc(100vh - 245px);max-height:760px}
+.report-list{border-right:1px solid var(--line);overflow-y:auto;background:var(--bg)}
+.report-list-head{padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:1}
+.report-list-head h4{font-size:13px;margin-bottom:10px}
+.report-list-head input{margin-top:0}
+.report-item{display:block;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;padding:13px 15px;cursor:pointer;transition:var(--transition)}
+.report-item:hover,.report-item.active{background:var(--blue-100)}
+.report-item .report-item-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.report-item .report-item-name{font-weight:700;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.report-item .report-item-date{font-size:10px;color:var(--ink-faint);white-space:nowrap}
+.report-item .report-item-preview{display:block;color:var(--ink-soft);font-size:11px;line-height:1.4;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.report-badge{display:inline-block;border-radius:99px;padding:2px 7px;font-size:10px;font-weight:700;background:#fdf1de;color:var(--amber);margin-top:7px}
+.report-badge.done{background:#e5f6ec;color:var(--green)}
+.report-chat{display:flex;flex-direction:column;min-width:0;background:var(--surface)}
+.report-chat-head{padding:16px 20px;border-bottom:1px solid var(--line);background:var(--surface)}
+.report-chat-head h4{font-size:14px}
+.report-chat-head p{font-size:11px;color:var(--ink-faint);margin-top:5px}
+.report-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,var(--bg),var(--surface))}
+.report-bubble{max-width:78%;padding:12px 15px;border-radius:14px;line-height:1.55;font-size:13px;white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 2px rgba(15,23,55,.06)}
+.report-bubble.user{align-self:flex-end;background:var(--blue-600);color:#fff;border-bottom-right-radius:4px}
+.report-bubble.admin{align-self:flex-start;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:4px}
+.report-bubble .report-meta{font-size:10px;font-weight:700;opacity:.72;margin-bottom:5px}
+.report-compose{padding:14px 18px;border-top:1px solid var(--line);background:var(--surface)}
+.report-compose textarea{min-height:76px;resize:vertical;margin-top:0}
+.report-compose .form-actions{margin-top:10px}
+.report-restricted{padding:40px;text-align:center;color:var(--ink-faint)}
+@media(max-width:900px){.report-layout{grid-template-columns:1fr;height:auto;max-height:none}.report-list{max-height:260px;border-right:0;border-bottom:1px solid var(--line)}.report-messages{min-height:300px}.report-bubble{max-width:90%}}
 .admin-bulk-toolbar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
 .admin-bulk-toolbar .bulk-field{min-width:180px;max-width:260px}
 .admin-bulk-toolbar .bulk-field label{display:block}
@@ -367,7 +394,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <a data-view="exportar" href="#"><span class="ic">⭳</span><span class="label">Exportar</span></a>
 <a data-view="relatorios" href="#"><span class="ic">▤</span><span class="label">Relatórios</span></a>
 <a data-view="lojas" href="#"><span class="ic">🏬</span><span class="label">Atualizar Lojas</span></a>
-<a data-view="usuarios" href="#"><span class="ic">👤</span><span class="label">USERS</span></a><div class="priority-menu"><div class="priority-label">MÓDULOS</div><a data-view="cadastro-item" href="#"><span class="ic">＋</span><span class="label">CADASTRO DE ITEM</span></a><a data-view="administracao" href="#"><span class="ic">▣</span><span class="label">ADMINISTRAÇÃO</span></a></div>
+<a data-view="usuarios" href="#"><span class="ic">👤</span><span class="label">USERS</span></a><div class="priority-menu"><div class="priority-label">MÓDULOS</div><a data-view="cadastro-item" href="#"><span class="ic">＋</span><span class="label">CADASTRO DE ITEM</span></a><a data-view="administracao" href="#"><span class="ic">▣</span><span class="label">ADMINISTRAÇÃO</span></a><a data-view="reportes" href="#"><span class="ic">💬</span><span class="label">REPORT DE ERRO</span></a></div>
 <a data-view="permissoes" href="#" id="menuPermissoes" style="display:none"><span class="ic">🔐</span><span class="label">Permissões</span></a>
 <a data-view="donorua" href="#" id="menuDonoRua" style="display:none"><span class="ic">🏷</span><span class="label">Dono de Rua</span></a>
 <a data-view="config" href="#"><span class="ic">⚙</span><span class="label">Configurações</span></a>
@@ -609,6 +636,10 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 </div>
 </div>
+<!-- REPORT DE ERRO -->
+<div class="view" id="view-reportes">
+<div class="panel"><div class="panel-head"><div><h4>REPORT DE ERRO</h4><p class="hint">Envie uma mensagem para a Administração e acompanhe a resposta como em um chat.</p></div><button class="btn ghost" onclick="carregarReportesErro()">Atualizar</button></div><div id="reportesRestricted" class="report-restricted" style="display:none">Acesso restrito.</div><div id="reportesPanel"><div class="report-layout"><aside class="report-list"><div class="report-list-head"><h4>Conversas</h4><input id="reportBusca" autocomplete="off" placeholder="Buscar mensagem ou usuário..." oninput="renderListaReportes()"/></div><div id="reportLista"><div class="empty">Carregando…</div></div></aside><section class="report-chat"><div class="report-chat-head"><h4 id="reportChatTitle">Selecione um report</h4><p id="reportChatSubtitle">Escolha uma mensagem na lista para visualizar a conversa.</p></div><div class="report-messages" id="reportMensagens"><div class="empty">Nenhuma conversa selecionada.</div></div><div class="report-compose" id="reportCompose"><textarea id="reportMensagemInput" maxlength="4000" placeholder="Descreva o erro ou problema encontrado..."></textarea><div class="form-actions"><button class="btn" onclick="enviarReportErro()">Enviar report</button></div></div></section></div></div></div>
+</div>
 <!-- MODAIS -->
 <!-- Modal Lançamento -->
 <div class="overlay" id="overlay">
@@ -844,7 +875,7 @@ const PERMISSION_ACTIONS = [
 ];
 const PERMISSION_AREAS = [
   ['dashboard','Dashboard'], ['lancamentos','Lançamentos & Histórico'], ['fefo','FEFO'],
-  ['exportar','Exportação geral'], ['relatorios','Relatórios'], ['administracao','Administração'],
+  ['exportar','Exportação geral'], ['relatorios','Relatórios'], ['administracao','Administração'], ['reportes','Report de Erro'],
   ['mip','MIP'], ['lancamento','Novo lançamento'], ['retrabalho','Retrabalho'],
   ['descarte','Descarte'], ['gaiola','Gaiola'], ['cadastro-item','Cadastro de Item'],
   ['lojas','Base de lojas'], ['usuarios','Usuários'], ['config','Configurações'],
@@ -857,6 +888,7 @@ function criarPermissoesVazias(){ const o={}; PERMISSION_AREAS.forEach(([area])=
 function criarPermissoesPadrao(nivel){
   const o=criarPermissoesVazias();
   const set=(area,acoes)=>acoes.forEach(a=>{if(o[area])o[area][a]=true;});
+  set('reportes',['consulta']);
   if(nivel===1){Object.values(o).forEach(v=>Object.keys(v).forEach(a=>v[a]=true));return o;}
   if(nivel===2){set('dashboard',['consulta']);set('lancamentos',['consulta','lancamento']);set('fefo',['consulta']);['lancamento','retrabalho','descarte','gaiola','mip'].forEach(a=>set(a,['lancamento']));set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
   if(nivel===3){set('dashboard',['consulta']);set('lancamentos',['consulta','edicao']);set('fefo',['consulta']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
@@ -888,7 +920,7 @@ function salvarPermissoes(){
 }
 function nivelPermissao(area,action){if(!currentUser)return false;if(lvl()===1)return true;return !!(permissoes[lvl()]&&permissoes[lvl()][area]&&permissoes[lvl()][area][action]);}
 function areaPermissao(area,action){return nivelPermissao(area,action);}
-function temPermissao(f){const map={dashboard:['dashboard','consulta'],lancamentos:['lancamentos','consulta'],fefo:['fefo','consulta'],exportar:['exportar','exportacao'],relatorios:['relatorios','consulta'],lojas:['lojas','edicao'],usuarios:['usuarios','edicao'],config:['config','edicao'],manual:['manual','consulta'],permissoes:['permissoes','edicao'],consulta:['lancamentos','consulta'],lancar:['lancamentos','lancamento'],retrabalho:['retrabalho','lancamento'],descarte:['descarte','lancamento'],gaiola:['gaiola','lancamento'],editar_lanc:['lancamentos','edicao'],excluir_lanc:['lancamentos','edicao'],alterar_senha:['conta','edicao']};const m=map[f];return m?areaPermissao(m[0],m[1]):false;}
+function temPermissao(f){const map={dashboard:['dashboard','consulta'],lancamentos:['lancamentos','consulta'],fefo:['fefo','consulta'],exportar:['exportar','exportacao'],relatorios:['relatorios','consulta'],lojas:['lojas','edicao'],usuarios:['usuarios','edicao'],config:['config','edicao'],manual:['manual','consulta'],permissoes:['permissoes','edicao'],consulta:['lancamentos','consulta'],lancar:['lancamentos','lancamento'],retrabalho:['retrabalho','lancamento'],descarte:['descarte','lancamento'],gaiola:['gaiola','lancamento'],editar_lanc:['lancamentos','edicao'],excluir_lanc:['lancamentos','edicao'],alterar_senha:['conta','edicao'],reportes:['reportes','consulta']};const m=map[f];return m?areaPermissao(m[0],m[1]):false;}
 function lvl(){return currentUser?Number(currentUser.level):0;}
 function isTotal(){return lvl()===1;}
 function canLancarArea(area){return areaPermissao(area,'lancamento');}
@@ -991,7 +1023,7 @@ function logout() { currentUser = null; document.getElementById("loginPass").val
 setTimeout(() => document.getElementById("loginUser").focus(), 150);
 
 /* ========== NAVEGAÇÃO ========== */
-const titles = { dashboard:["Dashboard","Visão geral"],lancamentos:["Lançamentos & Histórico","Central unificada de auditoria"],fefo:["FEFO","Validades próximas"],exportar:["Exportar","Baixe CSV ou Excel"],relatorios:["Relatórios","Indicadores"],lojas:["Atualizar Lojas","BD_LOJA"],usuarios:["Usuários","BD_USER"],permissoes:["Permissões","Configurar acessos"],config:["Configurações","Conexão"],manual:["Manual","Guia de uso"],donorua:["Dono de Rua","Mapeamento Rua → Dono"],mip:["MIP","Consulta e exportação"] };
+const titles = { dashboard:["Dashboard","Visão geral"],lancamentos:["Lançamentos & Histórico","Central unificada de auditoria"],fefo:["FEFO","Validades próximas"],exportar:["Exportar","Baixe CSV ou Excel"],relatorios:["Relatórios","Indicadores"],lojas:["Atualizar Lojas","BD_LOJA"],usuarios:["Usuários","BD_USER"],permissoes:["Permissões","Configurar acessos"],config:["Configurações","Conexão"],manual:["Manual","Guia de uso"],donorua:["Dono de Rua","Mapeamento Rua → Dono"],mip:["MIP","Consulta e exportação"],reportes:["Report de Erro","Atendimento e suporte"] };
 document.querySelectorAll(".menu a[data-view]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); switchView(a.dataset.view); }));
 let _loadingBarTimer = null;
 function switchView(name) {
@@ -1717,15 +1749,36 @@ async function salvarAdministracaoRow(index){
 function travarAdministracaoSomenteVisualizacao(){document.querySelectorAll('#administracaoTable [data-admin-field],#administracaoTable .admin-row-check').forEach(el=>el.disabled=true);document.querySelectorAll('#administracaoTable button').forEach(btn=>btn.style.display='none');document.querySelectorAll('.admin-bulk-toolbar button,.admin-bulk-toolbar input,.admin-bulk-toolbar select').forEach(el=>el.disabled=true);}
 
 
+/* ===== REPORT DE ERRO / CHAT MSG ===== */
+let reportesCache=[];
+let reportSelecionado=null;
+function podeResponderReport(){return isTotal();}
+function escaparReport(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+function campoReport(row,nome,alternativas=[]){if(row&&row[nome]!==undefined&&row[nome]!==null)return row[nome];for(const key of alternativas){if(row&&row[key]!==undefined&&row[key]!==null)return row[key];}return '';}
+function dataReport(row){return campoReport(row,'created_at',['DTA_HORA','DATA','createdAt']);}
+function chaveReport(row,index){return String(row?.id??row?.ID??('report-'+index));}
+function reportTemResposta(row){return String(campoReport(row,'RESPOSTA')).trim().length>0;}
+function reportDataFormatada(row){const d=dataReport(row);if(!d)return 'Sem data';try{return fmtDate(d);}catch(e){return String(d);}}
+function reportesVisiveis(){const busca=(document.getElementById('reportBusca')?.value||'').trim().toLocaleLowerCase();return reportesCache.filter(row=>{if(!busca)return true;return [campoReport(row,'USER'),campoReport(row,'NAME'),campoReport(row,'REPORT'),campoReport(row,'RESPOSTA')].some(v=>String(v??'').toLocaleLowerCase().includes(busca));});}
+function renderListaReportes(){const lista=document.getElementById('reportLista');if(!lista)return;const rows=reportesVisiveis();if(!rows.length){lista.innerHTML='<div class="empty">Nenhum report encontrado.</div>';return;}lista.innerHTML=rows.map(row=>{const index=reportesCache.indexOf(row),nome=escaparReport(campoReport(row,'NAME',['NAME_USER'])||campoReport(row,'USER')),preview=escaparReport(String(campoReport(row,'REPORT')).replace(/\s+/g,' ').slice(0,100)),done=reportTemResposta(row);return '<button type="button" class="report-item '+(reportSelecionado===row?'active':'')+'" onclick="selecionarReporte('+index+')"><span class="report-item-top"><span class="report-item-name">'+nome+'</span><span class="report-item-date">'+escaparReport(reportDataFormatada(row))+'</span></span><span class="report-item-preview">'+preview+'</span><span class="report-badge '+(done?'done':'')+'">'+(done?'Respondido':'Aguardando resposta')+'</span></button>';}).join('');}
+function selecionarReporte(index){const row=reportesCache[index];if(!row)return;reportSelecionado=row;renderListaReportes();renderChatReporte();}
+function novoReportErro(){reportSelecionado=null;renderListaReportes();renderChatReporte();setTimeout(()=>document.getElementById('reportMensagemInput')?.focus(),60);}
+function renderChatReporte(){const title=document.getElementById('reportChatTitle'),subtitle=document.getElementById('reportChatSubtitle'),messages=document.getElementById('reportMensagens'),compose=document.getElementById('reportCompose');if(!title||!subtitle||!messages||!compose)return;if(!reportSelecionado){title.textContent='Novo report de erro';subtitle.textContent='Descreva o problema encontrado para enviar à Administração.';messages.innerHTML='<div class="empty">Selecione uma conversa ou envie um novo report.</div>';compose.innerHTML='<textarea id="reportMensagemInput" maxlength="4000" placeholder="Descreva o erro ou problema encontrado..."></textarea><div class="form-actions"><button class="btn" onclick="enviarReportErro()">Enviar report</button></div>';return;}const nome=campoReport(reportSelecionado,'NAME',['NAME_USER'])||campoReport(reportSelecionado,'USER');title.textContent='Report de '+nome;subtitle.textContent='Usuário: '+campoReport(reportSelecionado,'USER')+' · '+reportDataFormatada(reportSelecionado);const report=escaparReport(campoReport(reportSelecionado,'REPORT')||'');const resposta=escaparReport(campoReport(reportSelecionado,'RESPOSTA')||'');messages.innerHTML='<div class="report-bubble user"><div class="report-meta">'+escaparReport(nome)+' · '+escaparReport(campoReport(reportSelecionado,'USER'))+'</div>'+report+'</div>'+(resposta?'<div class="report-bubble admin"><div class="report-meta">Administração · Nível 1</div>'+resposta+'</div>':'<div class="hint" style="align-self:flex-start">Aguardando resposta da Administração.</div>');if(podeResponderReport()){compose.innerHTML='<textarea id="reportRespostaInput" maxlength="4000" placeholder="Digite a resposta para este report..."></textarea><div class="form-actions"><button class="btn" onclick="responderReportErro()">Responder</button><button class="btn ghost" onclick="novoReportErro()">Novo report</button></div>';}else{compose.innerHTML='<textarea id="reportMensagemInput" maxlength="4000" placeholder="Descreva outro erro ou problema..."></textarea><div class="form-actions"><button class="btn" onclick="enviarReportErro()">Enviar novo report</button></div>';}}
+async function carregarReportesErro(){const panel=document.getElementById('reportesPanel'),restricted=document.getElementById('reportesRestricted');if(!panel||!restricted)return;if(!currentUser){panel.style.display='none';restricted.style.display='block';return;}panel.style.display='';restricted.style.display='none';const lista=document.getElementById('reportLista');if(lista)lista.innerHTML='<div class="empty">Carregando…</div>';try{let q=sb.from('MSG').select('*').limit(500);if(!isTotal())q=q.eq('USER',currentUser.user);const {data,error}=await q;if(error)throw error;reportesCache=(data||[]).slice().reverse();if(reportSelecionado){const chave=chaveReport(reportSelecionado,reportesCache.indexOf(reportSelecionado));reportSelecionado=reportesCache.find((r,i)=>chaveReport(r,i)===chave)||null;}if(!reportSelecionado&&reportesCache.length&&!isTotal())reportSelecionado=reportesCache[0];renderListaReportes();renderChatReporte();}catch(err){reportesCache=[];reportSelecionado=null;if(lista)lista.innerHTML='<div class="empty">Erro ao carregar reports: '+escaparReport(err.message)+'</div>';showToast('Erro ao consultar MSG: '+err.message,true);}}
+async function enviarReportErro(){if(!currentUser){showToast('Faça login para enviar um report.',true);return;}const input=document.getElementById('reportMensagemInput'),texto=(input?.value||'').trim();if(!texto){showToast('Digite a mensagem do report.',true);return;}const btn=document.querySelector('#reportCompose .btn:not(.ghost)');if(btn){btn.disabled=true;btn.textContent='Enviando…';}try{const payload={USER:currentUser.user,NAME:currentUser.fullName||currentUser.name,REPORT:texto,RESPOSTA:null};const {error}=await sb.from('MSG').insert(payload);if(error)throw error;showToast('Report enviado para a Administração.');if(input)input.value='';reportSelecionado=null;await carregarReportesErro();}catch(err){showToast('Erro ao enviar report: '+err.message,true);}finally{if(btn){btn.disabled=false;btn.textContent='Enviar report';}}}
+async function responderReportErro(){if(!podeResponderReport()){showToast('Somente o nível 1 pode responder reports.',true);return;}if(!reportSelecionado){showToast('Selecione um report para responder.',true);return;}const input=document.getElementById('reportRespostaInput'),texto=(input?.value||'').trim();if(!texto){showToast('Digite a resposta.',true);return;}const btn=document.querySelector('#reportCompose .btn:not(.ghost)');if(btn){btn.disabled=true;btn.textContent='Respondendo…';}try{let q=sb.from('MSG').update({RESPOSTA:texto}).eq('USER',campoReport(reportSelecionado,'USER')).eq('REPORT',campoReport(reportSelecionado,'REPORT'));if(reportSelecionado.id!==undefined)q=q.eq('id',reportSelecionado.id);else if(reportSelecionado.ID!==undefined)q=q.eq('ID',reportSelecionado.ID);const {error}=await q;if(error)throw error;reportSelecionado.RESPOSTA=texto;showToast('Resposta enviada.');if(input)input.value='';renderListaReportes();renderChatReporte();}catch(err){showToast('Erro ao responder report: '+err.message,true);}finally{if(btn){btn.disabled=false;btn.textContent='Responder';}}}
+
 /* ===== MÓDULOS EMBUTIDOS — SEM FETCH ===== */
 const SINGLE_MODULE_TITLES = {
   'cadastro-item': ['Cadastro de Item', 'Cadastro manual na tabela BD_CADASTRO'],
-  'administracao': ['ADMINISTRAÇÃO', 'Faturamento de descarte na tabela BD_PREV_RELAT']
+  'administracao': ['ADMINISTRAÇÃO', 'Faturamento de descarte na tabela BD_PREV_RELAT'],
+  'reportes': ['REPORT DE ERRO', 'Atendimento e suporte no chat MSG']
 };
 function switchView(name) {
   if (name === 'cadastro-item' && !podeCadastrarItem()) { showToast('Acesso negado. Somente usuários nível 1 podem acessar o Cadastro de Item.', true); return; }
   if (name === 'administracao' && !canConsultarArea('administracao')) { showToast('Acesso negado ao menu Administração.', true); return; }
   if (name === 'mip' && !canConsultarArea('mip')) { showToast('Acesso negado ao menu MIP.', true); return; }
+  if (name === 'reportes' && !canConsultarArea('reportes')) { showToast('Acesso negado ao Report de Erro.', true); return; }
   document.querySelectorAll('.menu a[data-view]').forEach(a => a.classList.toggle('active', a.dataset.view === name));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const view = document.getElementById('view-' + name);
@@ -1747,6 +1800,7 @@ function switchView(name) {
   if (name === 'cadastro-item') { renderCabecalhoCadastro(); carregarCadastroItens(); }
   if (name === 'administracao') carregarAdministracao();
   if (name === 'mip') carregarMipView();
+  if (name === 'reportes') carregarReportesErro();
 }
 function applyUserUI() {
   if(!currentUser)return;
