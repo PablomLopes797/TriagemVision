@@ -2346,6 +2346,8 @@ body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;tr
   display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;
   box-shadow:0 0 0 1px rgba(163,224,255,.25),0 0 18px rgba(47,157,255,.62),inset 0 1px rgba(255,255,255,.35);
 }
+.logo-name{color:#fff!important;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;text-shadow:0 0 2px #fff,0 0 5px #fff,0 0 10px rgba(255,255,255,.98),0 0 20px rgba(116,210,255,.95),0 0 34px rgba(47,157,255,.82);animation:logoNeonPulse 2.4s ease-in-out infinite alternate}.logo-image{display:block;width:auto;max-width:174px;height:auto;max-height:42px;object-fit:contain;object-position:left center;filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px rgba(255,255,255,.95)) drop-shadow(0 0 16px rgba(117,213,255,.95)) drop-shadow(0 0 28px rgba(47,157,255,.88));}
+@keyframes logoNeonPulse{from{opacity:.92;text-shadow:0 0 2px #fff,0 0 5px #fff,0 0 10px rgba(255,255,255,.9),0 0 18px rgba(116,210,255,.8),0 0 28px rgba(47,157,255,.65)}to{opacity:1;text-shadow:0 0 3px #fff,0 0 8px #fff,0 0 14px #fff,0 0 26px rgba(116,210,255,1),0 0 42px rgba(47,157,255,.95)}}
 .menu{padding:14px 10px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
 .menu-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.38);padding:10px 12px 6px}
 .menu a{
@@ -2575,7 +2577,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 .sync-log{margin-top:16px;font-family:var(--mono);font-size:12px;background:#0b1330;color:#c9d6ff;border-radius:10px;padding:14px;max-height:340px;overflow-y:auto;white-space:pre-wrap;line-height:1.5}
 .theme-toggle{background:none;border:1px solid var(--line);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--ink)}
 @media(max-width:900px){
-  .sidebar{width:70px}.sidebar .logo span,.menu a span.label,.menu-label,.footer{display:none}
+  .sidebar{width:70px}.sidebar .logo-image,.menu a span.label,.menu-label,.footer{display:none}
   .main{margin-left:70px}.cards{grid-template-columns:1fr 1fr}.grid,.settings-grid{grid-template-columns:1fr}
   .view{width:calc(100% - 122px)}
 }
@@ -2700,7 +2702,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 <!-- SIDEBAR -->
 <div class="sidebar">
-<div class="logo"><div class="mark">TP</div><span>Triagem Vision</span></div>
+<div class="logo"><div class="mark">TP</div><img class="logo-image" src="LOGO.PNG" alt="TRIAGEM VISION" loading="eager" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/PablomLopes797/TriagemVision/main/LOGO.PNG';"/></div>
 <div class="sidebar-video-wrap" id="sidebarVideoWrap">
   <video id="sidebarVideo" autoplay muted loop playsinline preload="metadata">
     <source src="7031327_Underwater_Angle_1280x720.mp4" type="video/mp4"/>
