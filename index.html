@@ -4650,19 +4650,18 @@ function normalizarDadosImpressaoGaiola(dados) {
 }
 function textoQrCodeGaiola(payload){
   const itens=Array.isArray(payload?.itens)?payload.itens:[];
-  const plus=[...new Set(itens.map(item=>String(item?.PLU??'').trim()).filter(Boolean))];
-  const linhas=itens.map((item,index)=>[(index+1)+')','EAN='+String(item?.EAN??'—'),'PLU='+String(item?.PLU??'—'),'PRODUTO='+String(item?.PRODUTO??'—'),'CATEGORIA='+String(item?.CATEGORIA??'—'),'QTD='+String(item?.QTD_UNIDADE??'—')].join(' | '));
-  return ['TRIAGEM VISION','GAIOLA='+String(payload?.gaiola??'—'),'LOJA='+String(payload?.loja??'—'),'CATEGORIA='+String(payload?.categoria??'—'),'PLUS='+ (plus.join(', ')||'—'),'ITENS='+itens.length,...linhas].join('\\n');
+  const linhas=['GAIOLA: '+String(payload?.gaiola??'—'),'LOJA: '+String(payload?.loja??'—'),'CATEGORIA: '+String(payload?.categoria??'—')];
+  itens.forEach((item,index)=>linhas.push('ITEM '+(index+1)+': EAN '+String(item?.EAN??'—')+' | PLU '+String(item?.PLU??'—')+' | PRODUTO '+String(item?.PRODUTO??'—')+' | CATEGORIA '+String(item?.CATEGORIA??'—')+' | QTD '+String(item?.QTD_UNIDADE??'—')));
+  return linhas.join('\n');
 }
 function gerarQrSvgGaiola(payload){
   const texto=textoQrCodeGaiola(payload);
   if(typeof qrcode!=='function') return '';
   for(let tipo=1;tipo<=40;tipo++){
     try{
-      const codigo=qrcode(tipo,'M');codigo.addData(texto);codigo.make();
-      const modulo=codigo.getModuleCount(),margem=4,tamanho=modulo+(margem*2);let caminho='';
-      for(let linha=0;linha<modulo;linha++)for(let coluna=0;coluna<modulo;coluna++)if(codigo.isDark(linha,coluna)){const x=coluna+margem,y=linha+margem;caminho+='M'+x+' '+y+'h1v1h-1z';}
-      return '<svg class="qr-code" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+tamanho+' '+tamanho+'" role="img" aria-label="QR Code da gaiola" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="'+caminho+'" fill="#000"/></svg>';
+      const codigo=qrcode(tipo,'L');codigo.addData(texto);codigo.make();
+      const svg=codigo.createSvgTag(8,4);
+      return svg.replace('<svg ','<svg class="qr-code" role="img" aria-label="QR Code da gaiola" shape-rendering="crispEdges" ');
     }catch(errTipo){ /* tenta uma versão QR maior */ }
   }
   return '';
