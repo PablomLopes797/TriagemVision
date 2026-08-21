@@ -2544,7 +2544,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
   display:none;align-items:center;gap:8px;
 }
 .login-error.show{display:flex}
-.login-foot{margin-top:22px;text-align:center;font-size:11px;color:rgba(255,255,255,.35)}
+.login-foot{margin-top:22px;text-align:center;font-size:11px;color:rgba(255,255,255,.35)}.access-denied-screen{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;overflow:hidden;background:#03050d}.access-denied-screen.show{display:flex}.access-denied-screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.48) saturate(1.1)}.access-denied-screen::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(5,16,45,.18),rgba(0,0,0,.78))}.access-denied-card{position:relative;z-index:1;width:min(520px,calc(100vw - 40px));padding:42px 34px 34px;text-align:center;border:1px solid rgba(255,255,255,.18);border-radius:22px;background:rgba(5,12,32,.66);box-shadow:0 30px 90px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:loginIn .55s cubic-bezier(.2,.9,.25,1)}.access-denied-mark{width:66px;height:66px;margin:0 auto 20px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:28px;font-weight:900}.access-denied-card h2{margin:0;color:#fff;font-size:25px;letter-spacing:.5px}.access-denied-card p{margin:12px 0 0;color:rgba(255,255,255,.72);font-size:13px;line-height:1.6}.access-denied-card small{display:block;margin-top:26px;color:rgba(255,255,255,.42);font-size:10px;letter-spacing:1.8px;text-transform:uppercase}
 .spinner{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .userbox{display:flex;align-items:center;gap:8px}
@@ -2698,6 +2698,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="login-error" id="loginError"><span>⚠</span><span id="loginErrorText">Usuário ou senha inválidos</span></div>
 <div class="login-foot">Triagem Vision · Acesso controlado por nível de permissão</div>
 </div>
+<div class="access-denied-screen" id="accessDeniedScreen" aria-live="assertive"><video id="accessDeniedVideo" autoplay muted loop playsinline preload="auto"><source src="0_Shipwreck_Underwater_1280x720.mp4" type="video/mp4"/><source src="https://raw.githubusercontent.com/PablomLopes797/TriagemVision/main/0_Shipwreck_Underwater_1280x720.mp4" type="video/mp4"/></video><div class="access-denied-card"><div class="access-denied-mark">!</div><h2>VOCÊ NÃO TEM PERMISSÃO</h2><p>Seu acesso a este sistema não está disponível.</p><small>TRIAGEM VISION</small></div></div>
 </div>
 <!-- SIDEBAR -->
 <div class="sidebar">
@@ -2918,6 +2919,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <h4>1. ACESSO, LOGIN E SESSÃO</h4>
 <p>Informe usuário e senha na tela inicial e pressione <b>ENTRAR</b> ou a tecla ENTER. O sistema consulta a tabela <b>BD_USER</b>, identifica o nível, aplica as permissões e libera somente os menus autorizados. O botão de saída encerra a sessão local e retorna à tela de login. Nunca compartilhe a senha ou a chave anon do projeto.</p>
 <p>As preferências de conexão, nomes de níveis, permissões e ajustes do vídeo são armazenados no <b>localStorage</b> deste navegador. Isso significa que uma alteração salva em um navegador não altera automaticamente o navegador de outro computador.</p>
+<p><b>RESTRIÇÃO DE REDE:</b> usuários diferentes do <b>LEVEL 1</b> só são liberados quando o navegador consegue identificar um endereço da faixa <b>10.211.212.0/24</b>. O LEVEL 1 não sofre essa restrição. Como esta é uma aplicação HTML no navegador, a verificação é uma barreira do cliente; para impedir acesso de forma realmente obrigatória, o servidor, proxy ou firewall que publica o HTML e a API também deve bloquear as demais redes.</p>
 
 <h4>2. NÍVEIS DE ACESSO PADRÃO</h4>
 <table><thead><tr><th>NÍVEL</th><th>NOME PADRÃO</th><th>ESCOPO PRINCIPAL</th></tr></thead><tbody>
@@ -3414,6 +3416,20 @@ function retornarAoPainelAnterior() {
     if (input) setTimeout(() => input.focus(), 80);
   }
 }
+const REDE_PERMITIDA_PREFIXO='10.211.212.';
+let redeAutorizadaAtual=false;
+function ipEstaNaRedePermitida(ip){return /^10\.211\.212\.(?:0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-4])$/.test(String(ip||'').trim());}
+function extrairIpCandidato(valor){const m=String(valor||'').match(/(?:\d{1,3}\.){3}\d{1,3}/);return m?m[0]:'';}
+async function descobrirIpsLocais(){
+  const candidatos=[];const hostname=extrairIpCandidato(location.hostname);if(hostname)candidatos.push(hostname);
+  if(typeof RTCPeerConnection==='undefined')return [...new Set(candidatos)];
+  await new Promise(resolve=>{let encerrado=false;const finalizar=()=>{if(encerrado)return;encerrado=true;try{pc.close();}catch(e){}resolve();};let pc;try{pc=new RTCPeerConnection({iceServers:[]});pc.createDataChannel('rede');pc.onicecandidate=evento=>{const ip=extrairIpCandidato(evento.candidate?.candidate);if(ip)candidatos.push(ip);if(!evento.candidate)finalizar();};pc.createOffer().then(oferta=>pc.setLocalDescription(oferta)).catch(finalizar);setTimeout(finalizar,1200);}catch(e){finalizar();}});
+  return [...new Set(candidatos)];
+}
+async function verificarRedeParaNivel(level){if(Number(level)===1)return{ok:true,ip:'LEVEL 1'};const ips=await descobrirIpsLocais();const permitido=ips.find(ipEstaNaRedePermitida);return{ok:!!permitido,ip:permitido||ips[0]||'não identificado',ips};}
+function mostrarTelaAcessoNegado(){const card=document.getElementById('loginCard'),screen=document.getElementById('accessDeniedScreen'),video=document.getElementById('accessDeniedVideo');if(card)card.style.display='none';if(screen){screen.classList.add('show');screen.style.display='flex';}if(video)video.play().catch(()=>{});}
+function esconderTelaAcessoNegado(){const card=document.getElementById('loginCard'),screen=document.getElementById('accessDeniedScreen');if(card)card.style.display='';if(screen){screen.classList.remove('show');screen.style.display='none';}}
+
 async function doLogin() {
   const userField = document.getElementById("loginUser"), passField = document.getElementById("loginPass"), errBox = document.getElementById("loginError"), errText = document.getElementById("loginErrorText"), card = document.getElementById("loginCard"), btn = document.getElementById("loginBtn"), btnText = document.getElementById("loginBtnText");
   const usuario = userField.value.trim(), senha = passField.value;
@@ -3427,6 +3443,8 @@ async function doLogin() {
     if (String(data[0].PASSWORD ?? "").trim() !== senha.trim()) { errText.textContent = "Senha incorreta."; errBox.classList.add("show"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); if (typeof setMatrixRed === "function") setMatrixRed(); return; }
     const level = Number(String(data[0].LEVEL ?? "2").trim()) || 2;
     if (String(data[0].STATE ?? "1").trim() !== "1") { errText.textContent = "Usuário inativo."; errBox.classList.add("show"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); return; }
+    const rede=await verificarRedeParaNivel(level);redeAutorizadaAtual=rede.ok;
+    if(!rede.ok){mostrarTelaAcessoNegado();return;}
     const nomeCompleto = String(data[0].NAME_USER ?? data[0].USER ?? "").trim();
     currentUser = { user: data[0].USER, level, name: nomeCompleto.split(" ")[0] || data[0].USER, fullName: nomeCompleto };
     document.getElementById("loginOverlay").classList.add("fade-out");
@@ -3449,7 +3467,7 @@ function applyUserUI() {
   document.querySelectorAll(".lancar-only").forEach(el => { el.style.display = canLancar() ? "" : "none"; });
   refreshActiveView(); checkPendingGaiola();
 }
-function logout() { currentUser = null; document.getElementById("loginPass").value = ""; document.getElementById("loginUser").value = ""; document.getElementById("userBox").style.display = "none"; document.getElementById("loginOverlay").style.display = "flex"; document.getElementById("loginOverlay").classList.remove("fade-out"); setTimeout(() => document.getElementById("loginUser").focus(), 80); }
+function logout() { currentUser = null; redeAutorizadaAtual=false; esconderTelaAcessoNegado(); document.getElementById("loginPass").value = ""; document.getElementById("loginUser").value = ""; document.getElementById("userBox").style.display = "none"; document.getElementById("loginOverlay").style.display = "flex"; document.getElementById("loginOverlay").classList.remove("fade-out"); setTimeout(() => document.getElementById("loginUser").focus(), 80); }
 setTimeout(() => document.getElementById("loginUser").focus(), 150);
 
 /* ========== NAVEGAÇÃO ========== */
@@ -4630,23 +4648,33 @@ function normalizarDadosImpressaoGaiola(dados) {
   const itens=(dados.itens||[]).map(normalizarItemImpressaoGaiola);
   return { gaiola: dados.gaiola || dados.chave || '—', loja: dados.loja || '—', categoria: dados.categoria || itens[0]?.categoria || '—', itens };
 }
-async function gerarQrCodeGaiola(payload) {
-  try {
-    if (typeof qrcode === 'function') {
-      const codigo = qrcode(0, 'M');
-      codigo.addData(JSON.stringify(payload));
-      codigo.make();
-      return codigo.createDataURL(8, 2);
-    }
-  } catch (err) { console.warn('Não foi possível gerar QR Code da gaiola',err); }
+function textoQrCodeGaiola(payload){
+  const itens=Array.isArray(payload?.itens)?payload.itens:[];
+  const plus=[...new Set(itens.map(item=>String(item?.PLU??'').trim()).filter(Boolean))];
+  const linhas=itens.map((item,index)=>[(index+1)+')','EAN='+String(item?.EAN??'—'),'PLU='+String(item?.PLU??'—'),'PRODUTO='+String(item?.PRODUTO??'—'),'CATEGORIA='+String(item?.CATEGORIA??'—'),'QTD='+String(item?.QTD_UNIDADE??'—')].join(' | '));
+  return ['TRIAGEM VISION','GAIOLA='+String(payload?.gaiola??'—'),'LOJA='+String(payload?.loja??'—'),'CATEGORIA='+String(payload?.categoria??'—'),'PLUS='+ (plus.join(', ')||'—'),'ITENS='+itens.length,...linhas].join('\\n');
+}
+function gerarQrSvgGaiola(payload){
+  const texto=textoQrCodeGaiola(payload);
+  if(typeof qrcode!=='function') return '';
+  for(let tipo=1;tipo<=40;tipo++){
+    try{
+      const codigo=qrcode(tipo,'M');codigo.addData(texto);codigo.make();
+      const modulo=codigo.getModuleCount(),margem=4,tamanho=modulo+(margem*2);let caminho='';
+      for(let linha=0;linha<modulo;linha++)for(let coluna=0;coluna<modulo;coluna++)if(codigo.isDark(linha,coluna)){const x=coluna+margem,y=linha+margem;caminho+='M'+x+' '+y+'h1v1h-1z';}
+      return '<svg class="qr-code" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+tamanho+' '+tamanho+'" role="img" aria-label="QR Code da gaiola" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="'+caminho+'" fill="#000"/></svg>';
+    }catch(errTipo){ /* tenta uma versão QR maior */ }
+  }
   return '';
 }
+async function gerarQrCodeGaiola(payload){return gerarQrSvgGaiola(payload);}
+function esperarImagensImpressaoGaiola(doc){const imagens=Array.from(doc.images||[]);return Promise.all(imagens.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));}
 function esperarImpressaoGaiola(html, titulo) {
   return new Promise((resolve,reject) => {
     const iframe=document.createElement('iframe');iframe.setAttribute('aria-hidden','true');Object.assign(iframe.style,{position:'fixed',left:'-10000px',top:'0',width:'100vw',height:'100vh',border:'0',opacity:'0'});document.body.appendChild(iframe);
     let terminou=false;let timerFallback=null;
     const limpar=()=>{if(terminou)return;terminou=true;if(timerFallback)clearTimeout(timerFallback);iframe.remove();resolve();};
-    try { const doc=iframe.contentDocument||iframe.contentWindow.document;doc.open();doc.write(html);doc.close();iframe.contentWindow.document.title=titulo||'TRIAGEM VISION';iframe.contentWindow.addEventListener('afterprint',limpar,{once:true});setTimeout(()=>{try{iframe.contentWindow.focus();iframe.contentWindow.print();timerFallback=setTimeout(limpar,12000);}catch(err){iframe.remove();reject(err);}},300); }
+    try { const doc=iframe.contentDocument||iframe.contentWindow.document;doc.open();doc.write(html);doc.close();iframe.contentWindow.document.title=titulo||'TRIAGEM VISION';iframe.contentWindow.addEventListener('afterprint',limpar,{once:true});esperarImagensImpressaoGaiola(doc).then(()=>setTimeout(()=>{try{iframe.contentWindow.focus();iframe.contentWindow.print();timerFallback=setTimeout(limpar,12000);}catch(err){iframe.remove();reject(err);}},250)).catch(()=>setTimeout(()=>{try{iframe.contentWindow.focus();iframe.contentWindow.print();timerFallback=setTimeout(limpar,12000);}catch(err){iframe.remove();reject(err);}},250)); }
     catch(err){iframe.remove();reject(err);}
   });
 }
@@ -4654,9 +4682,9 @@ function montarCabecalhoMarcaGaiola() { return '<div class="marca-triagem">TRIAG
 async function imprimirGaiolaSeparada(dados) {
   const normalizados=normalizarDadosImpressaoGaiola(dados),itens=normalizados.itens,gaiola=normalizados.gaiola,loja=normalizados.loja,categoria=normalizados.categoria;
   const qrPayload={sistema:'TRIAGEM VISION',tipo:'GAIOLA',gaiola,loja,categoria,itens:itens.map((item,index)=>({ordem:index+1,EAN:item.ean,PLU:item.plu,PRODUTO:item.produto,CATEGORIA:item.categoria,QTD_UNIDADE:item.qtd}))};
-  const qrDataUrl=await gerarQrCodeGaiola(qrPayload),qrMarkup=qrDataUrl?'<img class="qr-code" src="'+qrDataUrl+'" alt="QR Code da gaiola">':'<div class="qr-indisponivel">QR Code<br>indisponível</div>';
+  const qrMarkup=await gerarQrCodeGaiola(qrPayload)||'<div class="qr-indisponivel">QR Code<br>indisponível</div>';
   const tamanhoFonte=Math.min(190,Math.max(78,Math.floor(1020/Math.max(String(gaiola).length,1))));
-  const capaHtml='<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><title>Gaiola '+escaparGaiolaGestao(gaiola)+'</title><style>@page{size:A4 landscape;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#0b1020;font-family:Arial,Helvetica,sans-serif}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{width:297mm;height:210mm;overflow:hidden}.capa{width:297mm;height:210mm;position:relative;padding:16mm 18mm 12mm;display:flex;flex-direction:column}.marca-triagem{font-size:7pt;letter-spacing:2pt;font-weight:800;color:#667085;text-align:right}.capa-conteudo{flex:1;display:grid;grid-template-columns:1fr 72mm;gap:14mm;align-items:center}.capa-esquerda{display:flex;flex-direction:column;justify-content:center}.capa-kicker{font-size:16pt;font-weight:800;letter-spacing:4pt;color:#315ee8;margin-bottom:7mm}.capa-numero{font-size:'+tamanhoFonte+'pt;font-weight:900;line-height:.86;letter-spacing:2pt;color:#050505;white-space:nowrap;overflow:hidden}.capa-linha{height:2px;background:#0b1020;margin:12mm 0 7mm}.capa-dados{display:grid;grid-template-columns:1fr 1fr;gap:10mm}.dado{border-left:4px solid #315ee8;padding-left:5mm}.dado span{display:block;font-size:10pt;text-transform:uppercase;letter-spacing:1.5pt;color:#667085;font-weight:800;margin-bottom:2mm}.dado strong{display:block;font-size:24pt;line-height:1.05;overflow-wrap:anywhere}.capa-qr{height:72mm;border:1px solid #d9deea;border-radius:6mm;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4mm;padding:5mm;background:#fff}.qr-code{width:60mm;height:60mm;display:block}.qr-indisponivel{width:60mm;height:60mm;display:flex;align-items:center;justify-content:center;text-align:center;border:2px dashed #9aa4b2;color:#667085;font-weight:800}.qr-legenda{font-size:8pt;letter-spacing:1pt;text-align:center;color:#667085;font-weight:800}.capa-rodape{font-size:7pt;color:#98a2b3;letter-spacing:.7pt;text-align:center;margin-top:4mm}</style></head><body><section class="capa">'+montarCabecalhoMarcaGaiola()+'<div class="capa-conteudo"><div class="capa-esquerda"><div class="capa-kicker">IDENTIFICAÇÃO DA GAIOLA</div><div class="capa-numero">'+escaparGaiolaGestao(gaiola)+'</div><div class="capa-linha"></div><div class="capa-dados"><div class="dado"><span>Categoria</span><strong>'+escaparGaiolaGestao(categoria)+'</strong></div><div class="dado"><span>Loja</span><strong>'+escaparGaiolaGestao(loja)+'</strong></div></div></div><div class="capa-qr">'+qrMarkup+'<div class="qr-legenda">ESCANEIE PARA VER OS DADOS</div></div></div><div class="capa-rodape">TRIAGEM VISION · IDENTIFICAÇÃO OPERACIONAL · '+escaparGaiolaGestao(new Date().toLocaleString('pt-BR'))+'</div></section></body></html>';
+  const capaHtml='<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><title>Gaiola '+escaparGaiolaGestao(gaiola)+'</title><style>@page{size:A4 landscape;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#0b1020;font-family:Arial,Helvetica,sans-serif}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{width:297mm;height:210mm;overflow:hidden}.capa{width:297mm;height:210mm;position:relative;padding:16mm 18mm 12mm;display:flex;flex-direction:column}.marca-triagem{font-size:7pt;letter-spacing:2pt;font-weight:800;color:#667085;text-align:right}.capa-conteudo{flex:1;display:grid;grid-template-columns:1fr 72mm;gap:14mm;align-items:center}.capa-esquerda{display:flex;flex-direction:column;justify-content:center}.capa-kicker{font-size:16pt;font-weight:800;letter-spacing:4pt;color:#315ee8;margin-bottom:7mm}.capa-numero{font-size:'+tamanhoFonte+'pt;font-weight:900;line-height:.86;letter-spacing:2pt;color:#050505;white-space:nowrap;overflow:hidden}.capa-linha{height:2px;background:#0b1020;margin:12mm 0 7mm}.capa-dados{display:grid;grid-template-columns:1fr 1fr;gap:10mm}.dado{border-left:4px solid #315ee8;padding-left:5mm}.dado span{display:block;font-size:10pt;text-transform:uppercase;letter-spacing:1.5pt;color:#667085;font-weight:800;margin-bottom:2mm}.dado strong{display:block;font-size:24pt;line-height:1.05;overflow-wrap:anywhere}.capa-qr{height:72mm;border:1px solid #d9deea;border-radius:6mm;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4mm;padding:5mm;background:#fff}.qr-code{width:60mm;height:60mm;display:block;shape-rendering:crispEdges}.qr-indisponivel{width:60mm;height:60mm;display:flex;align-items:center;justify-content:center;text-align:center;border:2px dashed #9aa4b2;color:#667085;font-weight:800}.qr-legenda{font-size:8pt;letter-spacing:1pt;text-align:center;color:#667085;font-weight:800}.capa-rodape{font-size:7pt;color:#98a2b3;letter-spacing:.7pt;text-align:center;margin-top:4mm}</style></head><body><section class="capa">'+montarCabecalhoMarcaGaiola()+'<div class="capa-conteudo"><div class="capa-esquerda"><div class="capa-kicker">IDENTIFICAÇÃO DA GAIOLA</div><div class="capa-numero">'+escaparGaiolaGestao(gaiola)+'</div><div class="capa-linha"></div><div class="capa-dados"><div class="dado"><span>Categoria</span><strong>'+escaparGaiolaGestao(categoria)+'</strong></div><div class="dado"><span>Loja</span><strong>'+escaparGaiolaGestao(loja)+'</strong></div></div></div><div class="capa-qr">'+qrMarkup+'<div class="qr-legenda">ESCANEIE PARA VER OS DADOS</div></div></div><div class="capa-rodape">TRIAGEM VISION · IDENTIFICAÇÃO OPERACIONAL · '+escaparGaiolaGestao(new Date().toLocaleString('pt-BR'))+'</div></section></body></html>';
   const paginas=dividirItensParaImpressaoGaiola(itens),total=paginas.length;
   const paginasHtml=paginas.map((pagina,index)=>'<section class="folha-itens">'+montarCabecalhoMarcaGaiola()+'<header class="itens-cabecalho"><div><div class="itens-titulo">GAIOLA Nº '+escaparGaiolaGestao(gaiola)+'</div><div class="itens-subtitulo">LOJA <strong>'+escaparGaiolaGestao(loja)+'</strong> · CATEGORIA <strong>'+escaparGaiolaGestao(categoria)+'</strong></div></div><div class="pagina">Página '+(index+1)+' de '+total+'</div></header><div class="itens-resumo"><span>LISTA DE ITENS DA GAIOLA</span><span>'+itens.length+' item(ns) · '+itens.reduce((s,item)=>s+(Number(item.qtd)||0),0)+' unidade(s)</span></div><table><thead><tr><th class="ean">EAN</th><th class="plu">PLU</th><th class="produto">Produto</th><th class="categoria">Categoria</th><th class="qtd">Qtd.</th></tr></thead><tbody>'+montarLinhasItensGaiolaParaImpressao(pagina)+'</tbody></table><div class="rodape-itens">TRIAGEM VISION · GAIOLA '+escaparGaiolaGestao(gaiola)+' · Página '+(index+1)+' de '+total+'</div></section>').join('');
   const itensHtml='<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><title>Itens da gaiola '+escaparGaiolaGestao(gaiola)+'</title><style>@page{size:A4 portrait;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#101828;font-family:Arial,Helvetica,sans-serif}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{width:100%;margin:0;overflow:visible}.folha-itens{width:100%;height:auto;min-height:0;padding:10mm 12mm 9mm;overflow:visible;break-after:auto;page-break-after:auto;break-inside:avoid;page-break-inside:avoid}.folha-itens + .folha-itens{break-before:page;page-break-before:always}.marca-triagem{font-size:6.5pt;letter-spacing:2pt;font-weight:800;color:#667085;text-align:right;margin-bottom:4mm}.itens-cabecalho{display:flex;justify-content:space-between;gap:8mm;align-items:flex-start;border-bottom:2px solid #101828;padding-bottom:5mm}.itens-titulo{font-size:22pt;font-weight:900;line-height:1}.itens-subtitulo{font-size:10pt;color:#475467;margin-top:3mm;letter-spacing:.3pt}.pagina{font-size:11pt;font-weight:800;white-space:nowrap}.itens-resumo{display:flex;justify-content:space-between;gap:8mm;padding:5mm 0 4mm;font-size:8.5pt;color:#667085;font-weight:800;letter-spacing:.5pt}.itens-resumo span:last-child{text-align:right;font-weight:600;letter-spacing:0}.folha-itens table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9pt}.folha-itens th{background:#e8edff;color:#172b6b;border:1px solid #8b9ad4;padding:3mm 2mm;text-align:left;font-size:8pt;letter-spacing:.5pt;text-transform:uppercase}.folha-itens td{border:1px solid #98a2b3;padding:2.5mm 2mm;vertical-align:top;line-height:1.2;overflow-wrap:anywhere;word-break:break-word}.folha-itens .ean{width:21%}.folha-itens .plu{width:12%}.folha-itens .produto{width:35%}.folha-itens .categoria{width:20%}.folha-itens .qtd{width:12%;text-align:center}.rodape-itens{font-size:6.5pt;color:#98a2b3;letter-spacing:.7pt;text-align:center;margin-top:5mm}</style></head><body>'+paginasHtml+'</body></html>';
@@ -4671,6 +4699,7 @@ const SINGLE_MODULE_TITLES = {
   'reportes': ['REPORT DE ERRO', 'Atendimento e suporte no chat MSG']
 };
 function switchView(name) {
+  if(currentUser && !isTotal() && !redeAutorizadaAtual){mostrarTelaAcessoNegado();currentUser=null;return;}
   if (name === 'cadastro-item' && !podeCadastrarItem()) { showToast('Acesso negado. Somente usuários nível 1 podem acessar o Cadastro de Item.', true); return; }
   if (name === 'gaiolas-admin' && !podeConsultarGaiolas()) { showToast('Acesso negado para consultar gaiolas.', true); return; }
   if (name === 'administracao' && !canConsultarArea('administracao')) { showToast('Acesso negado ao menu Administração.', true); return; }
