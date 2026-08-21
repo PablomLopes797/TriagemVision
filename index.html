@@ -2552,6 +2552,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 .badge-level{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.3px}
 .badge-level.master{background:#2a1b06;color:#ffcf7a;border:1px solid rgba(255,207,122,.3)}
 .badge-level.basic{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+.lancamento-dicas{width:100%;height:38px;margin:0 0 18px;border:1px solid rgba(47,107,255,.20);border-radius:9px;background:linear-gradient(90deg,rgba(232,238,255,.90),rgba(255,255,255,.96),rgba(232,238,255,.90));box-shadow:0 4px 12px rgba(15,23,55,.05);overflow:hidden;display:flex;align-items:center}.lancamento-dicas-janela{width:100%;overflow:hidden;white-space:nowrap}.lancamento-dicas-track{display:flex;width:max-content;will-change:transform;animation:dicasLentas 78s linear infinite}.lancamento-dicas-grupo{display:flex;align-items:center;flex-shrink:0}.lancamento-dica{display:inline-flex;align-items:center;gap:9px;padding:0 30px;color:var(--ink-soft);font-size:11px;font-weight:700;letter-spacing:.2px}.lancamento-dica::before{content:'◆';color:var(--blue-600);font-size:8px}.lancamento-dica strong{color:var(--ink);font-weight:900}.lancamento-dicas:hover .lancamento-dicas-track{animation-play-state:paused}@keyframes dicasLentas{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .launcher-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
 .launcher-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 12px;text-align:center;cursor:pointer;transition:var(--transition)}
 .launcher-card:hover{transform:translateY(-5px) scale(1.015);box-shadow:0 16px 30px rgba(15,23,55,.13);border-color:var(--blue-500)}
@@ -2666,13 +2667,13 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 @media(max-width:900px){.content{max-width:100vw}.cadastro-modal{max-width:calc(100vw - 30px)}.sidebar{width:220px}.main{margin-left:220px}}
 
 .gaiola-admin-panel,.gaiola-editor-panel{border-color:rgba(47,107,255,.18);box-shadow:0 8px 24px rgba(15,23,55,.05)}
-.gaiola-admin-toolbar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--line);background:linear-gradient(100deg,rgba(231,237,255,.65),rgba(255,255,255,.9))}
+.gaiola-admin-toolbar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--line);background:linear-gradient(100deg,rgba(231,237,255,.65),rgba(255,255,255,.9))}.gaiola-admin-show-all{display:flex;align-items:center;gap:7px;min-height:38px;padding:0 10px;border:1px solid var(--blue-100);border-radius:8px;background:rgba(255,255,255,.78);color:var(--ink-soft);font-size:11px;font-weight:800;white-space:nowrap}.gaiola-admin-show-all input{min-width:auto;width:16px;height:16px;margin:0;accent-color:var(--blue-600)}
 .gaiola-admin-search{flex:1;min-width:240px}.gaiola-admin-search label{display:block;margin-bottom:5px}.gaiola-admin-search input{margin-top:0;font-family:var(--mono);font-weight:700}
 .gaiola-admin-status{padding:12px 20px;color:var(--ink-soft);font-size:12px;font-weight:600;border-bottom:1px solid var(--line)}
 .gaiola-admin-table{min-width:980px}.gaiola-admin-table th{background:#f7f8fc}.gaiola-admin-table td{vertical-align:top}.gaiola-admin-table .code{font-family:var(--mono);font-weight:700}.gaiola-admin-table .row-actions{white-space:nowrap}
-.gaiola-editor-panel{margin-top:20px}.gaiola-admin-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.gaiola-admin-editor-grid .field input,.gaiola-admin-editor-grid .field select{margin-top:5px}
+.gaiola-consulta-panel,.gaiola-editor-panel{margin-top:20px}.gaiola-consulta-resumo{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding:14px;border:1px solid var(--blue-100);border-radius:10px;background:linear-gradient(100deg,rgba(231,237,255,.65),rgba(255,255,255,.92));color:var(--ink-soft);font-size:12px;font-weight:700}.gaiola-consulta-resumo strong{color:var(--ink);font-family:var(--mono);font-size:15px}.gaiola-consulta-bloco{margin-top:18px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}.gaiola-consulta-bloco h5{margin:0 0 12px;color:var(--ink);font-size:12px;letter-spacing:.7px}.gaiola-consulta-campos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.gaiola-consulta-campo{min-width:0;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}.gaiola-consulta-campo small{display:block;margin-bottom:5px;color:var(--ink-faint);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}.gaiola-consulta-campo strong{display:block;color:var(--ink);font-size:12px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap}.gaiola-consulta-itens{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.gaiola-consulta-item{padding:14px;border:1px solid var(--line);border-left:4px solid var(--blue-500);border-radius:9px;background:var(--bg)}.gaiola-consulta-item h6{margin:0 0 10px;color:var(--ink);font-size:12px}.gaiola-consulta-item-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.gaiola-consulta-item-grid div{min-width:0}.gaiola-consulta-item-grid small{display:block;color:var(--ink-faint);font-size:9px;font-weight:800;text-transform:uppercase}.gaiola-consulta-item-grid span{display:block;margin-top:2px;color:var(--ink-soft);font-size:11px;overflow-wrap:anywhere;white-space:pre-wrap}.gaiola-consulta-vazio{padding:24px;text-align:center;color:var(--ink-faint);border:1px dashed var(--line);border-radius:8px}.gaiola-editor-panel{margin-top:20px}.gaiola-admin-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.gaiola-admin-editor-grid .field input,.gaiola-admin-editor-grid .field select{margin-top:5px}
 .gaiola-admin-summary{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0;padding:14px;border:1px solid var(--blue-100);border-radius:10px;background:rgba(231,237,255,.5);color:var(--ink-soft);font-size:12px;font-weight:600}.gaiola-admin-summary strong{color:var(--ink);font-family:var(--mono);font-size:14px}.gaiola-espelho-table{min-width:1120px}.gaiola-admin-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
-@media(max-width:900px){.gaiola-admin-editor-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.gaiola-admin-editor-grid{grid-template-columns:1fr}.gaiola-consulta-campos,.gaiola-consulta-itens{grid-template-columns:1fr}.gaiola-consulta-item-grid{grid-template-columns:1fr}.gaiola-admin-show-all{white-space:normal}}
 
 .sidebar-video-wrap{position:absolute;inset:0;z-index:2;margin:0;height:100%;border:0;border-radius:0;overflow:hidden;background:#07102f;box-shadow:none;pointer-events:none}.sidebar-video-wrap video{pointer-events:none}.sidebar-video-caption{display:none}
 #sidebarVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;transform:scale(1.35);transform-origin:center;filter:saturate(1.15) contrast(1.08) brightness(.78)}
@@ -2815,6 +2816,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 <!-- LANÇAMENTOS UNIFICADO -->
 <div class="view" id="view-lancamentos">
+<div class="lancamento-dicas" aria-label="Dicas de uso do sistema"><div class="lancamento-dicas-janela"><div class="lancamento-dicas-track"><div class="lancamento-dicas-grupo"><span class="lancamento-dica"><strong>CONSULTA:</strong> use o botão de pesquisa para localizar lançamentos e gaiolas.</span><span class="lancamento-dica"><strong>LANÇAMENTO:</strong> bipasse o EAN, confira produto, categoria, validade e quantidade antes de salvar.</span><span class="lancamento-dica"><strong>GAIOLA:</strong> somente o LEVEL 1 pode adicionar, editar e excluir; os demais níveis podem consultar e reimprimir.</span><span class="lancamento-dica"><strong>SALDO:</strong> confira o saldo disponível antes de registrar retrabalho ou descarte.</span><span class="lancamento-dica"><strong>PAINÉIS:</strong> clique no X para fechar; clicar fora não cancela nem apaga dados.</span><span class="lancamento-dica"><strong>FEFO:</strong> acompanhe os produtos próximos do vencimento e priorize os mais antigos.</span></div><div class="lancamento-dicas-grupo" aria-hidden="true"><span class="lancamento-dica"><strong>CONSULTA:</strong> use o botão de pesquisa para localizar lançamentos e gaiolas.</span><span class="lancamento-dica"><strong>LANÇAMENTO:</strong> bipasse o EAN, confira produto, categoria, validade e quantidade antes de salvar.</span><span class="lancamento-dica"><strong>GAIOLA:</strong> somente o LEVEL 1 pode adicionar, editar e excluir; os demais níveis podem consultar e reimprimir.</span><span class="lancamento-dica"><strong>SALDO:</strong> confira o saldo disponível antes de registrar retrabalho ou descarte.</span><span class="lancamento-dica"><strong>PAINÉIS:</strong> clique no X para fechar; clicar fora não cancela nem apaga dados.</span><span class="lancamento-dica"><strong>FEFO:</strong> acompanhe os produtos próximos do vencimento e priorize os mais antigos.</span></div></div></div></div>
 <div class="launcher-grid" id="launcherGrid">
 <div class="launcher-card" onclick="openConsultaModal()"><div class="launcher-icon t-consulta"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="21" x2="15.8" y1="21" y2="15.8"></line></svg></div><div class="launcher-label">Consulta</div></div>
 <div class="launcher-card lancar-only" data-perm-area="lancamento" onclick="openModal()"><div class="launcher-icon t-lanc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M10 2h4"></path><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"></path><line x1="6.5" x2="17.5" y1="14" y2="14"></line></svg></div><div class="launcher-label">Lançamento</div></div>
@@ -2890,7 +2892,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 <!-- PERMISSÕES -->
 <div class="view" id="view-permissoes">
-<div class="panel"><div class="panel-head"><h4>Gerenciar Permissões por Nível</h4></div><div class="panel-body"><p class="hint"><b>Somente o nível 1</b> pode alterar esta configuração. Defina o nome de cada nível e escolha, para cada área, se o usuário pode consultar, editar, lançar ou exportar. A alteração vale automaticamente para todos os usuários que possuem aquele número de nível neste navegador.</p><div id="permissoesContainer"></div><button class="btn" onclick="salvarPermissoes()" style="margin-top:16px">Salvar Permissões</button></div></div>
+<div class="panel"><div class="panel-head"><h4>Gerenciar Permissões por Nível</h4></div><div class="panel-body"><p class="hint"><b>Somente o nível 1</b> pode alterar esta configuração. Defina o nome de cada nível e escolha, para cada área, se o usuário pode consultar, adicionar, editar, lançar, exportar ou excluir. Na Gestão de Gaiolas, CONSULTAR permite abrir a lista, visualizar o painel detalhado e REIMPRIMIR; ADICIONAR, EDITAR e EXCLUIR ficam sempre limitados ao level 1. A alteração vale automaticamente para todos os usuários que possuem aquele número de nível neste navegador.</p><div id="permissoesContainer"></div><button class="btn" onclick="salvarPermissoes()" style="margin-top:16px">Salvar Permissões</button></div></div>
 </div>
 <!-- DONO DE RUA -->
 <div class="view" id="view-donorua">
@@ -2955,10 +2957,11 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <p>Digite ou bipasse o EAN e pressione ENTER. O sistema consulta <b>BD_CADASTRO</b>, mostra PLU, produto e categoria, consulta as lojas ativas em <b>BD_LOJA</b> usando o PLU do primeiro item e mantém a loja escolhida fixa para os itens seguintes. A quantidade deve ser positiva e o saldo é conferido antes da inclusão.</p>
 <p>Ao salvar, os itens são inseridos em <b>BD_GAIOLA</b> com a coluna <b>QTD UN</b>; a reserva de <b>GAIOLAS_LANC</b> recebe a loja, usuário e turno; e as quantidades são debitadas do <b>BD_SALDO</b>. Após o envio completo, a pendência local é limpa, a lista é encerrada e o fluxo de impressão é iniciado.</p>
 
-<h4>9. GESTÃO DE GAIOLAS — NÍVEL 1</h4>
-<p>A tela <b>GESTÃO DE GAIOLAS</b> é exclusiva do nível 1. A pesquisa percorre todas as páginas de <b>GAIOLAS_LANC</b> e <b>BD_GAIOLA</b>. Quando um número é informado, o sistema filtra diretamente pela coluna <b>GAIOLA</b> nas duas tabelas, inclusive para gaiolas novas.</p>
-<p>O espelho mostra número, loja, categoria principal, data, quantidade de itens, unidades, usuário e a tabela detalhada de EAN, PLU, produto, categoria, quantidade, data/hora, usuário e registro. A edição permite alterar número, loja e categoria. A loja é limitada às opções ativas do PLU do primeiro item, e a categoria é limitada às categorias presentes nos itens da própria gaiola.</p>
-<p>Ao excluir uma gaiola, o sistema soma novamente no <b>BD_SALDO</b> as quantidades dos itens agrupadas por EAN e depois exclui os registros de <b>BD_GAIOLA</b> e <b>GAIOLAS_LANC</b>. Se houver falha, o sistema tenta reverter a devolução do saldo. A exclusão exige confirmação explícita.</p>
+<h4>9. GESTÃO DE GAIOLAS — CONSULTA GERAL E ESCRITA LEVEL 1</h4>
+<p>A tela <b>GESTÃO DE GAIOLAS</b> fica disponível para consulta aos níveis autorizados. A opção <b>MOSTRAR TODAS AS GAIOLAS LANÇADAS</b> lista os agrupamentos encontrados em todas as páginas de <b>GAIOLAS_LANC</b> e <b>BD_GAIOLA</b>. Também é possível desmarcar essa opção e pesquisar um número diretamente pela coluna <b>GAIOLA</b> nas duas tabelas, inclusive para gaiolas novas.</p>
+<p>Na lista, qualquer usuário autorizado pode clicar em <b>CONSULTAR</b>. O painel detalhado mostra os dados completos do registro da gaiola, o resumo de loja, categoria, total de itens e unidades, além de todos os campos de cada item da <b>BD_GAIOLA</b> em cards organizados. O botão <b>REIMPRIMIR</b> repete as duas impressões da gaiola sem liberar edição.</p>
+<p>Somente o <b>LEVEL 1</b> pode adicionar novas gaiolas, editar número, loja e categoria ou excluir uma gaiola. A loja de edição é limitada às opções ativas do PLU do primeiro item, e a categoria é limitada às categorias presentes nos itens da própria gaiola.</p>
+<p>Ao excluir uma gaiola, o sistema soma novamente no <b>BD_SALDO</b> as quantidades agrupadas por EAN e depois exclui os registros de <b>BD_GAIOLA</b> e <b>GAIOLAS_LANC</b>. Se houver falha, o sistema tenta reverter a devolução do saldo. A exclusão exige confirmação explícita.</p>
 
 <h4>10. IMPRESSÃO DA GAIOLA</h4>
 <p>A impressão é separada em duas etapas. A primeira é uma folha A4 horizontal de identificação, com o número da gaiola em maior destaque, loja, categoria baseada no primeiro item, marca discreta <b>TRIAGEM VISION</b> e QR Code grande.</p>
@@ -2983,7 +2986,10 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <p>O vídeo do sidebar ocupa todo o fundo da área azul, é reproduzido em loop, sem áudio e com carregamento automático. O arquivo preferencial é <b>7031327_Underwater_Angle_1280x720.mp4</b>; o sistema também possui fontes alternativas configuradas para quando o arquivo principal não estiver disponível.</p>
 <p>A logo <b>LOGO.PNG</b> fica no topo do sidebar, acima do menu OPERAÇÃO, sem efeito de brilho. O recurso de ajuste PAN/CROP foi removido; o vídeo permanece no enquadramento padrão fixo. O menu, a logo e o rodapé continuam sobrepostos ao vídeo para preservar a navegação.</p>
 
-<h4>16. REGRAS OPERACIONAIS IMPORTANTES</h4>
+<h4>16. DICAS DE USO NA TELA DE LANÇAMENTOS</h4>
+<p>Na tela <b>LANÇAMENTOS &amp; HISTÓRICO</b>, uma faixa de dicas passa lentamente da direita para a esquerda em loop contínuo. Ela orienta sobre consulta, lançamento, gaiolas, saldo, FEFO e o fechamento seguro dos painéis. A animação pode ser pausada temporariamente ao posicionar o cursor sobre a faixa.</p>
+
+<h4>17. REGRAS OPERACIONAIS IMPORTANTES</h4>
 <p>Confira o EAN antes de adicionar, valide a quantidade, confirme a loja do primeiro item e aguarde a mensagem de sucesso antes de iniciar outra operação. Não recarregue a página enquanto houver uma gaiola pendente sem conferir o número reservado. Para fechar qualquer painel de lançamento sem salvar, use exclusivamente o X. O clique fora do painel é deliberadamente inofensivo e não deve ser usado para cancelar a operação.</p>
 </div></div>
 </div>
@@ -3023,16 +3029,21 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="view" id="view-gaiolas-admin">
   <div class="panel gaiola-admin-panel">
     <div class="panel-head">
-      <div><h4>GESTÃO DE GAIOLAS</h4><p class="hint">Consulta, edição e exclusão sincronizada nas tabelas GAIOLAS_LANC e BD_GAIOLA.</p></div>
-      <button class="btn" onclick="carregarGaiolasGestao()">Atualizar</button>
+      <div><h4>GESTÃO DE GAIOLAS</h4><p class="hint">Consulta disponível para todos os níveis. Edição e exclusão permanecem exclusivas do nível 1.</p></div>
+      <button class="btn" onclick="carregarGaiolasGestao()">ATUALIZAR</button>
     </div>
     <div class="gaiola-admin-toolbar">
-      <div class="gaiola-admin-search"><label for="gaiolaGestaoBusca">Buscar gaiola</label><input id="gaiolaGestaoBusca" autocomplete="off" placeholder="Digite o número da gaiola e pressione Enter" onkeydown="if(event.key==='Enter') carregarGaiolasGestao()"/></div>
-      <button class="btn" onclick="carregarGaiolasGestao()">Pesquisar</button>
-      <button class="btn ghost" onclick="limparBuscaGaiolasGestao()">Limpar</button>
+      <div class="gaiola-admin-search"><label for="gaiolaGestaoBusca">BUSCAR GAIOLA</label><input id="gaiolaGestaoBusca" autocomplete="off" placeholder="Digite o número da gaiola e pressione ENTER" onkeydown="if(event.key==='Enter'){document.getElementById('gaiolaGestaoMostrarTodas').checked=false;carregarGaiolasGestao()}"/></div>
+      <button class="btn" onclick="document.getElementById('gaiolaGestaoMostrarTodas').checked=false;carregarGaiolasGestao()">PESQUISAR</button>
+      <button class="btn ghost" onclick="limparBuscaGaiolasGestao()">LIMPAR</button>
+      <label class="gaiola-admin-show-all"><input id="gaiolaGestaoMostrarTodas" type="checkbox" checked onchange="if(this.checked){document.getElementById('gaiolaGestaoBusca').value='';carregarGaiolasGestao()}"/> MOSTRAR TODAS AS GAIOLAS LANÇADAS</label>
     </div>
-    <div class="gaiola-admin-status" id="gaiolaGestaoStatus">Use a busca para localizar uma gaiola.</div>
-    <div class="table-scroll-x"><table class="gaiola-admin-table"><thead><tr><th>Gaiola</th><th>Loja</th><th>Categoria principal</th><th>Data</th><th>Itens</th><th>Unidades</th><th>Usuário</th><th>Ações</th></tr></thead><tbody id="gaiolasGestaoTable"><tr><td class="empty" colspan="8">Nenhuma busca realizada.</td></tr></tbody></table></div>
+    <div class="gaiola-admin-status" id="gaiolaGestaoStatus">Carregando todas as gaiolas lançadas…</div>
+    <div class="table-scroll-x"><table class="gaiola-admin-table"><thead><tr><th>GAIOLA</th><th>LOJA</th><th>CATEGORIA PRINCIPAL</th><th>DATA</th><th>ITENS</th><th>UNIDADES</th><th>USUÁRIO</th><th>CONSULTAR / AÇÕES</th></tr></thead><tbody id="gaiolasGestaoTable"><tr><td class="empty" colspan="8">Carregando todas as gaiolas…</td></tr></tbody></table></div>
+  </div>
+  <div class="panel gaiola-consulta-panel" id="gaiolaGestaoConsultaPanel" style="display:none">
+    <div class="panel-head"><div><h4>CONSULTA DA GAIOLA <span id="gaiolaGestaoConsultaTitulo"></span></h4><p class="hint">Modo somente leitura. Todos os dados e itens da gaiola selecionada.</p></div><div class="module-actions"><button class="btn" onclick="reimprimirGaiolaConsultaGestao()">REIMPRIMIR</button><button class="btn ghost" onclick="fecharConsultaGaiolaGestao()">FECHAR</button></div></div>
+    <div class="panel-body"><div class="gaiola-consulta-resumo" id="gaiolaGestaoConsultaResumo"></div><div class="gaiola-consulta-bloco"><h5>DADOS DO REGISTRO DA GAIOLA</h5><div class="gaiola-consulta-campos" id="gaiolaGestaoConsultaDados"></div></div><div class="gaiola-consulta-bloco"><h5>ITENS DA GAIOLA</h5><div class="gaiola-consulta-itens" id="gaiolaGestaoConsultaItens"><div class="empty">Selecione uma gaiola.</div></div></div></div>
   </div>
   <div class="panel gaiola-editor-panel" id="gaiolaGestaoEditor" style="display:none">
     <div class="panel-head"><div><h4>Espelho da gaiola <span id="gaiolaGestaoEditorTitulo"></span></h4><p class="hint">O número e a loja são atualizados nas duas tabelas. A categoria é atualizada nos itens da BD_GAIOLA.</p></div><div class="module-actions"><button class="btn ghost" onclick="imprimirGaiolaSelecionadaGestao()">Imprimir</button><button class="btn ghost" onclick="fecharEditorGaiolaGestao()">Fechar</button></div></div>
@@ -3286,24 +3297,25 @@ function atualizarMsgValidade(inputId, msgId) { const val = document.getElementB
 
 /* ========== PERMISSÕES CONFIGURÁVEIS ========== */
 const PERMISSION_ACTIONS = [
-  ['consulta','Consultar'], ['edicao','Editar'], ['lancamento','Lançar'], ['exportacao','Exportar']
+  ['consulta','CONSULTAR'], ['adicionar','ADICIONAR'], ['edicao','EDITAR'], ['lancamento','LANÇAR'], ['exportacao','EXPORTAR'], ['exclusao','EXCLUIR']
 ];
 const PERMISSION_AREAS = [
   ['dashboard','Dashboard'], ['lancamentos','Lançamentos & Histórico'], ['fefo','FEFO'],
   ['exportar','Exportação geral'], ['relatorios','Relatórios'], ['administracao','Administração'], ['reportes','Report de Erro'],
   ['mip','MIP'], ['lancamento','Novo lançamento'], ['retrabalho','Retrabalho'],
-  ['descarte','Descarte'], ['gaiola','Gaiola'], ['cadastro-item','Cadastro de Item'],
+  ['descarte','Descarte'], ['gaiola','Gaiola'], ['gaiolas-admin','GESTÃO DE GAIOLAS'], ['cadastro-item','Cadastro de Item'],
   ['lojas','Base de lojas'], ['usuarios','Usuários'], ['config','Configurações'],
   ['manual','Manual'], ['conta','Conta / alterar senha']
 ];
 const DEFAULT_NIVEL_LABELS = {1:'Acesso Total',2:'Lançar',3:'Editar Lançamentos',4:'Atualizar Base',5:'Relatório Prevenção',6:'Somente Consulta',7:'Lançar e Editar',8:'Lançar e Exportar',9:'Administração'};
 let NIVEL_LABELS = {...DEFAULT_NIVEL_LABELS};
 let permissoes = {};
-function criarPermissoesVazias(){ const o={}; PERMISSION_AREAS.forEach(([area])=>{o[area]={consulta:false,edicao:false,lancamento:false,exportacao:false};}); return o; }
+function criarPermissoesVazias(){ const o={}; PERMISSION_AREAS.forEach(([area])=>{o[area]={consulta:false,adicionar:false,edicao:false,lancamento:false,exportacao:false,exclusao:false};}); return o; }
 function criarPermissoesPadrao(nivel){
   const o=criarPermissoesVazias();
   const set=(area,acoes)=>acoes.forEach(a=>{if(o[area])o[area][a]=true;});
   set('reportes',['consulta']);
+  set('gaiolas-admin',['consulta']);
   if(nivel===1){Object.values(o).forEach(v=>Object.keys(v).forEach(a=>v[a]=true));return o;}
   if(nivel===2){set('dashboard',['consulta']);set('lancamentos',['consulta','lancamento']);set('fefo',['consulta']);['lancamento','retrabalho','descarte','gaiola','mip'].forEach(a=>set(a,['lancamento']));set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
   if(nivel===3){set('dashboard',['consulta']);set('lancamentos',['consulta','edicao']);set('fefo',['consulta']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
@@ -3335,14 +3347,17 @@ function salvarPermissoes(){
 }
 function nivelPermissao(area,action){if(!currentUser)return false;if(lvl()===1)return true;return !!(permissoes[lvl()]&&permissoes[lvl()][area]&&permissoes[lvl()][area][action]);}
 function areaPermissao(area,action){return nivelPermissao(area,action);}
-function temPermissao(f){const map={dashboard:['dashboard','consulta'],lancamentos:['lancamentos','consulta'],fefo:['fefo','consulta'],exportar:['exportar','exportacao'],relatorios:['relatorios','consulta'],lojas:['lojas','edicao'],usuarios:['usuarios','edicao'],config:['config','edicao'],manual:['manual','consulta'],permissoes:['permissoes','edicao'],consulta:['lancamentos','consulta'],lancar:['lancamentos','lancamento'],retrabalho:['retrabalho','lancamento'],descarte:['descarte','lancamento'],gaiola:['gaiola','lancamento'],editar_lanc:['lancamentos','edicao'],excluir_lanc:['lancamentos','edicao'],alterar_senha:['conta','edicao'],reportes:['reportes','consulta']};const m=map[f];return m?areaPermissao(m[0],m[1]):false;}
+function temPermissao(f){const map={dashboard:['dashboard','consulta'],lancamentos:['lancamentos','consulta'],fefo:['fefo','consulta'],exportar:['exportar','exportacao'],relatorios:['relatorios','consulta'],lojas:['lojas','edicao'],usuarios:['usuarios','edicao'],config:['config','edicao'],manual:['manual','consulta'],permissoes:['permissoes','edicao'],consulta:['lancamentos','consulta'],lancar:['lancamentos','lancamento'],retrabalho:['retrabalho','lancamento'],descarte:['descarte','lancamento'],gaiola:['gaiola','lancamento'],gaiolasadmin:['gaiolas-admin','consulta'],editar_lanc:['lancamentos','edicao'],excluir_lanc:['lancamentos','edicao'],alterar_senha:['conta','edicao'],reportes:['reportes','consulta']};const m=map[f];return m?areaPermissao(m[0],m[1]):false;}
 function lvl(){return currentUser?Number(currentUser.level):0;}
 function isTotal(){return lvl()===1;}
 function canLancarArea(area){return areaPermissao(area,'lancamento');}
 function canEditarArea(area){return areaPermissao(area,'edicao');}
 function canConsultarArea(area){return areaPermissao(area,'consulta');}
 function canExportarArea(area){return areaPermissao(area,'exportacao');}
-function canLancar(){return ['lancamento','retrabalho','descarte','gaiola','mip'].some(canLancarArea);}
+function canExcluirArea(area){return areaPermissao(area,'exclusao');}
+function podeAdicionarGaiolas(){return !!currentUser && isTotal() && areaPermissao('gaiolas-admin','adicionar');}
+function canLancarGaiola(){return podeAdicionarGaiolas();}
+function canLancar(){return ['lancamento','retrabalho','descarte','gaiola','mip'].some(area=>area==='gaiola'?canLancarGaiola():canLancarArea(area));}
 function canEditarLanc(){return canEditarArea('lancamentos');}
 function canExcluirLanc(){return canEditarArea('lancamentos');}
 function canAtualizarBase(){return canEditarArea('lojas');}
@@ -3829,7 +3844,7 @@ async function buscarLojasDisponiveis(pluValue) {
 }
 
 async function openGaiolaModal(keepBatch) { 
-  if (!canLancar()) { showToast("Acesso negado.", true); return; } 
+  if (!canLancarGaiola()) { showToast("Acesso negado. Somente o level 1 pode adicionar gaiolas.", true); return; } 
   document.getElementById("overlayGaiola").classList.add("show"); 
   ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id => document.getElementById(id).value = ""); 
   document.getElementById("glEanStatus").textContent = ""; 
@@ -4037,7 +4052,7 @@ async function reiniciarGaiola() { if (!await showConfirm("Apagar todos os itens
 function renderGaiolaStagedTable() { const tbody = document.getElementById("glStagedTable"); if (!gaiolaStaged.length) { tbody.innerHTML = '<tr><td colspan="6" class="staged-empty">Nenhum item adicionado</td></tr>'; return; } tbody.innerHTML = gaiolaStaged.map((it, idx) => `<tr><td class="code">${it.ean}</td><td>${it.plu || "—"}</td><td>${it.produto || "—"}</td><td>${it.categoria || "—"}</td><td>${it.qtd}</td><td><button class="icon-btn" onclick="removerItemGaiola(${idx})">🗑</button></td></tr>`).join(""); }
 
 async function salvarGaiola() { 
-  if (!canLancarArea("gaiola")) { showToast("Acesso negado.", true); return; } 
+  if (!canLancarGaiola()) { showToast("Acesso negado. Somente o level 1 pode adicionar gaiolas.", true); return; } 
   if (!gaiolaStaged.length) { showToast("Adicione pelo menos um item.", true); return; } 
   
   // Confirmação se tiver apenas 1 item
@@ -4171,7 +4186,7 @@ function renderPermissoes(){
   if(!isTotal()){showToast('Somente o nível 1 pode abrir esta configuração.',true);return;}
   carregarPermissoes();const container=document.getElementById('permissoesContainer');let html='';
   for(let nivel=1;nivel<=9;nivel++){
-    html+='<div class="panel" style="margin-top:14px"><div class="panel-head"><h4>Nível '+nivel+'</h4><input data-level-name="'+nivel+'" value="'+String(NIVEL_LABELS[nivel]||('Nível '+nivel)).replace(/"/g,'&quot;')+'" placeholder="Nome do nível" style="max-width:300px"></div><div style="overflow-x:auto"><table><thead><tr><th>Área</th><th>Consultar</th><th>Editar</th><th>Lançar</th><th>Exportar</th></tr></thead><tbody>';
+    html+='<div class="panel" style="margin-top:14px"><div class="panel-head"><h4>Nível '+nivel+'</h4><input data-level-name="'+nivel+'" value="'+String(NIVEL_LABELS[nivel]||('Nível '+nivel)).replace(/"/g,'&quot;')+'" placeholder="Nome do nível" style="max-width:300px"></div><div style="overflow-x:auto"><table><thead><tr><th>ÁREA</th>'+PERMISSION_ACTIONS.map(([,label])=>'<th>'+label+'</th>').join('')+'</tr></thead><tbody>';
     PERMISSION_AREAS.forEach(([area,label])=>{html+='<tr><td><b>'+label+'</b></td>';PERMISSION_ACTIONS.forEach(([action])=>{const checked=permissoes[nivel][area]?.[action]?' checked':'';const disabled='';html+='<td><input type="checkbox" data-perm-level="'+nivel+'" data-perm-area="'+area+'" data-perm-action="'+action+'"'+checked+disabled+'></td>';});html+='</tr>';});
     html+='</tbody></table></div></div>';
   }
@@ -4358,11 +4373,16 @@ async function responderReportErro(){if(!podeResponderReport()){showToast('Somen
 /* ===== VÍDEO DO SIDEBAR ===== */
 function inicializarVideoSidebar(){const video=document.getElementById('sidebarVideo');if(video){video.style.objectPosition='50% 50%';video.style.transform='scale(1.35)';video.play().catch(()=>{});}}
 
-/* ===== GESTÃO DE GAIOLAS — SOMENTE NÍVEL 1 ===== */
+/* ===== GESTÃO DE GAIOLAS — CONSULTA GERAL / EDIÇÃO NÍVEL 1 ===== */
 let gaiolasGestaoCache = [];
 let gaiolaGestaoSelecionada = null;
+let gaiolaGestaoConsultaSelecionada = null;
 
-function podeGerirGaiolas() { return !!currentUser && isTotal(); }
+function podeConsultarGaiolas() { return !!currentUser && canConsultarArea('gaiolas-admin'); }
+function podeEditarGaiolas() { return !!currentUser && isTotal() && canEditarArea('gaiolas-admin'); }
+function podeExcluirGaiolas() { return !!currentUser && isTotal() && canExcluirArea('gaiolas-admin'); }
+function podeReimprimirGaiolas() { return podeConsultarGaiolas(); }
+function podeGerirGaiolas() { return podeConsultarGaiolas(); }
 function escaparGaiolaGestao(v) { return String(v ?? '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
 function chaveGaiolaGestao(v) { return String(v ?? '').trim(); }
 function dataGaiolaGestao(v) { if (!v) return '—'; try { return fmtDate(v); } catch (e) { return String(v); } }
@@ -4397,7 +4417,8 @@ function renderGaiolasGestao(grupos) {
   if (!grupos.length) { tbody.innerHTML = '<tr><td class="empty" colspan="8">Nenhuma gaiola encontrada.</td></tr>'; return; }
   tbody.innerHTML = grupos.map((grupo,index) => {
     const r = resumoGaiolaGestao(grupo); gaiolasGestaoCache[index] = r;
-    return '<tr><td class="code">'+escaparGaiolaGestao(r.chave)+'</td><td>'+escaparGaiolaGestao(r.loja)+'</td><td>'+escaparGaiolaGestao(r.categoria)+'</td><td>'+escaparGaiolaGestao(dataGaiolaGestao(r.data))+'</td><td>'+r.itens.length+'</td><td>'+r.unidades+'</td><td>'+escaparGaiolaGestao(r.usuario)+'</td><td class="row-actions"><button class="btn ghost" onclick="abrirEditorGaiolaGestao('+index+')">Editar</button><button class="btn danger" onclick="excluirGaiolaGestao('+index+')">Excluir</button></td></tr>';
+    const botoes = '<button class="btn" onclick="abrirConsultaGaiolaGestao('+index+')">CONSULTAR</button>' + (podeEditarGaiolas() ? '<button class="btn ghost" onclick="abrirEditorGaiolaGestao('+index+')">EDITAR</button>' : '') + (podeExcluirGaiolas() ? '<button class="btn danger" onclick="excluirGaiolaGestao('+index+')">EXCLUIR</button>' : '');
+    return '<tr><td class="code">'+escaparGaiolaGestao(r.chave)+'</td><td>'+escaparGaiolaGestao(r.loja)+'</td><td>'+escaparGaiolaGestao(r.categoria)+'</td><td>'+escaparGaiolaGestao(dataGaiolaGestao(r.data))+'</td><td>'+r.itens.length+'</td><td>'+r.unidades+'</td><td>'+escaparGaiolaGestao(r.usuario)+'</td><td class="row-actions gaiola-row-buttons">'+botoes+'</td></tr>';
   }).join('');
 }
 
@@ -4421,8 +4442,9 @@ async function consultarTabelaGaiolaGestao(tabela, busca, crescente) {
 async function carregarGaiolasGestao() {
   const tbody = document.getElementById('gaiolasGestaoTable'), status = document.getElementById('gaiolaGestaoStatus');
   if (!tbody) return;
-  if (!podeGerirGaiolas()) { tbody.innerHTML = '<tr><td class="empty" colspan="8">Acesso restrito ao nível 1.</td></tr>'; return; }
-  const busca = document.getElementById('gaiolaGestaoBusca')?.value.trim() || '';
+  if (!podeConsultarGaiolas()) { tbody.innerHTML = '<tr><td class="empty" colspan="8">Acesso restrito.</td></tr>'; return; }
+  const mostrarTodas = document.getElementById('gaiolaGestaoMostrarTodas')?.checked !== false;
+  const busca = mostrarTodas ? '' : (document.getElementById('gaiolaGestaoBusca')?.value.trim() || '');
   tbody.innerHTML = '<tr><td class="empty" colspan="8">Consultando todas as páginas das duas tabelas…</td></tr>';
   if (status) status.textContent = busca ? 'Buscando gaiola '+busca+' em GAIOLAS_LANC e BD_GAIOLA…' : 'Carregando todas as gaiolas…';
   try {
@@ -4442,9 +4464,25 @@ async function carregarGaiolasGestao() {
   }
 }
 
-function limparBuscaGaiolasGestao() { const input = document.getElementById('gaiolaGestaoBusca'); if (input) input.value=''; fecharEditorGaiolaGestao(); const tbody=document.getElementById('gaiolasGestaoTable'); if(tbody)tbody.innerHTML='<tr><td class="empty" colspan="8">Nenhuma busca realizada.</td></tr>'; const status=document.getElementById('gaiolaGestaoStatus'); if(status)status.textContent='Use a busca para localizar uma gaiola.'; }
+function limparBuscaGaiolasGestao() { const input = document.getElementById('gaiolaGestaoBusca'); if (input) input.value=''; const todas=document.getElementById('gaiolaGestaoMostrarTodas'); if(todas) todas.checked=true; fecharEditorGaiolaGestao(); fecharConsultaGaiolaGestao(); const tbody=document.getElementById('gaiolasGestaoTable'); if(tbody)tbody.innerHTML='<tr><td class="empty" colspan="8">Nenhuma busca realizada.</td></tr>'; const status=document.getElementById('gaiolaGestaoStatus'); if(status)status.textContent='Use MOSTRAR TODAS ou informe o número da gaiola.'; }
 function fecharEditorGaiolaGestao() { gaiolaGestaoSelecionada=null; const panel=document.getElementById('gaiolaGestaoEditor'); if(panel)panel.style.display='none'; }
+function fecharConsultaGaiolaGestao() { gaiolaGestaoConsultaSelecionada=null; const panel=document.getElementById('gaiolaGestaoConsultaPanel'); if(panel)panel.style.display='none'; }
 function encontrarGrupoGaiolaGestao(index) { return gaiolasGestaoCache[Number(index)] || null; }
+function valorCampoConsultaGaiolaGestao(chave,valor) { if(valor===null||valor===undefined||String(valor)==='') return '—'; if(/DTA|DATA|HORA/i.test(chave)&&typeof valor==='string'){try{return dataGaiolaGestao(valor);}catch(e){}} return String(valor); }
+function renderCamposConsultaGaiolaGestao(obj) { return Object.entries(obj||{}).filter(([chave])=>!String(chave).startsWith('__')).map(([chave,valor])=>'<div class="gaiola-consulta-campo"><small>'+escaparGaiolaGestao(chave)+'</small><strong>'+escaparGaiolaGestao(valorCampoConsultaGaiolaGestao(chave,valor))+'</strong></div>').join(''); }
+function abrirConsultaGaiolaGestao(index) {
+  if(!podeConsultarGaiolas()){showToast('Acesso negado para consultar gaiolas.',true);return;}
+  const grupo=encontrarGrupoGaiolaGestao(index); if(!grupo)return;
+  const r=resumoGaiolaGestao(grupo); gaiolaGestaoConsultaSelecionada=r; fecharEditorGaiolaGestao();
+  const titulo=document.getElementById('gaiolaGestaoConsultaTitulo'); if(titulo)titulo.textContent='Nº '+escaparGaiolaGestao(r.chave);
+  const resumo=document.getElementById('gaiolaGestaoConsultaResumo'); if(resumo)resumo.innerHTML='<span>GAIOLA <strong>'+escaparGaiolaGestao(r.chave)+'</strong></span><span>ITENS <strong>'+r.itens.length+'</strong></span><span>UNIDADES <strong>'+r.unidades+'</strong></span><span>LOJA <strong>'+escaparGaiolaGestao(r.loja)+'</strong></span><span>CATEGORIA <strong>'+escaparGaiolaGestao(r.categoria)+'</strong></span>';
+  const base={...(r.lanc||r.primeiro||{}),GAIOLA:r.chave,LOJA:r.loja,CATEGORIA:r.categoria,TOTAL_ITENS:r.itens.length,TOTAL_UNIDADES:r.unidades};
+  const dados=document.getElementById('gaiolaGestaoConsultaDados'); if(dados)dados.innerHTML=renderCamposConsultaGaiolaGestao(base)||'<div class="gaiola-consulta-vazio">Nenhum dado de cabeçalho encontrado.</div>';
+  const itens=document.getElementById('gaiolaGestaoConsultaItens'); if(itens)itens.innerHTML=r.itens.length?r.itens.map((item,pos)=>'<article class="gaiola-consulta-item"><h6>ITEM '+(pos+1)+'</h6><div class="gaiola-consulta-item-grid">'+renderCamposConsultaGaiolaGestao(item)+'</div></article>').join(''):'<div class="gaiola-consulta-vazio">Nenhum item encontrado em BD_GAIOLA.</div>';
+  const panel=document.getElementById('gaiolaGestaoConsultaPanel'); if(panel){panel.style.display='';panel.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+function reimprimirGaiolaConsultaGestao(){if(!podeReimprimirGaiolas()){showToast('Acesso negado.',true);return;}if(!gaiolaGestaoConsultaSelecionada){showToast('Consulte uma gaiola primeiro.',true);return;}imprimirGaiolaSeparada(gaiolaGestaoConsultaSelecionada);}
+
 
 async function carregarLojasAtivasGaiolaGestao(plu, lojaAtual) {
   const select = document.getElementById('gaiolaGestaoLoja'), hint = document.getElementById('gaiolaGestaoLojaHint');
@@ -4477,10 +4515,10 @@ function renderEditorGaiolaGestao(grupo) {
   carregarLojasAtivasGaiolaGestao(campoGaiolaGestao(primeiro,'PLU'),grupo.loja);
   panel.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function abrirEditorGaiolaGestao(index) { if(!podeGerirGaiolas()){showToast('Acesso negado. Somente o nível 1 pode editar gaiolas.',true);return;} const grupo=encontrarGrupoGaiolaGestao(index); if(grupo)renderEditorGaiolaGestao(grupo); }
+function abrirEditorGaiolaGestao(index) { if(!podeEditarGaiolas()){showToast('Acesso negado. Somente o nível 1 pode editar gaiolas.',true);return;} const grupo=encontrarGrupoGaiolaGestao(index); if(grupo)renderEditorGaiolaGestao(grupo); }
 
 async function salvarEdicaoGaiolaGestao() {
-  if(!podeGerirGaiolas()){showToast('Acesso negado.',true);return;}
+  if(!podeEditarGaiolas()){showToast('Acesso negado.',true);return;}
   const grupo=gaiolaGestaoSelecionada;if(!grupo){showToast('Selecione uma gaiola primeiro.',true);return;}
   const novoNumero=document.getElementById('gaiolaGestaoNumero').value.trim(),novaLoja=document.getElementById('gaiolaGestaoLoja').value.trim(),novaCategoria=document.getElementById('gaiolaGestaoCategoria').value.trim();
   if(!novoNumero||!novaLoja||!novaCategoria){showToast('Informe número, loja e categoria.',true);return;}
@@ -4550,7 +4588,7 @@ async function ajustarSaldoGaiola(itens, multiplicador) {
 }
 
 async function excluirGaiolaGestao(index) {
-  if(!podeGerirGaiolas()){showToast('Acesso negado. Somente o nível 1 pode excluir gaiolas.',true);return;}
+  if(!podeExcluirGaiolas()){showToast('Acesso negado. Somente o nível 1 pode excluir gaiolas.',true);return;}
   const grupo=index===undefined?gaiolaGestaoSelecionada:encontrarGrupoGaiolaGestao(index);if(!grupo){showToast('Selecione uma gaiola primeiro.',true);return;}
   const itens=grupo.itens||[];
   const totalUnidades=itens.reduce((s,item)=>s+(Number(valorQtdGaiolaGestao(item))||0),0);
@@ -4569,7 +4607,7 @@ async function excluirGaiolaGestao(index) {
   } finally {if(btn){btn.disabled=false;btn.textContent='Excluir gaiola nas duas tabelas';}}
 }
 
-function imprimirGaiolaSelecionadaGestao(){if(!podeGerirGaiolas()){showToast('Acesso negado.',true);return;}if(!gaiolaGestaoSelecionada){showToast('Selecione uma gaiola primeiro.',true);return;}imprimirGaiolaSeparada(resumoGaiolaGestao(gaiolaGestaoSelecionada));}
+function imprimirGaiolaSelecionadaGestao(){if(!podeReimprimirGaiolas()){showToast('Acesso negado.',true);return;}if(!gaiolaGestaoSelecionada){showToast('Selecione uma gaiola primeiro.',true);return;}imprimirGaiolaSeparada(resumoGaiolaGestao(gaiolaGestaoSelecionada));}
 
 function normalizarItemImpressaoGaiola(item,index) {
   return {
@@ -4624,12 +4662,12 @@ async function imprimirGaiolaSeparada(dados) {
 const SINGLE_MODULE_TITLES = {
   'cadastro-item': ['Cadastro de Item', 'Cadastro manual na tabela BD_CADASTRO'],
   'administracao': ['ADMINISTRAÇÃO', 'Faturamento de descarte na tabela BD_PREV_RELAT'],
-  'gaiolas-admin': ['GESTÃO DE GAIOLAS', 'Consulta, edição e exclusão sincronizada'],
+  'gaiolas-admin': ['GESTÃO DE GAIOLAS', 'Consulta geral · escrita exclusiva do level 1'],
   'reportes': ['REPORT DE ERRO', 'Atendimento e suporte no chat MSG']
 };
 function switchView(name) {
   if (name === 'cadastro-item' && !podeCadastrarItem()) { showToast('Acesso negado. Somente usuários nível 1 podem acessar o Cadastro de Item.', true); return; }
-  if (name === 'gaiolas-admin' && !podeGerirGaiolas()) { showToast('Acesso negado. Somente usuários nível 1 podem gerenciar gaiolas.', true); return; }
+  if (name === 'gaiolas-admin' && !podeConsultarGaiolas()) { showToast('Acesso negado para consultar gaiolas.', true); return; }
   if (name === 'administracao' && !canConsultarArea('administracao')) { showToast('Acesso negado ao menu Administração.', true); return; }
   if (name === 'mip' && !canConsultarArea('mip')) { showToast('Acesso negado ao menu MIP.', true); return; }
   if (name === 'reportes' && !canConsultarArea('reportes')) { showToast('Acesso negado ao Report de Erro.', true); return; }
@@ -4669,8 +4707,8 @@ function applyUserUI() {
   document.getElementById('userName').textContent=currentUser.name||currentUser.user;
   document.getElementById('userAvatar').textContent=(currentUser.name||currentUser.user).slice(0,2).toUpperCase();
   const badge=document.getElementById('userBadge');badge.textContent=NIVEL_LABELS[lvl()]||('Nível '+lvl());badge.className='badge-level '+(isTotal()?'master':'basic');
-  document.querySelectorAll('.menu a[data-view]').forEach(a=>{const v=a.dataset.view;let allowed=true;if(v==='permissoes')allowed=isTotal();else if(v==='donorua')allowed=currentUser.user==='5520967';else if(v==='administracao')allowed=canConsultarArea('administracao');else if(v==='gaiolas-admin')allowed=podeGerirGaiolas();else if(v==='cadastro-item')allowed=podeCadastrarItem();else if(v==='mip')allowed=canConsultarArea('mip');else allowed=temPermissao(v);a.style.display=allowed?'':'none';});
-  document.querySelectorAll('.lancar-only[data-perm-area]').forEach(el=>{el.style.display=canLancarArea(el.dataset.permArea)?'':'none';});
+  document.querySelectorAll('.menu a[data-view]').forEach(a=>{const v=a.dataset.view;let allowed=true;if(v==='permissoes')allowed=isTotal();else if(v==='donorua')allowed=currentUser.user==='5520967';else if(v==='administracao')allowed=canConsultarArea('administracao');else if(v==='gaiolas-admin')allowed=podeConsultarGaiolas();else if(v==='cadastro-item')allowed=podeCadastrarItem();else if(v==='mip')allowed=canConsultarArea('mip');else allowed=temPermissao(v);a.style.display=allowed?'':'none';});
+  document.querySelectorAll('.lancar-only[data-perm-area]').forEach(el=>{const area=el.dataset.permArea;el.style.display=(area==='gaiola'?canLancarGaiola():canLancarArea(area))?'':'none';});
   document.querySelectorAll('.mip-lancar-only').forEach(el=>{el.style.display=canLancarArea('mip')?'':'none';});
   const exportAdmin=document.getElementById('btnExportarAdministracao');if(exportAdmin)exportAdmin.style.display=canExportarArea('administracao')?'':'none';
   refreshActiveView();checkPendingGaiola();
