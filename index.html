@@ -2335,19 +2335,18 @@ body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;tr
 }
 .sidebar::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(2,8,30,.34),rgba(2,8,30,.62)),radial-gradient(circle at 18% 3%,rgba(74,179,255,.18),transparent 28%),radial-gradient(circle at 100% 56%,rgba(47,107,255,.12),transparent 34%);pointer-events:none}
 .sidebar::after{content:"";position:absolute;left:0;right:0;bottom:78px;height:1px;z-index:3;background:linear-gradient(90deg,transparent,rgba(92,198,255,.7),transparent);box-shadow:0 0 12px rgba(92,198,255,.8);pointer-events:none}
-.sidebar .logo,.sidebar .menu,.sidebar .footer{position:relative;z-index:2}
+.sidebar .logo{position:relative;z-index:4}.sidebar .menu,.sidebar .footer{position:relative;z-index:3}
 .logo{
-  padding:22px 22px 18px;font-size:19px;font-weight:800;letter-spacing:.2px;
-  border-bottom:1px solid rgba(255,255,255,.10);display:flex;align-items:center;gap:10px;
-  text-shadow:0 0 14px rgba(132,213,255,.18);
+  width:100%;height:86px;min-height:86px;padding:8px 10px 7px;font-size:19px;font-weight:800;letter-spacing:.2px;
+  border-bottom:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;gap:10px;
+  text-shadow:0 0 14px rgba(132,213,255,.18);background:rgba(3,17,52,.08);
 }
 .logo .mark{
   width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue-500),#5ec6ff);
   display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;
   box-shadow:0 0 0 1px rgba(163,224,255,.25),0 0 18px rgba(47,157,255,.62),inset 0 1px rgba(255,255,255,.35);
 }
-.logo-name{color:#fff!important;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;text-shadow:0 0 2px #fff,0 0 5px #fff,0 0 10px rgba(255,255,255,.98),0 0 20px rgba(116,210,255,.95),0 0 34px rgba(47,157,255,.82);animation:logoNeonPulse 2.4s ease-in-out infinite alternate}.logo-image{display:block;width:auto;max-width:174px;height:auto;max-height:42px;object-fit:contain;object-position:left center;filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px rgba(255,255,255,.95)) drop-shadow(0 0 16px rgba(117,213,255,.95)) drop-shadow(0 0 28px rgba(47,157,255,.88));}
-@keyframes logoNeonPulse{from{opacity:.92;text-shadow:0 0 2px #fff,0 0 5px #fff,0 0 10px rgba(255,255,255,.9),0 0 18px rgba(116,210,255,.8),0 0 28px rgba(47,157,255,.65)}to{opacity:1;text-shadow:0 0 3px #fff,0 0 8px #fff,0 0 14px #fff,0 0 26px rgba(116,210,255,1),0 0 42px rgba(47,157,255,.95)}}
+.logo-image{display:block;width:100%;max-width:226px;height:auto;max-height:70px;object-fit:contain;object-position:center;}
 .menu{padding:14px 10px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
 .menu-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.38);padding:10px 12px 6px}
 .menu a{
@@ -2677,8 +2676,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 
 .sidebar-video-wrap{position:absolute;inset:0;z-index:2;margin:0;height:100%;border:0;border-radius:0;overflow:hidden;background:#07102f;box-shadow:none;pointer-events:none}.sidebar-video-wrap video{pointer-events:none}.sidebar-video-caption{display:none}
 #sidebarVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;transform:scale(1.35);transform-origin:center;filter:saturate(1.15) contrast(1.08) brightness(.78)}
-.sidebar-video-wrap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,9,35,.10),rgba(2,9,35,.48));pointer-events:none}.sidebar-video-caption{position:absolute;left:10px;bottom:8px;z-index:2;font-size:8px;letter-spacing:1.5px;color:#d9f4ff;font-weight:800;text-shadow:0 1px 8px #000}.sidebar-video-crop-btn{position:absolute;right:10px;top:10px;z-index:4;pointer-events:auto;border:1px solid rgba(255,255,255,.45);background:rgba(6,24,63,.82);color:#fff;border-radius:6px;padding:5px 7px;font-size:8px;font-weight:800;cursor:pointer}.sidebar-video-crop-btn:hover{background:var(--blue-600)}
-.video-crop-preview{height:190px;border-radius:12px;overflow:hidden;background:#07102f;position:relative;border:1px solid var(--line)}.video-crop-preview video{width:100%;height:100%;object-fit:cover;object-position:50% 50%;transform:scale(1.35);transform-origin:center}.video-crop-values{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--bg)}
+.sidebar-video-wrap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,9,35,.10),rgba(2,9,35,.48));pointer-events:none}.sidebar-video-caption{position:absolute;left:10px;bottom:8px;z-index:2;font-size:8px;letter-spacing:1.5px;color:#d9f4ff;font-weight:800;text-shadow:0 1px 8px #000}
 
 </style>
 </head>
@@ -2702,7 +2700,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 <!-- SIDEBAR -->
 <div class="sidebar">
-<div class="logo"><div class="mark">TP</div><img class="logo-image" src="LOGO.PNG" alt="TRIAGEM VISION" loading="eager" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/PablomLopes797/TriagemVision/main/LOGO.PNG';"/></div>
+<div class="logo"><img class="logo-image" src="LOGO.PNG" alt="TRIAGEM VISION" loading="eager" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/PablomLopes797/TriagemVision/main/LOGO.PNG';"/></div>
 <div class="sidebar-video-wrap" id="sidebarVideoWrap">
   <video id="sidebarVideo" autoplay muted loop playsinline preload="metadata">
     <source src="7031327_Underwater_Angle_1280x720.mp4" type="video/mp4"/>
@@ -2710,7 +2708,6 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
     <source src="background.mp4" type="video/mp4"/>
   </video>
   <div class="sidebar-video-caption">TRIAGEM VISION</div>
-  <button class="sidebar-video-crop-btn" id="btnEditarCropVideo" onclick="abrirEditorCropVideo()" style="display:none" title="Ajustar crop do vídeo">AJUSTAR CROP</button>
 </div>
 <div class="menu">
 <div class="menu-label">Operação</div>
@@ -2982,9 +2979,9 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <h4>14. REPORT DE ERRO E DONO DE RUA</h4>
 <p>O <b>REPORT DE ERRO</b> funciona como uma conversa. O usuário envia a descrição para a administração e acompanha respostas na própria tela. O nível 1 pode responder aos reports. O módulo <b>DONO DE RUA</b> mantém o mapeamento entre rua e dono para preencher automaticamente esse dado nos lançamentos quando houver correspondência.</p>
 
-<h4>15. SIDEBAR, VÍDEO E CROP</h4>
+<h4>15. SIDEBAR E VÍDEO</h4>
 <p>O vídeo do sidebar ocupa todo o fundo da área azul, é reproduzido em loop, sem áudio e com carregamento automático. O arquivo preferencial é <b>7031327_Underwater_Angle_1280x720.mp4</b>; o sistema também possui fontes alternativas configuradas para quando o arquivo principal não estiver disponível.</p>
-<p>Somente o nível 1 visualiza o botão <b>AJUSTAR CROP</b>. Os controles definem posição horizontal, posição vertical e zoom. Ao salvar, o ajuste é aplicado diretamente no vídeo principal e armazenado no navegador. O menu, o logo e o rodapé continuam sobrepostos ao vídeo para preservar a navegação.</p>
+<p>A logo <b>LOGO.PNG</b> fica no topo do sidebar, acima do menu OPERAÇÃO, sem efeito de brilho. O recurso de ajuste PAN/CROP foi removido; o vídeo permanece no enquadramento padrão fixo. O menu, a logo e o rodapé continuam sobrepostos ao vídeo para preservar a navegação.</p>
 
 <h4>16. REGRAS OPERACIONAIS IMPORTANTES</h4>
 <p>Confira o EAN antes de adicionar, valide a quantidade, confirme a loja do primeiro item e aguarde a mensagem de sucesso antes de iniciar outra operação. Não recarregue a página enquanto houver uma gaiola pendente sem conferir o número reservado. Para fechar qualquer painel de lançamento sem salvar, use exclusivamente o X. O clique fora do painel é deliberadamente inofensivo e não deve ser usado para cancelar a operação.</p>
@@ -3057,21 +3054,6 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="panel"><div class="panel-head"><div><h4>REPORT DE ERRO</h4><p class="hint">Envie uma mensagem para a Administração e acompanhe a resposta como em um chat.</p></div><button class="btn ghost" onclick="carregarReportesErro()">Atualizar</button></div><div id="reportesRestricted" class="report-restricted" style="display:none">Acesso restrito.</div><div id="reportesPanel"><div class="report-layout"><aside class="report-list"><div class="report-list-head"><h4>Conversas</h4><input id="reportBusca" autocomplete="off" placeholder="Buscar mensagem ou usuário..." oninput="renderListaReportes()"/></div><div id="reportLista"><div class="empty">Carregando…</div></div></aside><section class="report-chat"><div class="report-chat-head"><h4 id="reportChatTitle">Selecione um report</h4><p id="reportChatSubtitle">Escolha uma mensagem na lista para visualizar a conversa.</p></div><div class="report-messages" id="reportMensagens"><div class="empty">Nenhuma conversa selecionada.</div></div><div class="report-compose" id="reportCompose"><textarea id="reportMensagemInput" maxlength="4000" placeholder="Descreva o erro ou problema encontrado..."></textarea><div class="form-actions"><button class="btn" onclick="enviarReportErro()">Enviar report</button></div></div></section></div></div></div>
 </div>
 </div>
-</div>
-<!-- EDITOR DE CROP DO VÍDEO — SOMENTE NÍVEL 1 -->
-<div class="overlay" id="overlayVideoCrop">
-  <div class="modal" style="width:520px;max-width:calc(100vw - 30px)">
-    <div class="modal-header"><h3>AJUSTAR CROP DO VÍDEO</h3><button class="close-x" onclick="fecharEditorCropVideo()">✕</button></div>
-    <div class="modal-body">
-      <div class="video-crop-preview"><video id="videoCropPreview" muted loop playsinline></video></div>
-      <p class="hint" style="margin:12px 0 16px">Mova os controles para escolher a parte do vídeo que ficará visível no sidebar. O ajuste é salvo neste navegador.</p>
-      <div class="field"><label for="videoCropX">Posição horizontal</label><input id="videoCropX" type="range" min="0" max="100" value="50" oninput="atualizarCropVideo()"/></div>
-      <div class="field"><label for="videoCropY">Posição vertical</label><input id="videoCropY" type="range" min="0" max="100" value="50" oninput="atualizarCropVideo()"/></div>
-      <div class="field"><label for="videoCropZoom">Zoom</label><input id="videoCropZoom" type="range" min="1" max="3" step="0.05" value="1.35" oninput="atualizarCropVideo()"/></div>
-      <div class="video-crop-values" id="videoCropValues"></div>
-    </div>
-    <div class="modal-footer"><button class="btn ghost" onclick="restaurarCropVideo()">Restaurar padrão</button><button class="btn" onclick="salvarCropVideo()">Salvar crop</button></div>
-  </div>
 </div>
 <!-- MODAIS -->
 <!-- Modal Lançamento -->
@@ -4373,19 +4355,8 @@ async function carregarReportesErro(){const panel=document.getElementById('repor
 async function enviarReportErro(){if(!currentUser){showToast('Faça login para enviar um report.',true);return;}const input=document.getElementById('reportMensagemInput'),texto=(input?.value||'').trim();if(!texto){showToast('Digite a mensagem do report.',true);return;}const btn=document.querySelector('#reportCompose .btn:not(.ghost)');if(btn){btn.disabled=true;btn.textContent='Enviando…';}try{const payload={USER:currentUser.user,NAME:currentUser.fullName||currentUser.name,REPORT:texto,RESPOSTA:null};const {error}=await sb.from('MSG').insert(payload);if(error)throw error;showToast('Report enviado para a Administração.');if(input)input.value='';reportSelecionado=null;await carregarReportesErro();}catch(err){showToast('Erro ao enviar report: '+err.message,true);}finally{if(btn){btn.disabled=false;btn.textContent='Enviar report';}}}
 async function responderReportErro(){if(!podeResponderReport()){showToast('Somente o nível 1 pode responder reports.',true);return;}if(!reportSelecionado){showToast('Selecione um report para responder.',true);return;}const input=document.getElementById('reportRespostaInput'),texto=(input?.value||'').trim();if(!texto){showToast('Digite a resposta.',true);return;}const btn=document.querySelector('#reportCompose .btn:not(.ghost)');if(btn){btn.disabled=true;btn.textContent='Respondendo…';}try{let q=sb.from('MSG').update({RESPOSTA:texto}).eq('USER',campoReport(reportSelecionado,'USER')).eq('REPORT',campoReport(reportSelecionado,'REPORT'));if(reportSelecionado.id!==undefined)q=q.eq('id',reportSelecionado.id);else if(reportSelecionado.ID!==undefined)q=q.eq('ID',reportSelecionado.ID);const {error}=await q;if(error)throw error;reportSelecionado.RESPOSTA=texto;showToast('Resposta enviada.');if(input)input.value='';renderListaReportes();renderChatReporte();}catch(err){showToast('Erro ao responder report: '+err.message,true);}finally{if(btn){btn.disabled=false;btn.textContent='Responder';}}}
 
-/* ===== VÍDEO DO SIDEBAR E CROP — SOMENTE NÍVEL 1 ===== */
-const SIDEBAR_VIDEO_CROP_KEY='tp_sidebar_video_crop_v1';
-const SIDEBAR_VIDEO_CROP_DEFAULT={x:50,y:50,zoom:1.35};
-function lerCropVideo(){try{return {...SIDEBAR_VIDEO_CROP_DEFAULT,...JSON.parse(localStorage.getItem(SIDEBAR_VIDEO_CROP_KEY)||'{}')};}catch(e){return {...SIDEBAR_VIDEO_CROP_DEFAULT};}}
-function aplicarCropVideo(crop=lerCropVideo(),preview=false){const video=document.getElementById(preview?'videoCropPreview':'sidebarVideo');if(!video)return;const pos=String(crop.x)+'% '+String(crop.y)+'%';video.style.setProperty('object-position',pos,'important');video.style.setProperty('transform','scale('+String(crop.zoom)+')','important');video.dataset.cropX=String(crop.x);video.dataset.cropY=String(crop.y);video.dataset.cropZoom=String(crop.zoom);}
-function atualizarCropVideo(){const crop={x:Number(document.getElementById('videoCropX')?.value||50),y:Number(document.getElementById('videoCropY')?.value||50),zoom:Number(document.getElementById('videoCropZoom')?.value||1.35)};aplicarCropVideo(crop,true);const values=document.getElementById('videoCropValues');if(values)values.textContent='Horizontal: '+crop.x+'% · Vertical: '+crop.y+'% · Zoom: '+crop.zoom.toFixed(2)+'×';}
-function carregarValoresCropVideo(){const crop=lerCropVideo();['videoCropX','videoCropY','videoCropZoom'].forEach((id,index)=>{const el=document.getElementById(id);if(el)el.value=[crop.x,crop.y,crop.zoom][index];});aplicarCropVideo(crop,false);atualizarCropVideo();}
-function inicializarVideoSidebar(){const video=document.getElementById('sidebarVideo'),preview=document.getElementById('videoCropPreview');if(video){aplicarCropVideo(lerCropVideo(),false);video.addEventListener('loadedmetadata',()=>aplicarCropVideo(lerCropVideo(),false),{once:false});video.play().catch(()=>{});}if(preview&&video){const sincronizarPreview=()=>{const fonte=video.currentSrc||video.querySelector('source')?.src;if(fonte&&preview.src!==fonte){preview.src=fonte;preview.load();preview.play().catch(()=>{});}};video.addEventListener('loadedmetadata',sincronizarPreview,{once:true});sincronizarPreview();}carregarValoresCropVideo();atualizarAcessoCropVideo();}
-function atualizarAcessoCropVideo(){const btn=document.getElementById('btnEditarCropVideo');if(btn)btn.style.display=isTotal()?'inline-flex':'none';}
-function abrirEditorCropVideo(){if(!isTotal()){showToast('Somente o nível 1 pode ajustar o crop do vídeo.',true);return;}carregarValoresCropVideo();const overlay=document.getElementById('overlayVideoCrop');if(overlay)overlay.classList.add('show');}
-function fecharEditorCropVideo(){const overlay=document.getElementById('overlayVideoCrop');if(overlay)overlay.classList.remove('show');}
-function salvarCropVideo(){if(!isTotal()){showToast('Acesso negado.',true);return;}const crop={x:Number(document.getElementById('videoCropX').value),y:Number(document.getElementById('videoCropY').value),zoom:Number(document.getElementById('videoCropZoom').value)};localStorage.setItem(SIDEBAR_VIDEO_CROP_KEY,JSON.stringify(crop));aplicarCropVideo(crop,false);aplicarCropVideo(crop,true);fecharEditorCropVideo();showToast('Crop do vídeo salvo e aplicado ao sidebar.');}
-function restaurarCropVideo(){const crop={...SIDEBAR_VIDEO_CROP_DEFAULT};['videoCropX','videoCropY','videoCropZoom'].forEach((id,index)=>{const el=document.getElementById(id);if(el)el.value=[crop.x,crop.y,crop.zoom][index];});atualizarCropVideo();}
+/* ===== VÍDEO DO SIDEBAR ===== */
+function inicializarVideoSidebar(){const video=document.getElementById('sidebarVideo');if(video){video.style.objectPosition='50% 50%';video.style.transform='scale(1.35)';video.play().catch(()=>{});}}
 
 /* ===== GESTÃO DE GAIOLAS — SOMENTE NÍVEL 1 ===== */
 let gaiolasGestaoCache = [];
@@ -4662,6 +4633,12 @@ function switchView(name) {
   if (name === 'administracao' && !canConsultarArea('administracao')) { showToast('Acesso negado ao menu Administração.', true); return; }
   if (name === 'mip' && !canConsultarArea('mip')) { showToast('Acesso negado ao menu MIP.', true); return; }
   if (name === 'reportes' && !canConsultarArea('reportes')) { showToast('Acesso negado ao Report de Erro.', true); return; }
+  // Ao trocar de menu, sobe somente a área principal. A posição do sidebar é preservada.
+  window.scrollTo({top:0,left:0,behavior:'auto'});
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  const areaPrincipal = document.querySelector('.main');
+  if (areaPrincipal) areaPrincipal.scrollTop = 0;
   document.querySelectorAll('.menu a[data-view]').forEach(a => a.classList.toggle('active', a.dataset.view === name));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const view = document.getElementById('view-' + name);
@@ -4691,7 +4668,7 @@ function applyUserUI() {
   document.getElementById('userBox').style.display='flex';
   document.getElementById('userName').textContent=currentUser.name||currentUser.user;
   document.getElementById('userAvatar').textContent=(currentUser.name||currentUser.user).slice(0,2).toUpperCase();
-  const badge=document.getElementById('userBadge');badge.textContent=NIVEL_LABELS[lvl()]||('Nível '+lvl());badge.className='badge-level '+(isTotal()?'master':'basic');atualizarAcessoCropVideo();
+  const badge=document.getElementById('userBadge');badge.textContent=NIVEL_LABELS[lvl()]||('Nível '+lvl());badge.className='badge-level '+(isTotal()?'master':'basic');
   document.querySelectorAll('.menu a[data-view]').forEach(a=>{const v=a.dataset.view;let allowed=true;if(v==='permissoes')allowed=isTotal();else if(v==='donorua')allowed=currentUser.user==='5520967';else if(v==='administracao')allowed=canConsultarArea('administracao');else if(v==='gaiolas-admin')allowed=podeGerirGaiolas();else if(v==='cadastro-item')allowed=podeCadastrarItem();else if(v==='mip')allowed=canConsultarArea('mip');else allowed=temPermissao(v);a.style.display=allowed?'':'none';});
   document.querySelectorAll('.lancar-only[data-perm-area]').forEach(el=>{el.style.display=canLancarArea(el.dataset.permArea)?'':'none';});
   document.querySelectorAll('.mip-lancar-only').forEach(el=>{el.style.display=canLancarArea('mip')?'':'none';});
