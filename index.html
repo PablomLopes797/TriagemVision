@@ -2585,7 +2585,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 .module-header h2{font-size:20px;font-weight:800}
 .module-header p{font-size:12px;color:var(--ink-faint);margin-top:5px}
 .module-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.module-note{padding:12px 14px;border:1px solid var(--blue-100);background:rgba(231,237,255,.5);border-radius:10px;color:var(--ink-soft);font-size:12px;line-height:1.5;margin-bottom:16px}
+.module-note{padding:12px 14px;border:1px solid var(--blue-100);background:rgba(231,237,255,.5);border-radius:10px;color:var(--ink-soft);font-size:12px;line-height:1.5;margin-bottom:16px}.modal-lock-note{margin-right:auto;align-self:center}.view#view-manual table{width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:12px}.view#view-manual th,.view#view-manual td{border:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}.view#view-manual th{background:var(--bg);color:var(--ink);font-weight:800}.view#view-manual h4{margin-top:22px;color:var(--ink)}.view#view-manual p{margin:8px 0}
 .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;flex-wrap:wrap}
 .readonly-field{background:var(--bg)!important;color:var(--ink-soft)!important}
 .table-scroll-x{overflow-x:auto}
@@ -2673,7 +2673,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 .gaiola-admin-summary{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0;padding:14px;border:1px solid var(--blue-100);border-radius:10px;background:rgba(231,237,255,.5);color:var(--ink-soft);font-size:12px;font-weight:600}.gaiola-admin-summary strong{color:var(--ink);font-family:var(--mono);font-size:14px}.gaiola-espelho-table{min-width:1120px}.gaiola-admin-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
 @media(max-width:900px){.gaiola-admin-editor-grid{grid-template-columns:1fr}}
 
-.sidebar-video-wrap{position:absolute;inset:0;z-index:0;margin:0;height:100%;border:0;border-radius:0;overflow:hidden;background:#07102f;box-shadow:none;pointer-events:none}.sidebar-video-wrap video{pointer-events:none}.sidebar-video-caption{display:none}
+.sidebar-video-wrap{position:absolute;inset:0;z-index:2;margin:0;height:100%;border:0;border-radius:0;overflow:hidden;background:#07102f;box-shadow:none;pointer-events:none}.sidebar-video-wrap video{pointer-events:none}.sidebar-video-caption{display:none}
 #sidebarVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;transform:scale(1.35);transform-origin:center;filter:saturate(1.15) contrast(1.08) brightness(.78)}
 .sidebar-video-wrap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,9,35,.10),rgba(2,9,35,.48));pointer-events:none}.sidebar-video-caption{position:absolute;left:10px;bottom:8px;z-index:2;font-size:8px;letter-spacing:1.5px;color:#d9f4ff;font-weight:800;text-shadow:0 1px 8px #000}.sidebar-video-crop-btn{position:absolute;right:10px;top:10px;z-index:4;pointer-events:auto;border:1px solid rgba(255,255,255,.45);background:rgba(6,24,63,.82);color:#fff;border-radius:6px;padding:5px 7px;font-size:8px;font-weight:800;cursor:pointer}.sidebar-video-crop-btn:hover{background:var(--blue-600)}
 .video-crop-preview{height:190px;border-radius:12px;overflow:hidden;background:#07102f;position:relative;border:1px solid var(--line)}.video-crop-preview video{width:100%;height:100%;object-fit:cover;object-position:50% 50%;transform:scale(1.35);transform-origin:center}.video-crop-values{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--bg)}
@@ -2910,21 +2910,82 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 <!-- MANUAL -->
 <div class="view" id="view-manual">
-<div class="panel"><div class="panel-head"><h4>Manual do Sistema</h4></div><div class="panel-body" style="line-height:1.7;max-height:70vh;overflow-y:auto">
-<h3>Bem-vindo ao Triagem Vision</h3>
-<p>Este sistema gerencia o fluxo de triagem de produtos em um centro de distribuição.</p>
-<h4>Painéis:</h4>
-<ul>
-<li><b>Dashboard:</b> Visão geral com gráficos e estatísticas.</li>
-<li><b>Lançamentos &amp; Histórico:</b> Central unificada de auditoria e consulta.</li>
-<li><b>FEFO:</b> Produtos próximos do vencimento.</li>
-<li><b>Exportar:</b> Baixar dados em CSV ou Excel.</li>
-<li><b>Relatórios:</b> Indicadores por motivo e origem.</li>
-<li><b>Atualizar Lojas:</b> Upload de arquivos para sincronizar a base de lojas.</li>
-<li><b>USERS:</b> Gerenciamento de usuários (nível 1).</li>
-<li><b>Permissões:</b> (apenas admin) Configurar o que cada nível pode acessar.</li>
-<li><b>Configurações:</b> Conexão com Supabase e URL da planilha.</li>
-</ul>
+<div class="panel"><div class="panel-head"><h4>MANUAL DO SISTEMA</h4></div><div class="panel-body" style="line-height:1.7;max-height:70vh;overflow-y:auto">
+<h3>TRIAGEM VISION — GUIA COMPLETO DE OPERAÇÃO</h3>
+<p>O TRIAGEM VISION centraliza o registro, a consulta, a auditoria e o controle de produtos em triagem. Os dados são mantidos nas tabelas configuradas do Supabase e as permissões são aplicadas conforme o nível do usuário autenticado.</p>
+
+<h4>1. ACESSO, LOGIN E SESSÃO</h4>
+<p>Informe usuário e senha na tela inicial e pressione <b>ENTRAR</b> ou a tecla ENTER. O sistema consulta a tabela <b>BD_USER</b>, identifica o nível, aplica as permissões e libera somente os menus autorizados. O botão de saída encerra a sessão local e retorna à tela de login. Nunca compartilhe a senha ou a chave anon do projeto.</p>
+<p>As preferências de conexão, nomes de níveis, permissões e ajustes do vídeo são armazenados no <b>localStorage</b> deste navegador. Isso significa que uma alteração salva em um navegador não altera automaticamente o navegador de outro computador.</p>
+
+<h4>2. NÍVEIS DE ACESSO PADRÃO</h4>
+<table><thead><tr><th>NÍVEL</th><th>NOME PADRÃO</th><th>ESCOPO PRINCIPAL</th></tr></thead><tbody>
+<tr><td>1</td><td>ACESSO TOTAL</td><td>Consulta, lançamento, edição, exclusão, exportação, usuários, permissões, lojas, configuração e administração.</td></tr>
+<tr><td>2</td><td>LANÇAR</td><td>Dashboard, consulta, FEFO, lançamentos, retrabalho, descarte, gaiola, MIP, Manual e alteração da própria senha.</td></tr>
+<tr><td>3</td><td>EDITAR LANÇAMENTOS</td><td>Consulta e edição de lançamentos, Dashboard, FEFO, Manual e alteração da própria senha.</td></tr>
+<tr><td>4</td><td>ATUALIZAR BASE</td><td>Consulta geral autorizada e atualização da base de lojas.</td></tr>
+<tr><td>5</td><td>RELATÓRIO PREVENÇÃO</td><td>Consulta de Dashboard, lançamentos, FEFO, relatórios e administração de prevenção.</td></tr>
+<tr><td>6</td><td>SOMENTE CONSULTA</td><td>Consulta do Dashboard, lançamentos, FEFO e Manual.</td></tr>
+<tr><td>7</td><td>LANÇAR E EDITAR</td><td>Consulta, lançamento e edição de lançamentos, Dashboard, FEFO, Manual e senha.</td></tr>
+<tr><td>8</td><td>LANÇAR E EXPORTAR</td><td>Consulta e lançamento, exportação, Dashboard, FEFO, Manual e senha.</td></tr>
+<tr><td>9</td><td>ADMINISTRAÇÃO</td><td>Consulta e exportação de Dashboard, lançamentos, FEFO, relatórios, administração, MIP e exportação; edição e exportação na administração.</td></tr>
+</tbody></table>
+<p>O nível 1 pode alterar os nomes exibidos e as ações de cada nível na tela <b>PERMISSÕES</b>. As ações são <b>CONSULTA</b>, <b>EDIÇÃO</b>, <b>LANÇAMENTO</b> e <b>EXPORTAÇÃO</b>. O nível 1 sempre mantém acesso total, independentemente da matriz.</p>
+
+<h4>3. REGRAS GERAIS DOS PAINÉIS DE LANÇAMENTO</h4>
+<p>Os painéis de <b>LANÇAMENTO</b>, <b>RETRABALHO</b>, <b>DESCARTE</b>, <b>MIP</b> e <b>GAIOLA</b> possuem bloqueio rígido contra cliques externos. Clicar na área escura fora do formulário não fecha, não cancela, não exclui, não limpa o formulário e não remove itens da memória. O painel somente pode ser encerrado pelo <b>X</b> no cabeçalho ou pela conclusão bem-sucedida do salvamento, quando o próprio fluxo exigir fechamento.</p>
+<p>Os botões de salvar e de adicionar item continuam funcionando normalmente. Em caso de saldo insuficiente, o sistema pode abrir o fluxo para adicionar saldo e retorna ao painel de origem sem perder a operação pendente. A orientação para sair sem salvar é usar exclusivamente o <b>X</b>.</p>
+
+<h4>4. LANÇAMENTO E HISTÓRICO</h4>
+<p>Use <b>CONSULTA</b> para localizar um EAN. Ao pressionar ENTER, o sistema busca o cadastro em <b>BD_CADASTRO</b> e preenche PLU, produto, endereço de apanha, rua, dono, categoria e quantidade de embalagem. No painel de lançamento, informe motivo, origem, validade e quantidade em unidades. A validade é validada antes do envio.</p>
+<p>Um novo registro é gravado em <b>BD_LANC</b> com data/hora, EAN, PLU, produto, apanha, motivo, origem, validade, categoria, rua, dono, quantidade, usuário e turno. Depois do lançamento, a quantidade é somada ao <b>BD_SALDO</b>. Usuários autorizados podem editar ou excluir registros a partir de <b>LANÇAMENTOS &amp; HISTÓRICO</b>.</p>
+<p>O histórico unifica lançamentos, retrabalho, descarte e gaiola para consulta operacional. Os filtros podem ser usados por tipo, EAN, produto, motivo, usuário, categoria e período, conforme os controles exibidos na tela.</p>
+
+<h4>5. RETRABALHO</h4>
+<p>O painel de <b>RETRABALHO</b> busca o EAN no cadastro, preenche os dados do produto e solicita validade e quantidade. O sistema verifica se a quantidade fecha caixas inteiras conforme a quantidade de embalagem e verifica o saldo disponível. Ao salvar, insere em <b>BD_RETRABALHO</b> e debita a quantidade correspondente no <b>BD_SALDO</b>.</p>
+
+<h4>6. DESCARTE</h4>
+<p>O painel de <b>DESCARTE</b> busca o produto pelo EAN e exige motivo e quantidade. O sistema verifica o saldo antes do envio. O registro é gravado em <b>BD_DESCARTE</b> com usuário, turno, produto, categoria, motivo e quantidade, e o saldo é debitado em <b>BD_SALDO</b>.</p>
+
+<h4>7. MIP — CONSUMO INTERNO</h4>
+<p>O painel de <b>MIP</b> trabalha com um carrinho. Para cada item, informe EAN, quantidade e matrícula do solicitante. O sistema consulta o saldo antes de adicionar o item, mostra a contagem e o total de unidades, permite remover itens e permite reiniciar o carrinho mediante confirmação.</p>
+<p>Ao salvar, os itens são inseridos em <b>MIP</b> e o saldo é debitado por EAN no <b>BD_SALDO</b>. O painel só é encerrado depois que o envio for concluído com sucesso.</p>
+
+<h4>8. GAIOLAS — LANÇAMENTO</h4>
+<p>Ao abrir o painel de <b>GAIOLA</b>, o sistema reserva um número sequencial em <b>GAIOLAS_LANC</b> com situação pendente. Os dados também podem ficar salvos localmente para recuperação caso a tela seja recarregada. A reserva não deve ser apagada por clique externo; para abandonar uma gaiola, use o <b>X</b>, que executa o fluxo explícito de cancelamento da pendência.</p>
+<p>Digite ou bipasse o EAN e pressione ENTER. O sistema consulta <b>BD_CADASTRO</b>, mostra PLU, produto e categoria, consulta as lojas ativas em <b>BD_LOJA</b> usando o PLU do primeiro item e mantém a loja escolhida fixa para os itens seguintes. A quantidade deve ser positiva e o saldo é conferido antes da inclusão.</p>
+<p>Ao salvar, os itens são inseridos em <b>BD_GAIOLA</b> com a coluna <b>QTD UN</b>; a reserva de <b>GAIOLAS_LANC</b> recebe a loja, usuário e turno; e as quantidades são debitadas do <b>BD_SALDO</b>. Após o envio completo, a pendência local é limpa, a lista é encerrada e o fluxo de impressão é iniciado.</p>
+
+<h4>9. GESTÃO DE GAIOLAS — NÍVEL 1</h4>
+<p>A tela <b>GESTÃO DE GAIOLAS</b> é exclusiva do nível 1. A pesquisa percorre todas as páginas de <b>GAIOLAS_LANC</b> e <b>BD_GAIOLA</b>. Quando um número é informado, o sistema filtra diretamente pela coluna <b>GAIOLA</b> nas duas tabelas, inclusive para gaiolas novas.</p>
+<p>O espelho mostra número, loja, categoria principal, data, quantidade de itens, unidades, usuário e a tabela detalhada de EAN, PLU, produto, categoria, quantidade, data/hora, usuário e registro. A edição permite alterar número, loja e categoria. A loja é limitada às opções ativas do PLU do primeiro item, e a categoria é limitada às categorias presentes nos itens da própria gaiola.</p>
+<p>Ao excluir uma gaiola, o sistema soma novamente no <b>BD_SALDO</b> as quantidades dos itens agrupadas por EAN e depois exclui os registros de <b>BD_GAIOLA</b> e <b>GAIOLAS_LANC</b>. Se houver falha, o sistema tenta reverter a devolução do saldo. A exclusão exige confirmação explícita.</p>
+
+<h4>10. IMPRESSÃO DA GAIOLA</h4>
+<p>A impressão é separada em duas etapas. A primeira é uma folha A4 horizontal de identificação, com o número da gaiola em maior destaque, loja, categoria baseada no primeiro item, marca discreta <b>TRIAGEM VISION</b> e QR Code grande.</p>
+<p>O QR Code contém um objeto com sistema, tipo, número, loja, categoria e a lista completa de itens com ordem, EAN, PLU, produto, categoria e quantidade. A segunda etapa é uma impressão A4 vertical com os itens organizados em tabela. Cada página repete os dados da gaiola e informa <b>PÁGINA X DE Y</b>. A última página não recebe quebra adicional para evitar folha em branco.</p>
+
+<h4>11. DASHBOARD E FEFO</h4>
+<p>O <b>DASHBOARD</b> apresenta total de unidades, unidades do dia, pendências de cadastro, categorias distintas, produtos distintos, usuários ativos, média diária e média por lançamento. Também possui filtros por tipo, turno, data, usuário, categoria, motivo, origem, rua, dono e CD, além de gráficos por turno, usuário, item, motivo, origem, categoria, rua, dono e distribuição por CD.</p>
+<p>O módulo <b>FEFO</b> lista produtos próximos da validade e permite alternar janelas de 7, 15, 30, 60 e 90 dias. Use <b>ATUALIZAR</b> para consultar novamente os registros.</p>
+
+<h4>12. EXPORTAÇÃO E RELATÓRIOS</h4>
+<p>O menu <b>EXPORTAR</b> permite escolher a tabela e o intervalo de datas, gerando CSV ou Excel quando a permissão de exportação estiver liberada. As tabelas disponíveis incluem lançamentos, retrabalho, gaiola, gaiolas lançadas, descarte, MIP, saldo e lojas.</p>
+<p>O módulo <b>RELATÓRIOS</b> apresenta indicadores por motivo e origem. A tela de <b>ADMINISTRAÇÃO</b> permite consultar e, conforme o nível, preencher faturamento de descarte, número de nota fiscal, CGO'S, status, administrador e nome do administrador.</p>
+
+<h4>13. CADASTRO, LOJAS, USUÁRIOS E CONFIGURAÇÃO</h4>
+<p><b>CADASTRO DE ITEM</b> é destinado ao nível 1 e permite inserir dados manuais em <b>BD_CADASTRO</b>, consultar por EAN, PLU e produto e atualizar a tabela. <b>ATUALIZAR LOJAS</b> recebe uma pasta de arquivos e extrai SEQPRODUTO, DESCCOMPLETA e NROEMPRESA para sincronizar <b>BD_LOJA</b>.</p>
+<p><b>USERS</b> permite ao nível 1 cadastrar, editar, ativar, inativar e consultar usuários em <b>BD_USER</b>. <b>PERMISSÕES</b> permite editar nomes dos níveis e marcar consulta, edição, lançamento e exportação por área. <b>CONFIGURAÇÕES</b> permite conferir URL do projeto, chave anon e URL de planilha, salvar a conexão e restaurar os padrões.</p>
+
+<h4>14. REPORT DE ERRO E DONO DE RUA</h4>
+<p>O <b>REPORT DE ERRO</b> funciona como uma conversa. O usuário envia a descrição para a administração e acompanha respostas na própria tela. O nível 1 pode responder aos reports. O módulo <b>DONO DE RUA</b> mantém o mapeamento entre rua e dono para preencher automaticamente esse dado nos lançamentos quando houver correspondência.</p>
+
+<h4>15. SIDEBAR, VÍDEO E CROP</h4>
+<p>O vídeo do sidebar ocupa todo o fundo da área azul, é reproduzido em loop, sem áudio e com carregamento automático. O arquivo preferencial é <b>7031327_Underwater_Angle_1280x720.mp4</b>; o sistema também possui fontes alternativas configuradas para quando o arquivo principal não estiver disponível.</p>
+<p>Somente o nível 1 visualiza o botão <b>AJUSTAR CROP</b>. Os controles definem posição horizontal, posição vertical e zoom. Ao salvar, o ajuste é aplicado diretamente no vídeo principal e armazenado no navegador. O menu, o logo e o rodapé continuam sobrepostos ao vídeo para preservar a navegação.</p>
+
+<h4>16. REGRAS OPERACIONAIS IMPORTANTES</h4>
+<p>Confira o EAN antes de adicionar, valide a quantidade, confirme a loja do primeiro item e aguarde a mensagem de sucesso antes de iniciar outra operação. Não recarregue a página enquanto houver uma gaiola pendente sem conferir o número reservado. Para fechar qualquer painel de lançamento sem salvar, use exclusivamente o X. O clique fora do painel é deliberadamente inofensivo e não deve ser usado para cancelar a operação.</p>
 </div></div>
 </div>
 <div class="view" id="view-cadastro-item">
@@ -3031,7 +3092,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="field"><label>Qtd. Unidade</label><input id="f_qtd_unidade" inputmode="numeric" placeholder="Somente números" type="text"/></div>
 </div>
 </div>
-<div class="modal-footer"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn" id="btnSalvar" onclick="salvarLancamento()">Salvar</button></div>
+<div class="modal-footer"><span class="hint modal-lock-note">Para sair sem salvar, use somente o X.</span><button class="btn" id="btnSalvar" onclick="salvarLancamento()">Salvar</button></div>
 </div>
 </div>
 <!-- Modal Consulta -->
@@ -3078,7 +3139,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="field"><label>Qtd. Unidade</label><input id="rt_qtd_unidade" inputmode="numeric" placeholder="Somente números" type="text"/><p class="hint" id="rtQtdWarn" style="color:var(--red);font-weight:600;display:none">Quantidade não fecha caixas inteiras da embalagem.</p></div>
 </div>
 </div>
-<div class="modal-footer"><button class="btn ghost" onclick="closeRetrabalhoModal()">Cancelar</button><button class="btn" id="btnSalvarRetrabalho" onclick="salvarRetrabalho()">Salvar</button></div>
+<div class="modal-footer"><span class="hint modal-lock-note">Para sair sem salvar, use somente o X.</span><button class="btn" id="btnSalvarRetrabalho" onclick="salvarRetrabalho()">Salvar</button></div>
 </div>
 </div>
 <!-- Modal Descarte -->
@@ -3096,7 +3157,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="field"><label>Qtd. Unidade</label><input id="ds_qtd_unidade" inputmode="numeric" placeholder="Somente números" type="text"/></div>
 </div>
 </div>
-<div class="modal-footer"><button class="btn ghost" onclick="closeDescarteModal()">Cancelar</button><button class="btn" id="btnSalvarDescarte" onclick="salvarDescarte()">Salvar</button></div>
+<div class="modal-footer"><span class="hint modal-lock-note">Para sair sem salvar, use somente o X.</span><button class="btn" id="btnSalvarDescarte" onclick="salvarDescarte()">Salvar</button></div>
 </div>
 </div>
 <!-- Modal MIP -->
@@ -3116,7 +3177,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div class="mip-cart-summary"><span>Itens no carrinho</span><strong id="mipCartCount">0</strong><span>Unidades</span><strong id="mipCartUnits">0</strong></div>
 <div class="staged-table-wrap mip-cart-table"><table><thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Qtd</th><th>Matrícula</th><th>Ações</th></tr></thead><tbody id="mipStagedTable"><tr><td class="staged-empty" colspan="6">Nenhum item adicionado ainda</td></tr></tbody></table></div>
 </div>
-<div class="modal-footer"><button class="btn ghost" onclick="closeMipModal()">Fechar sem salvar</button><button class="btn" id="btnSalvarMip" onclick="salvarMip()">Salvar MIP</button></div>
+<div class="modal-footer"><span class="hint modal-lock-note">Para sair sem salvar, use somente o X.</span><button class="btn" id="btnSalvarMip" onclick="salvarMip()">Salvar MIP</button></div>
 </div>
 </div>
 <div class="overlay" id="overlayGaiola">
@@ -3139,7 +3200,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <div style="margin-top:12px;display:flex;gap:10px"><button class="btn ghost" onclick="adicionarItemGaiola()">＋ Adicionar item à lista</button><button class="btn danger" onclick="reiniciarGaiola()">↺ Reiniciar Gaiola</button></div>
 <div class="staged-table-wrap"><table><thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Categoria</th><th>Qtd</th><th></th></tr></thead><tbody id="glStagedTable"><tr><td class="staged-empty" colspan="6">Nenhum item adicionado ainda</td></tr></tbody></table></div>
 </div>
-<div class="modal-footer"><button class="btn ghost" onclick="closeGaiolaModal()">Fechar sem enviar</button><button class="btn" id="btnSalvarGaiola" onclick="salvarGaiola()">Salvar Gaiola (enviar tudo)</button></div>
+<div class="modal-footer"><span class="hint modal-lock-note">Para sair sem enviar, use somente o X.</span><button class="btn" id="btnSalvarGaiola" onclick="salvarGaiola()">Salvar Gaiola (enviar tudo)</button></div>
 </div>
 </div>
 <!-- Modal Gaiola Pendente -->
@@ -3835,8 +3896,25 @@ async function openGaiolaModal(keepBatch) {
   setTimeout(() => document.getElementById("gl_ean").focus(), 80); 
 }
 
-function closeGaiolaModal() { if (!gaiolaAtual.gaiola) { document.getElementById("overlayGaiola").classList.remove("show"); return; } cancelarGaiolaSemEnviar(); }
-document.getElementById("overlayGaiola").addEventListener("click", e => { if (e.target.id === "overlayGaiola") closeGaiolaModal(); });
+function closeGaiolaModal() {
+  const overlay = document.getElementById("overlayGaiola");
+  if (!overlay) return;
+  if (!gaiolaAtual.gaiola) { overlay.classList.remove("show"); return; }
+  cancelarGaiolaSemEnviar();
+}
+function protegerPainelLancamento(id) {
+  const overlay = document.getElementById(id);
+  if (!overlay || overlay.dataset.bloqueioExterno === "1") return;
+  const bloquearCliqueFora = e => {
+    if (e.target !== overlay) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  };
+  ["pointerdown","mousedown","click"].forEach(tipo => overlay.addEventListener(tipo,bloquearCliqueFora,true));
+  overlay.dataset.bloqueioExterno = "1";
+}
+["overlay","overlayRetrabalho","overlayDescarte","overlayMip","overlayGaiola","overlayGaiolaPendente"].forEach(protegerPainelLancamento);
 
 document.getElementById("gl_ean").addEventListener("keydown", async e => { 
   if (e.key !== "Enter") return; 
@@ -4297,14 +4375,14 @@ async function responderReportErro(){if(!podeResponderReport()){showToast('Somen
 const SIDEBAR_VIDEO_CROP_KEY='tp_sidebar_video_crop_v1';
 const SIDEBAR_VIDEO_CROP_DEFAULT={x:50,y:50,zoom:1.35};
 function lerCropVideo(){try{return {...SIDEBAR_VIDEO_CROP_DEFAULT,...JSON.parse(localStorage.getItem(SIDEBAR_VIDEO_CROP_KEY)||'{}')};}catch(e){return {...SIDEBAR_VIDEO_CROP_DEFAULT};}}
-function aplicarCropVideo(crop=lerCropVideo(),preview=false){const video=document.getElementById(preview?'videoCropPreview':'sidebarVideo');if(!video)return;video.style.objectPosition=String(crop.x)+'% '+String(crop.y)+'%';video.style.transform='scale('+String(crop.zoom)+')';}
+function aplicarCropVideo(crop=lerCropVideo(),preview=false){const video=document.getElementById(preview?'videoCropPreview':'sidebarVideo');if(!video)return;const pos=String(crop.x)+'% '+String(crop.y)+'%';video.style.setProperty('object-position',pos,'important');video.style.setProperty('transform','scale('+String(crop.zoom)+')','important');video.dataset.cropX=String(crop.x);video.dataset.cropY=String(crop.y);video.dataset.cropZoom=String(crop.zoom);}
 function atualizarCropVideo(){const crop={x:Number(document.getElementById('videoCropX')?.value||50),y:Number(document.getElementById('videoCropY')?.value||50),zoom:Number(document.getElementById('videoCropZoom')?.value||1.35)};aplicarCropVideo(crop,true);const values=document.getElementById('videoCropValues');if(values)values.textContent='Horizontal: '+crop.x+'% · Vertical: '+crop.y+'% · Zoom: '+crop.zoom.toFixed(2)+'×';}
 function carregarValoresCropVideo(){const crop=lerCropVideo();['videoCropX','videoCropY','videoCropZoom'].forEach((id,index)=>{const el=document.getElementById(id);if(el)el.value=[crop.x,crop.y,crop.zoom][index];});aplicarCropVideo(crop,false);atualizarCropVideo();}
-function inicializarVideoSidebar(){const video=document.getElementById('sidebarVideo'),preview=document.getElementById('videoCropPreview');if(video){aplicarCropVideo(lerCropVideo(),false);video.play().catch(()=>{});}if(preview&&video){const fonte=video.querySelector('source');if(fonte)preview.src=fonte.src;preview.load();preview.play().catch(()=>{});}carregarValoresCropVideo();atualizarAcessoCropVideo();}
+function inicializarVideoSidebar(){const video=document.getElementById('sidebarVideo'),preview=document.getElementById('videoCropPreview');if(video){aplicarCropVideo(lerCropVideo(),false);video.addEventListener('loadedmetadata',()=>aplicarCropVideo(lerCropVideo(),false),{once:false});video.play().catch(()=>{});}if(preview&&video){const sincronizarPreview=()=>{const fonte=video.currentSrc||video.querySelector('source')?.src;if(fonte&&preview.src!==fonte){preview.src=fonte;preview.load();preview.play().catch(()=>{});}};video.addEventListener('loadedmetadata',sincronizarPreview,{once:true});sincronizarPreview();}carregarValoresCropVideo();atualizarAcessoCropVideo();}
 function atualizarAcessoCropVideo(){const btn=document.getElementById('btnEditarCropVideo');if(btn)btn.style.display=isTotal()?'inline-flex':'none';}
 function abrirEditorCropVideo(){if(!isTotal()){showToast('Somente o nível 1 pode ajustar o crop do vídeo.',true);return;}carregarValoresCropVideo();const overlay=document.getElementById('overlayVideoCrop');if(overlay)overlay.classList.add('show');}
 function fecharEditorCropVideo(){const overlay=document.getElementById('overlayVideoCrop');if(overlay)overlay.classList.remove('show');}
-function salvarCropVideo(){if(!isTotal()){showToast('Acesso negado.',true);return;}const crop={x:Number(document.getElementById('videoCropX').value),y:Number(document.getElementById('videoCropY').value),zoom:Number(document.getElementById('videoCropZoom').value)};localStorage.setItem(SIDEBAR_VIDEO_CROP_KEY,JSON.stringify(crop));aplicarCropVideo(crop,false);fecharEditorCropVideo();showToast('Crop do vídeo salvo.');}
+function salvarCropVideo(){if(!isTotal()){showToast('Acesso negado.',true);return;}const crop={x:Number(document.getElementById('videoCropX').value),y:Number(document.getElementById('videoCropY').value),zoom:Number(document.getElementById('videoCropZoom').value)};localStorage.setItem(SIDEBAR_VIDEO_CROP_KEY,JSON.stringify(crop));aplicarCropVideo(crop,false);aplicarCropVideo(crop,true);fecharEditorCropVideo();showToast('Crop do vídeo salvo e aplicado ao sidebar.');}
 function restaurarCropVideo(){const crop={...SIDEBAR_VIDEO_CROP_DEFAULT};['videoCropX','videoCropY','videoCropZoom'].forEach((id,index)=>{const el=document.getElementById(id);if(el)el.value=[crop.x,crop.y,crop.zoom][index];});atualizarCropVideo();}
 
 /* ===== GESTÃO DE GAIOLAS — SOMENTE NÍVEL 1 ===== */
@@ -4350,24 +4428,36 @@ function renderGaiolasGestao(grupos) {
   }).join('');
 }
 
+async function consultarTabelaGaiolaGestao(tabela, busca, crescente) {
+  const tamanhoPagina = 1000;
+  const registros = [];
+  let inicio = 0;
+  while (true) {
+    let query = sb.from(tabela).select('*').order('DTA_HORA',{ascending:crescente}).range(inicio,inicio+tamanhoPagina-1);
+    if (busca) query = query.eq('GAIOLA',busca);
+    const {data,error} = await query;
+    if (error) throw error;
+    const lote = data || [];
+    registros.push(...lote);
+    if (busca || lote.length < tamanhoPagina) break;
+    inicio += tamanhoPagina;
+  }
+  return registros;
+}
+
 async function carregarGaiolasGestao() {
   const tbody = document.getElementById('gaiolasGestaoTable'), status = document.getElementById('gaiolaGestaoStatus');
   if (!tbody) return;
   if (!podeGerirGaiolas()) { tbody.innerHTML = '<tr><td class="empty" colspan="8">Acesso restrito ao nível 1.</td></tr>'; return; }
   const busca = document.getElementById('gaiolaGestaoBusca')?.value.trim() || '';
-  tbody.innerHTML = '<tr><td class="empty" colspan="8">Consultando as duas tabelas…</td></tr>';
-  if (status) status.textContent = busca ? 'Buscando gaiola '+busca+' em GAIOLAS_LANC e BD_GAIOLA…' : 'Carregando gaiolas…';
+  tbody.innerHTML = '<tr><td class="empty" colspan="8">Consultando todas as páginas das duas tabelas…</td></tr>';
+  if (status) status.textContent = busca ? 'Buscando gaiola '+busca+' em GAIOLAS_LANC e BD_GAIOLA…' : 'Carregando todas as gaiolas…';
   try {
-    let lancQuery = sb.from('GAIOLAS_LANC').select('*').order('DTA_HORA',{ascending:false}).limit(5000);
-    let itemQuery = sb.from('BD_GAIOLA').select('*').order('DTA_HORA',{ascending:true}).limit(10000);
-    if (busca) {
-      lancQuery = lancQuery.eq('GAIOLA', busca);
-      itemQuery = itemQuery.eq('GAIOLA', busca);
-    }
-    const [lancResult, itemResult] = await Promise.all([lancQuery, itemQuery]);
-    if (lancResult.error) throw lancResult.error;
-    if (itemResult.error) throw itemResult.error;
-    const grupos = agruparGaiolasGestao(lancResult.data || [], itemResult.data || [], busca);
+    const [lancRows,itemRows] = await Promise.all([
+      consultarTabelaGaiolaGestao('GAIOLAS_LANC',busca,false),
+      consultarTabelaGaiolaGestao('BD_GAIOLA',busca,true)
+    ]);
+    const grupos = agruparGaiolasGestao(lancRows,itemRows,busca);
     gaiolasGestaoCache = [];
     renderGaiolasGestao(grupos);
     if (status) status.textContent = grupos.length+' gaiola(s) encontrada(s). Selecione Editar para abrir o espelho completo.';
@@ -4437,16 +4527,73 @@ async function salvarEdicaoGaiolaGestao() {
   } finally {btn.disabled=false;btn.textContent='Salvar alterações';}
 }
 
+function consolidarItensSaldoGaiola(itens) {
+  const mapa = new Map();
+  (itens || []).forEach(item => {
+    const ean = String(campoGaiolaGestao(item,'EAN',['ean']) || '').trim();
+    const qtd = Number(valorQtdGaiolaGestao(item)) || 0;
+    if (!ean || qtd <= 0) return;
+    if (!mapa.has(ean)) mapa.set(ean,{ean,plu:campoGaiolaGestao(item,'PLU',['plu']),produto:campoGaiolaGestao(item,'PRODUTO',['produto']),qtd:0});
+    mapa.get(ean).qtd += qtd;
+  });
+  return Array.from(mapa.values());
+}
+async function ajustarSaldoGaiola(itens, multiplicador) {
+  const ajustes = consolidarItensSaldoGaiola(itens).map(item => ({...item,qtd:item.qtd * multiplicador}));
+  const aplicados = [];
+  try {
+    for (const ajuste of ajustes) {
+      const atual = await getSaldo(ajuste.ean);
+      const saldoAtual = atual ? Number(atual.QTD_UNIDADE) || 0 : 0;
+      const novoSaldo = saldoAtual + ajuste.qtd;
+      if (novoSaldo < 0) throw new Error('O saldo do EAN '+ajuste.ean+' ficaria negativo.');
+      if (atual) {
+        const filtro = atual.id !== undefined && atual.id !== null ? {campo:'id',valor:atual.id} : {campo:'EAN',valor:ajuste.ean};
+        const {error} = await sb.from('BD_SALDO').update({QTD_UNIDADE:novoSaldo}).eq(filtro.campo,filtro.valor);
+        if (error) throw error;
+        aplicados.push({ajuste,atual,filtro});
+      } else {
+        if (ajuste.qtd < 0) throw new Error('Não existe registro de saldo para o EAN '+ajuste.ean+'.');
+        const {data,error} = await sb.from('BD_SALDO').insert({EAN:ajuste.ean,PLU:ajuste.plu||null,PRODUTO:ajuste.produto||null,QTD_UNIDADE:ajuste.qtd}).select('id').limit(1);
+        if (error) throw error;
+        aplicados.push({ajuste,atual:null,insertedId:data?.[0]?.id});
+      }
+    }
+    return aplicados;
+  } catch (err) {
+    for (const aplicado of aplicados.reverse()) {
+      try {
+        if (aplicado.atual) {
+          await sb.from('BD_SALDO').update({QTD_UNIDADE:Number(aplicado.atual.QTD_UNIDADE)||0}).eq(aplicado.filtro.campo,aplicado.filtro.valor);
+        } else if (aplicado.insertedId !== undefined && aplicado.insertedId !== null) {
+          await sb.from('BD_SALDO').delete().eq('id',aplicado.insertedId);
+        } else {
+          await sb.from('BD_SALDO').delete().eq('EAN',aplicado.ajuste.ean).eq('QTD_UNIDADE',aplicado.ajuste.qtd);
+        }
+      } catch (rollbackErr) { console.error('Falha ao reverter ajuste de saldo da gaiola',rollbackErr); }
+    }
+    throw err;
+  }
+}
+
 async function excluirGaiolaGestao(index) {
   if(!podeGerirGaiolas()){showToast('Acesso negado. Somente o nível 1 pode excluir gaiolas.',true);return;}
   const grupo=index===undefined?gaiolaGestaoSelecionada:encontrarGrupoGaiolaGestao(index);if(!grupo){showToast('Selecione uma gaiola primeiro.',true);return;}
-  const confirmar=await showConfirm('A gaiola '+grupo.chave+' será excluída de GAIOLAS_LANC e BD_GAIOLA, incluindo todos os itens. Esta ação não pode ser desfeita.','Excluir gaiola','Excluir definitivamente');if(!confirmar)return;
-  const btn=document.getElementById('btnExcluirGaiolaGestao');if(btn){btn.disabled=true;btn.textContent='Excluindo…';}
+  const itens=grupo.itens||[];
+  const totalUnidades=itens.reduce((s,item)=>s+(Number(valorQtdGaiolaGestao(item))||0),0);
+  const confirmar=await showConfirm('A gaiola '+grupo.chave+' será excluída de GAIOLAS_LANC e BD_GAIOLA. As '+totalUnidades+' unidades dos itens serão devolvidas ao BD_SALDO por EAN. Esta ação não pode ser desfeita.','Excluir gaiola','Devolver saldo e excluir');if(!confirmar)return;
+  const btn=document.getElementById('btnExcluirGaiolaGestao');if(btn){btn.disabled=true;btn.textContent='Devolvendo saldo…';}
+  let saldoAplicado=false;
   try {
+    await ajustarSaldoGaiola(itens,1);saldoAplicado=true;
+    if(btn)btn.textContent='Excluindo registros…';
     const resultados=await Promise.allSettled([sb.from('BD_GAIOLA').delete().eq('GAIOLA',grupo.chave),sb.from('GAIOLAS_LANC').delete().eq('GAIOLA',grupo.chave)]);
     const erros=resultados.map(r=>r.status==='rejected'?r.reason:(r.value?.error||null)).filter(Boolean);if(erros.length)throw erros[0];
-    showToast('Gaiola '+grupo.chave+' excluída das duas tabelas.');fecharEditorGaiolaGestao();await carregarGaiolasGestao();
-  } catch(err){showToast('Erro ao excluir gaiola. Verifique as permissões do Supabase: '+err.message,true);} finally {if(btn){btn.disabled=false;btn.textContent='Excluir gaiola nas duas tabelas';}}
+    showToast('Gaiola '+grupo.chave+' excluída e saldo devolvido ao BD_SALDO.');fecharEditorGaiolaGestao();await carregarGaiolasGestao();
+  } catch(err){
+    if(saldoAplicado){try{await ajustarSaldoGaiola(itens,-1);}catch(rollbackErr){console.error('Não foi possível reverter a devolução de saldo da gaiola',rollbackErr);showToast('Atenção: falha ao reverter o saldo após erro na exclusão.',true);}}
+    showToast('Erro ao excluir gaiola: '+err.message,true);
+  } finally {if(btn){btn.disabled=false;btn.textContent='Excluir gaiola nas duas tabelas';}}
 }
 
 function imprimirGaiolaSelecionadaGestao(){if(!podeGerirGaiolas()){showToast('Acesso negado.',true);return;}if(!gaiolaGestaoSelecionada){showToast('Selecione uma gaiola primeiro.',true);return;}imprimirGaiolaSeparada(resumoGaiolaGestao(gaiolaGestaoSelecionada));}
@@ -4480,7 +4627,7 @@ async function gerarQrCodeGaiola(payload) {
 }
 function esperarImpressaoGaiola(html, titulo) {
   return new Promise((resolve,reject) => {
-    const iframe=document.createElement('iframe');iframe.setAttribute('aria-hidden','true');Object.assign(iframe.style,{position:'fixed',right:'0',bottom:'0',width:'1px',height:'1px',border:'0',opacity:'0'});document.body.appendChild(iframe);
+    const iframe=document.createElement('iframe');iframe.setAttribute('aria-hidden','true');Object.assign(iframe.style,{position:'fixed',left:'-10000px',top:'0',width:'100vw',height:'100vh',border:'0',opacity:'0'});document.body.appendChild(iframe);
     let terminou=false;let timerFallback=null;
     const limpar=()=>{if(terminou)return;terminou=true;if(timerFallback)clearTimeout(timerFallback);iframe.remove();resolve();};
     try { const doc=iframe.contentDocument||iframe.contentWindow.document;doc.open();doc.write(html);doc.close();iframe.contentWindow.document.title=titulo||'TRIAGEM VISION';iframe.contentWindow.addEventListener('afterprint',limpar,{once:true});setTimeout(()=>{try{iframe.contentWindow.focus();iframe.contentWindow.print();timerFallback=setTimeout(limpar,12000);}catch(err){iframe.remove();reject(err);}},300); }
@@ -4495,8 +4642,8 @@ async function imprimirGaiolaSeparada(dados) {
   const tamanhoFonte=Math.min(190,Math.max(78,Math.floor(1020/Math.max(String(gaiola).length,1))));
   const capaHtml='<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><title>Gaiola '+escaparGaiolaGestao(gaiola)+'</title><style>@page{size:A4 landscape;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#0b1020;font-family:Arial,Helvetica,sans-serif}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{width:297mm;height:210mm;overflow:hidden}.capa{width:297mm;height:210mm;position:relative;padding:16mm 18mm 12mm;display:flex;flex-direction:column}.marca-triagem{font-size:7pt;letter-spacing:2pt;font-weight:800;color:#667085;text-align:right}.capa-conteudo{flex:1;display:grid;grid-template-columns:1fr 72mm;gap:14mm;align-items:center}.capa-esquerda{display:flex;flex-direction:column;justify-content:center}.capa-kicker{font-size:16pt;font-weight:800;letter-spacing:4pt;color:#315ee8;margin-bottom:7mm}.capa-numero{font-size:'+tamanhoFonte+'pt;font-weight:900;line-height:.86;letter-spacing:2pt;color:#050505;white-space:nowrap;overflow:hidden}.capa-linha{height:2px;background:#0b1020;margin:12mm 0 7mm}.capa-dados{display:grid;grid-template-columns:1fr 1fr;gap:10mm}.dado{border-left:4px solid #315ee8;padding-left:5mm}.dado span{display:block;font-size:10pt;text-transform:uppercase;letter-spacing:1.5pt;color:#667085;font-weight:800;margin-bottom:2mm}.dado strong{display:block;font-size:24pt;line-height:1.05;overflow-wrap:anywhere}.capa-qr{height:72mm;border:1px solid #d9deea;border-radius:6mm;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4mm;padding:5mm;background:#fff}.qr-code{width:60mm;height:60mm;display:block}.qr-indisponivel{width:60mm;height:60mm;display:flex;align-items:center;justify-content:center;text-align:center;border:2px dashed #9aa4b2;color:#667085;font-weight:800}.qr-legenda{font-size:8pt;letter-spacing:1pt;text-align:center;color:#667085;font-weight:800}.capa-rodape{font-size:7pt;color:#98a2b3;letter-spacing:.7pt;text-align:center;margin-top:4mm}</style></head><body><section class="capa">'+montarCabecalhoMarcaGaiola()+'<div class="capa-conteudo"><div class="capa-esquerda"><div class="capa-kicker">IDENTIFICAÇÃO DA GAIOLA</div><div class="capa-numero">'+escaparGaiolaGestao(gaiola)+'</div><div class="capa-linha"></div><div class="capa-dados"><div class="dado"><span>Categoria</span><strong>'+escaparGaiolaGestao(categoria)+'</strong></div><div class="dado"><span>Loja</span><strong>'+escaparGaiolaGestao(loja)+'</strong></div></div></div><div class="capa-qr">'+qrMarkup+'<div class="qr-legenda">ESCANEIE PARA VER OS DADOS</div></div></div><div class="capa-rodape">TRIAGEM VISION · IDENTIFICAÇÃO OPERACIONAL · '+escaparGaiolaGestao(new Date().toLocaleString('pt-BR'))+'</div></section></body></html>';
   const paginas=dividirItensParaImpressaoGaiola(itens),total=paginas.length;
-  const paginasHtml=paginas.map((pagina,index)=>'<section class="folha-itens '+(index<total-1?'quebra-depois':'')+'">'+montarCabecalhoMarcaGaiola()+'<header class="itens-cabecalho"><div><div class="itens-titulo">GAIOLA Nº '+escaparGaiolaGestao(gaiola)+'</div><div class="itens-subtitulo">LOJA <strong>'+escaparGaiolaGestao(loja)+'</strong> · CATEGORIA <strong>'+escaparGaiolaGestao(categoria)+'</strong></div></div><div class="pagina">Página '+(index+1)+' de '+total+'</div></header><div class="itens-resumo"><span>LISTA DE ITENS DA GAIOLA</span><span>'+itens.length+' item(ns) · '+itens.reduce((s,item)=>s+(Number(item.qtd)||0),0)+' unidade(s)</span></div><table><thead><tr><th class="ean">EAN</th><th class="plu">PLU</th><th class="produto">Produto</th><th class="categoria">Categoria</th><th class="qtd">Qtd.</th></tr></thead><tbody>'+montarLinhasItensGaiolaParaImpressao(pagina)+'</tbody></table><div class="rodape-itens">TRIAGEM VISION · GAIOLA '+escaparGaiolaGestao(gaiola)+' · Página '+(index+1)+' de '+total+'</div></section>').join('');
-  const itensHtml='<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><title>Itens da gaiola '+escaparGaiolaGestao(gaiola)+'</title><style>@page{size:A4 portrait;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#101828;font-family:Arial,Helvetica,sans-serif}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{width:210mm;margin:0}.folha-itens{width:210mm;height:297mm;min-height:0;padding:10mm 12mm 9mm;overflow:hidden}.folha-itens.quebra-depois{break-after:page;page-break-after:always}.marca-triagem{font-size:6.5pt;letter-spacing:2pt;font-weight:800;color:#667085;text-align:right;margin-bottom:4mm}.itens-cabecalho{display:flex;justify-content:space-between;gap:8mm;align-items:flex-start;border-bottom:2px solid #101828;padding-bottom:5mm}.itens-titulo{font-size:22pt;font-weight:900;line-height:1}.itens-subtitulo{font-size:10pt;color:#475467;margin-top:3mm;letter-spacing:.3pt}.pagina{font-size:11pt;font-weight:800;white-space:nowrap}.itens-resumo{display:flex;justify-content:space-between;gap:8mm;padding:5mm 0 4mm;font-size:8.5pt;color:#667085;font-weight:800;letter-spacing:.5pt}.itens-resumo span:last-child{text-align:right;font-weight:600;letter-spacing:0}.folha-itens table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9pt}.folha-itens th{background:#e8edff;color:#172b6b;border:1px solid #8b9ad4;padding:3mm 2mm;text-align:left;font-size:8pt;letter-spacing:.5pt;text-transform:uppercase}.folha-itens td{border:1px solid #98a2b3;padding:2.5mm 2mm;vertical-align:top;line-height:1.2;overflow-wrap:anywhere;word-break:break-word}.folha-itens .ean{width:21%}.folha-itens .plu{width:12%}.folha-itens .produto{width:35%}.folha-itens .categoria{width:20%}.folha-itens .qtd{width:12%;text-align:center}.rodape-itens{font-size:6.5pt;color:#98a2b3;letter-spacing:.7pt;text-align:center;margin-top:5mm}</style></head><body>'+paginasHtml+'</body></html>';
+  const paginasHtml=paginas.map((pagina,index)=>'<section class="folha-itens">'+montarCabecalhoMarcaGaiola()+'<header class="itens-cabecalho"><div><div class="itens-titulo">GAIOLA Nº '+escaparGaiolaGestao(gaiola)+'</div><div class="itens-subtitulo">LOJA <strong>'+escaparGaiolaGestao(loja)+'</strong> · CATEGORIA <strong>'+escaparGaiolaGestao(categoria)+'</strong></div></div><div class="pagina">Página '+(index+1)+' de '+total+'</div></header><div class="itens-resumo"><span>LISTA DE ITENS DA GAIOLA</span><span>'+itens.length+' item(ns) · '+itens.reduce((s,item)=>s+(Number(item.qtd)||0),0)+' unidade(s)</span></div><table><thead><tr><th class="ean">EAN</th><th class="plu">PLU</th><th class="produto">Produto</th><th class="categoria">Categoria</th><th class="qtd">Qtd.</th></tr></thead><tbody>'+montarLinhasItensGaiolaParaImpressao(pagina)+'</tbody></table><div class="rodape-itens">TRIAGEM VISION · GAIOLA '+escaparGaiolaGestao(gaiola)+' · Página '+(index+1)+' de '+total+'</div></section>').join('');
+  const itensHtml='<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><title>Itens da gaiola '+escaparGaiolaGestao(gaiola)+'</title><style>@page{size:A4 portrait;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#101828;font-family:Arial,Helvetica,sans-serif}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{width:100%;margin:0;overflow:visible}.folha-itens{width:100%;height:auto;min-height:0;padding:10mm 12mm 9mm;overflow:visible;break-after:auto;page-break-after:auto;break-inside:avoid;page-break-inside:avoid}.folha-itens + .folha-itens{break-before:page;page-break-before:always}.marca-triagem{font-size:6.5pt;letter-spacing:2pt;font-weight:800;color:#667085;text-align:right;margin-bottom:4mm}.itens-cabecalho{display:flex;justify-content:space-between;gap:8mm;align-items:flex-start;border-bottom:2px solid #101828;padding-bottom:5mm}.itens-titulo{font-size:22pt;font-weight:900;line-height:1}.itens-subtitulo{font-size:10pt;color:#475467;margin-top:3mm;letter-spacing:.3pt}.pagina{font-size:11pt;font-weight:800;white-space:nowrap}.itens-resumo{display:flex;justify-content:space-between;gap:8mm;padding:5mm 0 4mm;font-size:8.5pt;color:#667085;font-weight:800;letter-spacing:.5pt}.itens-resumo span:last-child{text-align:right;font-weight:600;letter-spacing:0}.folha-itens table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9pt}.folha-itens th{background:#e8edff;color:#172b6b;border:1px solid #8b9ad4;padding:3mm 2mm;text-align:left;font-size:8pt;letter-spacing:.5pt;text-transform:uppercase}.folha-itens td{border:1px solid #98a2b3;padding:2.5mm 2mm;vertical-align:top;line-height:1.2;overflow-wrap:anywhere;word-break:break-word}.folha-itens .ean{width:21%}.folha-itens .plu{width:12%}.folha-itens .produto{width:35%}.folha-itens .categoria{width:20%}.folha-itens .qtd{width:12%;text-align:center}.rodape-itens{font-size:6.5pt;color:#98a2b3;letter-spacing:.7pt;text-align:center;margin-top:5mm}</style></head><body>'+paginasHtml+'</body></html>';
   try { await esperarImpressaoGaiola(capaHtml,'Gaiola '+gaiola+' · TRIAGEM VISION'); await esperarImpressaoGaiola(itensHtml,'Itens da gaiola '+gaiola+' · TRIAGEM VISION'); showToast('Impressões da gaiola '+gaiola+' concluídas.'); } catch(err) { showToast('Erro ao abrir impressão da gaiola: '+err.message,true); }
 }
 
