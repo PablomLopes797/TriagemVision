@@ -2816,7 +2816,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 <!-- LANÇAMENTOS UNIFICADO -->
 <div class="view" id="view-lancamentos">
-<div class="lancamento-dicas" aria-label="Dicas de uso do sistema"><div class="lancamento-dicas-janela"><div class="lancamento-dicas-track"><div class="lancamento-dicas-grupo"><span class="lancamento-dica"><strong>CONSULTA:</strong> use o botão de pesquisa para localizar lançamentos e gaiolas.</span><span class="lancamento-dica"><strong>LANÇAMENTO:</strong> bipasse o EAN, confira produto, categoria, validade e quantidade antes de salvar.</span><span class="lancamento-dica"><strong>GAIOLA:</strong> somente o LEVEL 1 pode adicionar, editar e excluir; os demais níveis podem consultar e reimprimir.</span><span class="lancamento-dica"><strong>SALDO:</strong> confira o saldo disponível antes de registrar retrabalho ou descarte.</span><span class="lancamento-dica"><strong>PAINÉIS:</strong> clique no X para fechar; clicar fora não cancela nem apaga dados.</span><span class="lancamento-dica"><strong>FEFO:</strong> acompanhe os produtos próximos do vencimento e priorize os mais antigos.</span></div><div class="lancamento-dicas-grupo" aria-hidden="true"><span class="lancamento-dica"><strong>CONSULTA:</strong> use o botão de pesquisa para localizar lançamentos e gaiolas.</span><span class="lancamento-dica"><strong>LANÇAMENTO:</strong> bipasse o EAN, confira produto, categoria, validade e quantidade antes de salvar.</span><span class="lancamento-dica"><strong>GAIOLA:</strong> somente o LEVEL 1 pode adicionar, editar e excluir; os demais níveis podem consultar e reimprimir.</span><span class="lancamento-dica"><strong>SALDO:</strong> confira o saldo disponível antes de registrar retrabalho ou descarte.</span><span class="lancamento-dica"><strong>PAINÉIS:</strong> clique no X para fechar; clicar fora não cancela nem apaga dados.</span><span class="lancamento-dica"><strong>FEFO:</strong> acompanhe os produtos próximos do vencimento e priorize os mais antigos.</span></div></div></div></div>
+<div class="lancamento-dicas" aria-label="Dicas de uso do sistema"><div class="lancamento-dicas-janela"><div class="lancamento-dicas-track"><div class="lancamento-dicas-grupo"><span class="lancamento-dica"><strong>CONSULTA:</strong> use o botão de pesquisa para localizar lançamentos e gaiolas.</span><span class="lancamento-dica"><strong>LANÇAMENTO:</strong> bipasse o EAN, confira produto, categoria, validade e quantidade antes de salvar.</span><span class="lancamento-dica"><strong>GAIOLA:</strong> usuários com permissão de lançamento podem adicionar; editar e excluir na Gestão de Gaiolas continuam exclusivos do LEVEL 1.</span><span class="lancamento-dica"><strong>SALDO:</strong> confira o saldo disponível antes de registrar retrabalho ou descarte.</span><span class="lancamento-dica"><strong>PAINÉIS:</strong> clique no X para fechar; clicar fora não cancela nem apaga dados.</span><span class="lancamento-dica"><strong>FEFO:</strong> acompanhe os produtos próximos do vencimento e priorize os mais antigos.</span></div><div class="lancamento-dicas-grupo" aria-hidden="true"><span class="lancamento-dica"><strong>CONSULTA:</strong> use o botão de pesquisa para localizar lançamentos e gaiolas.</span><span class="lancamento-dica"><strong>LANÇAMENTO:</strong> bipasse o EAN, confira produto, categoria, validade e quantidade antes de salvar.</span><span class="lancamento-dica"><strong>GAIOLA:</strong> usuários com permissão de lançamento podem adicionar; editar e excluir na Gestão de Gaiolas continuam exclusivos do LEVEL 1.</span><span class="lancamento-dica"><strong>SALDO:</strong> confira o saldo disponível antes de registrar retrabalho ou descarte.</span><span class="lancamento-dica"><strong>PAINÉIS:</strong> clique no X para fechar; clicar fora não cancela nem apaga dados.</span><span class="lancamento-dica"><strong>FEFO:</strong> acompanhe os produtos próximos do vencimento e priorize os mais antigos.</span></div></div></div></div>
 <div class="launcher-grid" id="launcherGrid">
 <div class="launcher-card" onclick="openConsultaModal()"><div class="launcher-icon t-consulta"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="21" x2="15.8" y1="21" y2="15.8"></line></svg></div><div class="launcher-label">Consulta</div></div>
 <div class="launcher-card lancar-only" data-perm-area="lancamento" onclick="openModal()"><div class="launcher-icon t-lanc"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M10 2h4"></path><path d="M10 2v4.2c0 .5-.2 1-.6 1.4L7 10c-.6.6-1 1.4-1 2.3V20a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7.7c0-.9-.4-1.7-1-2.3l-2.4-2.4c-.4-.4-.6-.9-.6-1.4V2"></path><line x1="6.5" x2="17.5" y1="14" y2="14"></line></svg></div><div class="launcher-label">Lançamento</div></div>
@@ -3322,8 +3322,8 @@ function criarPermissoesPadrao(nivel){
   if(nivel===4){set('dashboard',['consulta']);set('lancamentos',['consulta']);set('fefo',['consulta']);set('lojas',['consulta','edicao']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
   if(nivel===5){set('dashboard',['consulta']);set('lancamentos',['consulta']);set('fefo',['consulta']);set('relatorios',['consulta']);set('administracao',['consulta']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
   if(nivel===6){set('dashboard',['consulta']);set('lancamentos',['consulta']);set('fefo',['consulta']);set('manual',['consulta']);return o;}
-  if(nivel===7){set('dashboard',['consulta']);set('lancamentos',['consulta','edicao','lancamento']);set('fefo',['consulta']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
-  if(nivel===8){set('dashboard',['consulta']);set('lancamentos',['consulta','lancamento']);set('fefo',['consulta']);set('exportar',['consulta','exportacao']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
+  if(nivel===7){set('dashboard',['consulta']);set('lancamentos',['consulta','edicao','lancamento']);set('gaiola',['lancamento']);set('fefo',['consulta']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
+  if(nivel===8){set('dashboard',['consulta']);set('lancamentos',['consulta','lancamento']);set('gaiola',['lancamento']);set('fefo',['consulta']);set('exportar',['consulta','exportacao']);set('manual',['consulta']);set('conta',['consulta','edicao']);return o;}
   if(nivel===9){
     ['dashboard','lancamentos','fefo','relatorios','administracao','mip','exportar'].forEach(a=>set(a,['consulta','exportacao']));
     set('administracao',['consulta','edicao','exportacao']); set('manual',['consulta']); set('conta',['consulta','edicao']); return o;
@@ -3356,7 +3356,7 @@ function canConsultarArea(area){return areaPermissao(area,'consulta');}
 function canExportarArea(area){return areaPermissao(area,'exportacao');}
 function canExcluirArea(area){return areaPermissao(area,'exclusao');}
 function podeAdicionarGaiolas(){return !!currentUser && isTotal() && areaPermissao('gaiolas-admin','adicionar');}
-function canLancarGaiola(){return podeAdicionarGaiolas();}
+function canLancarGaiola(){return !!currentUser && (isTotal() || canLancarArea('gaiola'));}
 function canLancar(){return ['lancamento','retrabalho','descarte','gaiola','mip'].some(area=>area==='gaiola'?canLancarGaiola():canLancarArea(area));}
 function canEditarLanc(){return canEditarArea('lancamentos');}
 function canExcluirLanc(){return canEditarArea('lancamentos');}
@@ -3751,7 +3751,7 @@ async function atualizarReservaGaiola(loja) { if (!gaiolaAtual.reservationId || 
 async function excluirReservaGaiola() { const id = gaiolaAtual.reservationId; if (!id) return; const { error } = await sb.from("GAIOLAS_LANC").delete().eq("id", id); if (error) throw error; gaiolaAtual.reservationId = null; }
 async function cancelarGaiolaSemEnviar() { try { await excluirReservaGaiola(); } catch (err) { showToast("Não foi possível excluir a gaiola pendente: " + err.message, true); return; } gaiolaStaged = []; gaiolaAtual = { gaiola: "", loja: "", reservationId: null }; clearGaiolaLocal(); document.getElementById("overlayGaiola").classList.remove("show"); showToast("Gaiola pendente excluída."); }
 function checkPendingGaiola() {
-  if (!canLancar()) return;
+  if (!canLancarGaiola()) return;
   const pending = loadGaiolaLocal();
   if (pending && Array.isArray(pending.items) && pending.items.length) {
     document.getElementById("pendGaiolaMsg").textContent = `Gaiola nº ${pending.gaiola} — Loja ${pending.loja} — ${pending.items.length} item(ns) pendentes.`;
@@ -3844,7 +3844,7 @@ async function buscarLojasDisponiveis(pluValue) {
 }
 
 async function openGaiolaModal(keepBatch) { 
-  if (!canLancarGaiola()) { showToast("Acesso negado. Somente o level 1 pode adicionar gaiolas.", true); return; } 
+  if (!canLancarGaiola()) { showToast("Acesso negado. Este usuário não possui permissão para lançar gaiolas.", true); return; } 
   document.getElementById("overlayGaiola").classList.add("show"); 
   ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id => document.getElementById(id).value = ""); 
   document.getElementById("glEanStatus").textContent = ""; 
@@ -4002,8 +4002,9 @@ document.getElementById("gl_loja").addEventListener("change", async e => { const
 document.getElementById("gl_qtd_unidade").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9]/g, ""); });
 
 async function adicionarItemGaiola() { 
-  if (!canLancar()) { showToast("Acesso negado.", true); return; } 
-  const ean = document.getElementById("gl_ean").value.trim(), 
+    if (!canLancarGaiola()) { showToast("Acesso negado. Este usuário não possui permissão para lançar gaiolas.", true); return; }
+  const ean = document.getElementById("gl_ean").value.trim(),
+ 
         plu = document.getElementById("gl_plu").value.trim(), 
         produto = document.getElementById("gl_produto").value.trim(), 
         categoria = document.getElementById("gl_categoria").value.trim(), 
@@ -4052,7 +4053,7 @@ async function reiniciarGaiola() { if (!await showConfirm("Apagar todos os itens
 function renderGaiolaStagedTable() { const tbody = document.getElementById("glStagedTable"); if (!gaiolaStaged.length) { tbody.innerHTML = '<tr><td colspan="6" class="staged-empty">Nenhum item adicionado</td></tr>'; return; } tbody.innerHTML = gaiolaStaged.map((it, idx) => `<tr><td class="code">${it.ean}</td><td>${it.plu || "—"}</td><td>${it.produto || "—"}</td><td>${it.categoria || "—"}</td><td>${it.qtd}</td><td><button class="icon-btn" onclick="removerItemGaiola(${idx})">🗑</button></td></tr>`).join(""); }
 
 async function salvarGaiola() { 
-  if (!canLancarGaiola()) { showToast("Acesso negado. Somente o level 1 pode adicionar gaiolas.", true); return; } 
+  if (!canLancarGaiola()) { showToast("Acesso negado. Este usuário não possui permissão para lançar gaiolas.", true); return; } 
   if (!gaiolaStaged.length) { showToast("Adicione pelo menos um item.", true); return; } 
   
   // Confirmação se tiver apenas 1 item
