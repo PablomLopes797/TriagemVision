@@ -3753,8 +3753,9 @@ async function cancelarGaiolaSemEnviar() { try { await excluirReservaGaiola(); }
 function checkPendingGaiola() {
   if (!canLancarGaiola()) return;
   const pending = loadGaiolaLocal();
-  if (pending && Array.isArray(pending.items) && pending.items.length) {
-    document.getElementById("pendGaiolaMsg").textContent = `Gaiola nº ${pending.gaiola} — Loja ${pending.loja} — ${pending.items.length} item(ns) pendentes.`;
+  if (pending && pending.gaiola) {
+    const qtdItens = Array.isArray(pending.items) ? pending.items.length : 0;
+    document.getElementById("pendGaiolaMsg").textContent = `Você tem a gaiola nº ${pending.gaiola} pendente (Loja ${pending.loja || "não definida"}, ${qtdItens} item(ns)). Deseja continuar lançando essa gaiola ou excluí-la?`;
     document.getElementById("overlayGaiolaPendente").classList.add("show");
   } else if (pending) {
     // Não exiba registros vazios ou antigos como se fossem pendências reais.
@@ -3762,7 +3763,28 @@ function checkPendingGaiola() {
   }
 }
 function continuarGaiolaPendente() { const pending = loadGaiolaLocal(); if (pending) { gaiolaAtual = { gaiola: pending.gaiola, loja: pending.loja, reservationId: pending.reservationId || null }; gaiolaStaged = pending.items || []; } document.getElementById("overlayGaiolaPendente").classList.remove("show"); openGaiolaModal(true); }
-async function apagarGaiolaPendente() { try { await excluirReservaGaiola(); } catch (err) { showToast("Erro ao apagar pendência: " + err.message, true); return; } clearGaiolaLocal(); gaiolaStaged = []; gaiolaAtual = { gaiola: "", loja: "", reservationId: null }; document.getElementById("overlayGaiolaPendente").classList.remove("show"); showToast("Pendentes da gaiola apagados"); }
+async function apagarGaiolaPendente() {
+  const pending = loadGaiolaLocal();
+  const reservationId = (pending && pending.reservationId) || gaiolaAtual.reservationId;
+  const numeroGaiola = (pending && pending.gaiola) || gaiolaAtual.gaiola;
+  try {
+    if (reservationId) {
+      const { error } = await sb.from("GAIOLAS_LANC").delete().eq("id", reservationId);
+      if (error) throw error;
+    } else if (numeroGaiola) {
+      const { error } = await sb.from("GAIOLAS_LANC").delete().eq("GAIOLA", numeroGaiola);
+      if (error) throw error;
+    }
+  } catch (err) {
+    showToast("Erro ao apagar pendência: " + err.message, true);
+    return;
+  }
+  clearGaiolaLocal();
+  gaiolaStaged = [];
+  gaiolaAtual = { gaiola: "", loja: "", reservationId: null };
+  document.getElementById("overlayGaiolaPendente").classList.remove("show");
+  showToast("Gaiola pendente excluída.");
+}
 
 async function fetchNextGaiolaNumber() {
   const { data, error } = await sb.from('GAIOLAS_LANC').select('GAIOLA');
@@ -3845,6 +3867,17 @@ async function buscarLojasDisponiveis(pluValue) {
 
 async function openGaiolaModal(keepBatch) { 
   if (!canLancarGaiola()) { showToast("Acesso negado. Este usuário não possui permissão para lançar gaiolas.", true); return; } 
+
+  if (!keepBatch) {
+    const pendente = loadGaiolaLocal();
+    if (pendente && pendente.gaiola) {
+      const qtdItens = Array.isArray(pendente.items) ? pendente.items.length : 0;
+      document.getElementById("pendGaiolaMsg").textContent = `Você tem a gaiola nº ${pendente.gaiola} pendente (Loja ${pendente.loja || "não definida"}, ${qtdItens} item(ns)). Deseja continuar lançando essa gaiola ou excluí-la?`;
+      document.getElementById("overlayGaiolaPendente").classList.add("show");
+      return;
+    }
+  }
+
   document.getElementById("overlayGaiola").classList.add("show"); 
   ["gl_ean","gl_plu","gl_produto","gl_categoria","gl_qtd_unidade"].forEach(id => document.getElementById(id).value = ""); 
   document.getElementById("glEanStatus").textContent = ""; 
@@ -3898,8 +3931,13 @@ async function openGaiolaModal(keepBatch) {
 function closeGaiolaModal() {
   const overlay = document.getElementById("overlayGaiola");
   if (!overlay) return;
-  if (!gaiolaAtual.gaiola) { overlay.classList.remove("show"); return; }
-  cancelarGaiolaSemEnviar();
+  overlay.classList.remove("show");
+  // O X não exclui mais a gaiola. Os dados ficam pendentes (salvos localmente e
+  // com a reserva mantida em GAIOLAS_LANC) até o usuário decidir continuar ou excluir.
+  if (gaiolaAtual.gaiola) {
+    saveGaiolaLocal();
+    showToast(`Gaiola ${gaiolaAtual.gaiola} ficou pendente. Na próxima vez que abrir o lançamento de gaiola, você poderá continuar ou excluir.`);
+  }
 }
 function protegerPainelLancamento(id) {
   const overlay = document.getElementById(id);
@@ -4685,7 +4723,7 @@ function switchView(name) {
   if (name === 'gaiolas-admin' && !podeConsultarGaiolas()) { showToast('Acesso negado para consultar gaiolas.', true); return; }
   if (name === 'administracao' && !canConsultarArea('administracao')) { showToast('Acesso negado ao menu Administração.', true); return; }
   if (name === 'mip' && !canConsultarArea('mip')) { showToast('Acesso negado ao menu MIP.', true); return; }
-  if (name === 'reportes' && !canConsultarArea('reportes')) { showToast('Acesso negado ao Report de Erro.', true); return; }
+  // O Report de Erro fica sempre liberado para qualquer usuário logado.
   // Ao trocar de menu, sobe somente a área principal. A posição do sidebar é preservada.
   window.scrollTo({top:0,left:0,behavior:'auto'});
   document.documentElement.scrollTop = 0;
@@ -4722,7 +4760,7 @@ function applyUserUI() {
   document.getElementById('userName').textContent=currentUser.name||currentUser.user;
   document.getElementById('userAvatar').textContent=(currentUser.name||currentUser.user).slice(0,2).toUpperCase();
   const badge=document.getElementById('userBadge');badge.textContent=NIVEL_LABELS[lvl()]||('Nível '+lvl());badge.className='badge-level '+(isTotal()?'master':'basic');
-  document.querySelectorAll('.menu a[data-view]').forEach(a=>{const v=a.dataset.view;let allowed=true;if(v==='permissoes')allowed=isTotal();else if(v==='donorua')allowed=currentUser.user==='5520967';else if(v==='administracao')allowed=canConsultarArea('administracao');else if(v==='gaiolas-admin')allowed=podeConsultarGaiolas();else if(v==='cadastro-item')allowed=podeCadastrarItem();else if(v==='mip')allowed=canConsultarArea('mip');else allowed=temPermissao(v);a.style.display=allowed?'':'none';});
+  document.querySelectorAll('.menu a[data-view]').forEach(a=>{const v=a.dataset.view;let allowed=true;if(v==='permissoes')allowed=isTotal();else if(v==='donorua')allowed=currentUser.user==='5520967';else if(v==='administracao')allowed=canConsultarArea('administracao');else if(v==='gaiolas-admin')allowed=podeConsultarGaiolas();else if(v==='cadastro-item')allowed=podeCadastrarItem();else if(v==='mip')allowed=canConsultarArea('mip');else if(v==='reportes')allowed=true;else allowed=temPermissao(v);a.style.display=allowed?'':'none';});
   document.querySelectorAll('.lancar-only[data-perm-area]').forEach(el=>{const area=el.dataset.permArea;el.style.display=(area==='gaiola'?canLancarGaiola():canLancarArea(area))?'':'none';});
   document.querySelectorAll('.mip-lancar-only').forEach(el=>{el.style.display=canLancarArea('mip')?'':'none';});
   const exportAdmin=document.getElementById('btnExportarAdministracao');if(exportAdmin)exportAdmin.style.display=canExportarArea('administracao')?'':'none';
