@@ -79,6 +79,7 @@
         .top-bar .user-avatar { width:32px; height:32px; border-radius:8px; background:var(--navy-800); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
         .btn { background:var(--blue-600); color:#fff; border:0; padding:10px 16px; border-radius:9px; cursor:pointer; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:7px; transition:var(--transition); }
         .btn:hover { background:var(--navy-800); }
+        .btn:disabled { opacity:.5; cursor:not-allowed; background:var(--ink-faint); }
         .btn.ghost { background:transparent; color:var(--ink-soft); border:1px solid var(--line); }
         .btn.ghost:hover { background:var(--bg); color:var(--ink); }
         .report-container { max-width:100%; margin:0 auto; padding:20px 26px; }
@@ -287,7 +288,7 @@
             <div class="filter-toggle no-print">
                 <button class="btn ghost" onclick="toggleFiltros()" id="btnToggleFiltros">🔍 Mostrar Filtros</button>
                 <button class="btn" onclick="buscarDados()" style="margin-left:8px;">🔎 Filtrar</button>
-                <button class="btn" onclick="imprimirRelatorio()" style="margin-left:8px;">🖨️ Imprimir</button>
+                <button class="btn" onclick="imprimirRelatorio()" style="margin-left:8px;" id="btnImprimir" disabled>🖨️ Imprimir</button>
                 <button class="btn" onclick="abrirModalSalvar()" style="margin-left:8px;background:var(--purple);" id="btnSalvar">💾 Salvar</button>
             </div>
             <div class="filters-panel" id="filtersPanel">
@@ -363,6 +364,7 @@
     let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentUser = null;
     let prevDataCache = [];
+    let relatorioSalvo = false; // controle para impressão
 
     const canvas = document.getElementById('matrixCanvas'), ctx = canvas.getContext('2d'), video = document.getElementById('loginVideo'), userField = document.getElementById('loginUser');
     const chars = 'ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890'.split(''), fontSize = 32;
@@ -440,6 +442,9 @@
 
     function logout(){
         currentUser=null;
+        relatorioSalvo = false;
+        document.getElementById('btnImprimir').disabled = true;
+        document.getElementById('btnSalvar').disabled = false;
         document.getElementById('loginPass').value=''; document.getElementById('loginUser').value='';
         document.getElementById('mainContent').classList.remove('active');
         document.getElementById('loginOverlay').style.display='flex'; document.getElementById('loginOverlay').classList.remove('fade-out');
@@ -468,6 +473,9 @@
             prevDataCache=rows;
             atualizarLabels(dataIni,dataFim,turno,rows.length);
             renderizarTabela(rows);
+            relatorioSalvo = false;
+            document.getElementById('btnImprimir').disabled = true;
+            document.getElementById('btnSalvar').disabled = false;
             if(rows.length===0) showToast('Nenhum registro encontrado.');
         }catch(e){ tbody.innerHTML='<tr><td colspan="13" class="empty-state">Erro: '+e.message+'</td></tr>'; showToast('Erro: '+e.message,true); }
     }
@@ -612,6 +620,9 @@
         try{
             const {error}=await sb.from('BD_PREV_RELAT').insert(payloads);
             if(error)throw error;
+            relatorioSalvo = true;
+            document.getElementById('btnImprimir').disabled = false;
+            document.getElementById('btnSalvar').disabled = true; // evita duplicações
             showToast(payloads.length+' registro(s) salvo(s) no BD_PREV_RELAT.');
             fecharModalGestorOperacional();
             linhasParaSalvar=[];
@@ -621,6 +632,10 @@
     };
 
     window.imprimirRelatorio = function(){
+        if(!relatorioSalvo){
+            showToast('Salve o relatório antes de imprimir.', true);
+            return;
+        }
         const rows = document.querySelectorAll('#tabelaBody tr[data-row-index]');
         const tabelaDados = [];
         rows.forEach(row=>{
