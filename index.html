@@ -2995,7 +2995,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 <div class="view" id="view-cadastro-item">
 <div class="panel cadastro-panel">
-<div class="panel-head"><div><h4>Cadastro de Item</h4><p class="hint">Itens já cadastrados manualmente na tabela BD_CADASTRO.</p></div><button class="btn" id="btnAbrirCadastroItem" onclick="abrirCadastroItem()">＋ Cadastrar</button></div>
+<div class="panel-head"><div><h4>Cadastro de Item</h4><p class="hint">Itens já cadastrados manualmente na tabela BD_CADASTRO.</p></div><div class="module-actions"><button class="btn ghost" onclick="abrirAtualizacaoCadastro('endereco')">Atualizar apanha/endereço</button><button class="btn ghost" onclick="abrirAtualizacaoCadastro('categoria')">Atualizar categoria</button><button class="btn" id="btnAbrirCadastroItem" onclick="abrirCadastroItem()">＋ Cadastrar</button></div></div>
 <div class="filters cadastro-filters"><input id="cadFiltroCodigo" placeholder="EAN / CODACESSO"/><input id="cadFiltroPlu" placeholder="PLU / SEQPRODUTO"/><input id="cadFiltroProduto" placeholder="Produto"/><button class="btn" onclick="carregarCadastroItens()">Atualizar</button></div>
 <div class="panel-body"><div class="table-scroll-x cadastro-table-wrap"><table class="cadastro-table"><thead id="cadastroItensHead"></thead><tbody id="cadastroItensTable"><tr><td class="empty">Clique em Atualizar para consultar os itens.</td></tr></tbody></table></div></div>
 </div>
@@ -3016,6 +3016,19 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 </div>
 </div>
 <div class="modal-footer"><button class="btn ghost" onclick="fecharCadastroItem()">Cancelar</button><button class="btn" id="btnSalvarCadastroItem" onclick="salvarCadastroItem()">Salvar cadastro</button></div>
+</div>
+</div>
+<div class="overlay" id="overlayAtualizacaoCadastro">
+<div class="modal cadastro-modal">
+<div class="modal-header"><h3 id="tituloAtualizacaoCadastro">Atualizar cadastro por PLU</h3><button class="close-x" onclick="fecharAtualizacaoCadastro()">✕</button></div>
+<div class="modal-body"><div class="module-note" id="notaAtualizacaoCadastro">Informe o PLU para localizar todos os itens correspondentes e atualizar somente o campo selecionado.</div>
+<div class="grid">
+<div class="field full"><label>SEQPRODUTO — PLU de referência</label><input autocomplete="off" id="atualizacao_cad_plu" inputmode="numeric" type="text"/></div>
+<div class="field full" id="campoAtualizacaoEndereco"><label>ENDERECO — Apanha / Endereço</label><input id="atualizacao_cad_endereco" type="text"/></div>
+<div class="field full" id="campoAtualizacaoCategoria" style="display:none"><label>NM_MERC_N1 — Categoria</label><input id="atualizacao_cad_categoria" type="text"/></div>
+</div>
+</div>
+<div class="modal-footer"><button class="btn ghost" onclick="fecharAtualizacaoCadastro()">Cancelar</button><button class="btn" id="btnSalvarAtualizacaoCadastro" onclick="salvarAtualizacaoCadastro()">Atualizar itens</button></div>
 </div>
 </div>
 <div class="view" id="view-administracao">
@@ -4325,6 +4338,10 @@ function podeCadastrarItem(){ return !!currentUser && Number(currentUser.level) 
 function limparCadastroFormulario(){ ['cad_ean','cad_plu','cad_produto','cad_apanha','cad_categoria','cad_rua','cad_dono','cad_qtd_embalagem'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); }
 function abrirCadastroItem(){ if(!podeCadastrarItem()){showToast('Acesso negado. Somente usuários nível 1 podem cadastrar itens.',true);return;} limparCadastroFormulario(); document.getElementById('overlayCadastroItem').classList.add('show'); setTimeout(()=>document.getElementById('cad_ean').focus(),80); }
 function fecharCadastroItem(){const e=document.getElementById('overlayCadastroItem');if(e)e.classList.remove('show');}
+let tipoAtualizacaoCadastro='endereco';
+function abrirAtualizacaoCadastro(tipo){if(!podeCadastrarItem()){showToast('Acesso negado. Somente usuários nível 1 podem atualizar itens.',true);return;}tipoAtualizacaoCadastro=tipo==='categoria'?'categoria':'endereco';const ehCategoria=tipoAtualizacaoCadastro==='categoria';document.getElementById('tituloAtualizacaoCadastro').textContent=ehCategoria?'Atualizar categoria por PLU':'Atualizar apanha/endereço por PLU';document.getElementById('notaAtualizacaoCadastro').textContent=ehCategoria?'O PLU será usado para localizar os itens. Somente a categoria NM_MERC_N1 será alterada.':'O PLU será usado para localizar os itens. Somente o campo ENDERECO (apanha/endereço) será alterado.';document.getElementById('campoAtualizacaoEndereco').style.display=ehCategoria?'none':'block';document.getElementById('campoAtualizacaoCategoria').style.display=ehCategoria?'block':'none';document.getElementById('atualizacao_cad_plu').value='';document.getElementById('atualizacao_cad_endereco').value='';document.getElementById('atualizacao_cad_categoria').value='';document.getElementById('overlayAtualizacaoCadastro').classList.add('show');setTimeout(()=>document.getElementById('atualizacao_cad_plu').focus(),80);}
+function fecharAtualizacaoCadastro(){const e=document.getElementById('overlayAtualizacaoCadastro');if(e)e.classList.remove('show');}
+async function salvarAtualizacaoCadastro(){if(!podeCadastrarItem()){showToast('Acesso negado. Somente usuários nível 1 podem atualizar itens.',true);return;}const plu=document.getElementById('atualizacao_cad_plu').value.trim();const valor=(tipoAtualizacaoCadastro==='categoria'?document.getElementById('atualizacao_cad_categoria').value:document.getElementById('atualizacao_cad_endereco').value).trim();if(!plu){showToast('Informe o PLU.',true);return;}if(!valor){showToast(tipoAtualizacaoCadastro==='categoria'?'Informe a categoria.':'Informe a apanha/endereço.',true);return;}const btn=document.getElementById('btnSalvarAtualizacaoCadastro');btn.disabled=true;btn.textContent='Atualizando…';try{const {data:itens,error:buscaError}=await sb.from('BD_CADASTRO').select('id').eq('SEQPRODUTO',plu);if(buscaError)throw buscaError;if(!itens||!itens.length){showToast('Nenhum item encontrado para o PLU informado.',true);return;}const campo=tipoAtualizacaoCadastro==='categoria'?'NM_MERC_N1':'ENDERECO';const {error}=await sb.from('BD_CADASTRO').update({[campo]:valor}).eq('SEQPRODUTO',plu);if(error)throw error;showToast(itens.length===1?'1 item atualizado com sucesso.':itens.length+' itens atualizados com sucesso.');fecharAtualizacaoCadastro();await carregarCadastroItens();}catch(err){showToast('Erro ao atualizar cadastro: '+err.message,true);}finally{btn.disabled=false;btn.textContent='Atualizar itens';}}
 function escaparCadastro(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function cadastroFiltros(){return {codigo:document.getElementById('cadFiltroCodigo')?.value.trim()||'',plu:document.getElementById('cadFiltroPlu')?.value.trim()||'',produto:document.getElementById('cadFiltroProduto')?.value.trim()||''};}
 function renderCabecalhoCadastro(){const h=document.getElementById('cadastroItensHead');if(!h)return;h.innerHTML='<tr>'+CADASTRO_COLS.map(c=>'<th>'+escaparCadastro(c)+'</th>').join('')+'</tr>';}
