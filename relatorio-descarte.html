@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* (mesmo estilo anterior - mantido) */
         :root {
             --navy-900: #051339;
             --navy-800: #0a2472;
@@ -326,9 +327,7 @@
     </div>
 </div>
 
-
-
-<!-- Modal de confirmação do gestor operacional — exclusivo deste relatório -->
+<!-- Modal de confirmação do gestor operacional -->
 <div class="modal-overlay" id="modalGestorOperacional" aria-hidden="true">
     <div class="modal-card" id="cardGestorOperacional">
         <div class="modal-mark">✓</div>
@@ -364,7 +363,7 @@
     let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentUser = null;
     let prevDataCache = [];
-    let relatorioSalvo = false; // controle para impressão
+    let relatorioSalvo = false;
 
     const canvas = document.getElementById('matrixCanvas'), ctx = canvas.getContext('2d'), video = document.getElementById('loginVideo'), userField = document.getElementById('loginUser');
     const chars = 'ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890'.split(''), fontSize = 32;
@@ -548,7 +547,6 @@
             const campos={};
             ['descarte','vencimento','degustacao'].forEach(kind=>{const el=linha.querySelector('[data-kind="'+kind+'"]');campos[kind]=el?numeroCampoAuditoria(el):0;});
             const total=campos.descarte+campos.vencimento+campos.degustacao;
-            // Campos vazios representam ausência do item e são gravados como zero.
             linhasParaSalvar.push({row,quantidades:campos,total});
         }
         gestorOperacionalSelecionado=null;
@@ -589,46 +587,92 @@
         return senha!=='' && String(gestorOperacionalSelecionado.PASSWORD??'').trim()===senha;
     }
 
+    // *** FUNÇÃO PRINCIPAL DE SALVAR – COM DATA/HORA ÚNICA ***
     window.confirmarSalvarRelatorio = async function(){
-        const errorBox=document.getElementById('gestorModalError'),errorText=document.getElementById('gestorModalErrorText'),btn=document.getElementById('btnConfirmarRelatorio');
+        const errorBox=document.getElementById('gestorModalError'), errorText=document.getElementById('gestorModalErrorText'), btn=document.getElementById('btnConfirmarRelatorio');
         errorBox.classList.remove('show');
-        if(!gestorOperacionalSelecionado){errorText.textContent='Informe uma matrícula de gestor válida.';errorBox.classList.add('show');return;}
-        if(!document.getElementById('gestorSenha').value.trim()){errorText.textContent='Informe a senha do gestor operacional.';errorBox.classList.add('show');return;}
-        if(!(await confirmarSenhaGestor())){errorText.textContent='Senha do gestor operacional inválida.';errorBox.classList.add('show');document.getElementById('cardGestorOperacional').classList.add('shake');setTimeout(()=>document.getElementById('cardGestorOperacional').classList.remove('shake'),450);return;}
-        if(!linhasParaSalvar.length){errorText.textContent='Nenhuma linha pronta para salvar.';errorBox.classList.add('show');return;}
-        btn.disabled=true;btn.textContent='Validando e salvando…';
+
+        // Validações
+        if(!gestorOperacionalSelecionado){
+            errorText.textContent='Informe uma matrícula de gestor válida.';
+            errorBox.classList.add('show');
+            return;
+        }
+        const senhaDigitada=document.getElementById('gestorSenha').value.trim();
+        if(!senhaDigitada){
+            errorText.textContent='Informe a senha do gestor operacional.';
+            errorBox.classList.add('show');
+            return;
+        }
+        if(!(await confirmarSenhaGestor())){
+            errorText.textContent='Senha do gestor operacional inválida.';
+            errorBox.classList.add('show');
+            document.getElementById('cardGestorOperacional').classList.add('shake');
+            setTimeout(()=>document.getElementById('cardGestorOperacional').classList.remove('shake'),450);
+            return;
+        }
+        if(!linhasParaSalvar.length){
+            errorText.textContent='Nenhuma linha pronta para salvar.';
+            errorBox.classList.add('show');
+            return;
+        }
+
+        btn.disabled=true;
+        btn.textContent='Validando e salvando…';
         const gestor=gestorOperacionalSelecionado;
+
+        // 🔥 GERA A DATA/HORA UMA ÚNICA VEZ PARA TODOS OS REGISTROS
+        const agora = new Date().toISOString();
+
         const payloads=linhasParaSalvar.map(({row,quantidades,total})=>({
-            'DTA_HORA':new Date().toISOString(),
-            'USER PREVENÇÃO':currentUser.user,
-            'NAME USER PREVENÇÃO':currentUser.fullName||currentUser.name,
-            'TURNO_LANC':row.TURNO_LANC??null,
-            'PLU':row.PLU||null,
-            'PRODUTO':row.PRODUTO||null,
-            'QTD_UNIDADE':Number(row.QTD_UNIDADE)||0,
-            'QTD_UN DESCARTE':quantidades.descarte,
-            'QTD_UN VENCIMENTO':quantidades.vencimento,
-            'QTD_UN DEGUSTAÇÃO':quantidades.degustacao,
-            'QTD_AUDITADA':total,
-            'USER GESTOR OPERAÇÃO':gestor.USER,
-            'NAME GESTOR OPERAÇÃO':gestor.NAME_USER||gestor.USER,
-            'STATUS FATURAMENTO':null,
-            'ADM FATURAMENTO':null,
-            'Nº NF':null,
-            'NAME ADM':null
+            DTA_HORA: agora,  // mesma data/hora para todos
+            USER_PREVENÇÃO: currentUser.user,
+            NAME_USER_PREVENÇÃO: currentUser.fullName||currentUser.name,
+            TURNO_LANC: row.TURNO_LANC??null,
+            PLU: row.PLU ? Number(row.PLU) : null,
+            PRODUTO: row.PRODUTO||null,
+            QTD_UNIDADE: Number(row.QTD_UNIDADE)||0,
+            QTD_UN_DESCARTE: quantidades.descarte,
+            QTD_UN_VENCIMENTO: quantidades.vencimento,
+            QTD_UN_DEGUSTAÇÃO: quantidades.degustacao,
+            QTD_AUDITADA: total,
+            USER_GESTOR_OPERAÇÃO: gestor.USER,
+            NAME_GESTOR_OPERAÇÃO: gestor.NAME_USER||gestor.USER,
+            STATUS_FATURAMENTO: null,
+            ADM_FATURAMENTO: null,
+            NUMERO_NF: null,
+            NAME_ADM: null,
+            CGO: null
         }));
+
+        console.log('📦 Payload a enviar (com mesma data/hora):', JSON.stringify(payloads, null, 2));
+
         try{
-            const {error}=await sb.from('BD_PREV_RELAT').insert(payloads);
-            if(error)throw error;
+            const {data, error} = await sb.from('BD_PREV_RELAT').insert(payloads);
+            console.log('✅ Resposta Supabase:', {data, error});
+            if(error) throw error;
+
             relatorioSalvo = true;
             document.getElementById('btnImprimir').disabled = false;
-            document.getElementById('btnSalvar').disabled = true; // evita duplicações
+            document.getElementById('btnSalvar').disabled = true;
             showToast(payloads.length+' registro(s) salvo(s) no BD_PREV_RELAT.');
             fecharModalGestorOperacional();
             linhasParaSalvar=[];
-            document.querySelectorAll('#tabelaBody tr[data-row-index]').forEach(linha=>{linha.classList.add('row-saved');const status=linha.querySelector('.row-status');if(status){status.textContent='Salvo';status.classList.add('saved');}linha.querySelectorAll('input').forEach(input=>input.disabled=true);});
-        }catch(err){errorText.textContent='Erro ao salvar no BD_PREV_RELAT: '+err.message;errorBox.classList.add('show');}
-        finally{btn.disabled=false;btn.textContent='Validar e salvar';}
+
+            document.querySelectorAll('#tabelaBody tr[data-row-index]').forEach(linha=>{
+                linha.classList.add('row-saved');
+                const status=linha.querySelector('.row-status');
+                if(status){status.textContent='Salvo';status.classList.add('saved');}
+                linha.querySelectorAll('input').forEach(input=>input.disabled=true);
+            });
+        }catch(err){
+            console.error('❌ Erro ao salvar:', err);
+            errorText.textContent='Erro ao salvar: ' + err.message + (err.details ? ' | ' + err.details : '');
+            errorBox.classList.add('show');
+        }finally{
+            btn.disabled=false;
+            btn.textContent='Validar e salvar';
+        }
     };
 
     window.imprimirRelatorio = function(){
