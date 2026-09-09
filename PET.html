@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js">
+    </script>
     <style>
         :root {
             --bg: #f0f4ff;
@@ -66,7 +68,7 @@
             background: var(--blue-100);
         }
 
-        /* ===== PARTÍCULAS DE FUNDO ===== */
+        /* PARTÍCULAS */
         #particlesCanvas {
             position: fixed;
             top: 0;
@@ -78,7 +80,7 @@
             opacity: 0.4;
         }
 
-        /* ===== LOGIN OVERLAY ===== */
+        /* LOGIN */
         .login-overlay {
             position: fixed;
             inset: 0;
@@ -281,7 +283,7 @@
             }
         }
 
-        /* ===== SIDEBAR ===== */
+        /* SIDEBAR */
         .sidebar {
             position: fixed;
             left: 0;
@@ -433,7 +435,7 @@
             box-shadow: 0 0 10px var(--red);
         }
 
-        /* ===== MAIN ===== */
+        /* MAIN */
         .main {
             margin-left: 260px;
             min-height: 100vh;
@@ -482,23 +484,15 @@
         .theme-toggle:hover {
             background: var(--bg);
         }
-        .content {
-            padding: 28px 28px 60px;
-            transition: var(--transition);
-            max-width: 1100px;
-        }
 
-        /* ===== CARDS ===== */
-        .donation-panel {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-            transition: var(--transition);
-            animation: fadeSlideUp 0.5s ease;
+        .view {
+            display: none;
+            padding: 28px 28px 60px;
+            max-width: 1100px;
+            animation: fadeSlideUp 0.4s ease;
+        }
+        .view.active {
+            display: block;
         }
         @keyframes fadeSlideUp {
             from {
@@ -509,6 +503,18 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* CARDS */
+        .donation-panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
         }
         .panel-head {
             padding: 20px 24px;
@@ -528,7 +534,7 @@
             transition: var(--transition);
         }
 
-        /* ===== FORM GRID ===== */
+        /* GRID */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -589,13 +595,8 @@
         .ean-status.notfound {
             color: var(--red);
         }
-        .hint {
-            font-size: 12px;
-            color: var(--ink-faint);
-            margin-top: 5px;
-        }
 
-        /* ===== BUTTONS ===== */
+        /* BUTTONS */
         .btn {
             background: linear-gradient(135deg, #8b5cf6, #6366f1);
             color: #fff;
@@ -640,13 +641,17 @@
             background: var(--red);
             color: #fff;
         }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
 
-        /* ===== STAGED TABLE ===== */
-        .staged-table-wrap {
+        /* TABLES */
+        .table-wrap {
             border: 1px solid var(--line);
             border-radius: 14px;
             overflow: hidden;
-            margin-top: 20px;
+            margin-top: 16px;
         }
         table {
             width: 100%;
@@ -682,14 +687,83 @@
             color: var(--purple);
             font-weight: 600;
         }
-        .staged-empty {
+        .empty-state {
             padding: 28px;
             text-align: center;
             color: var(--ink-faint);
             font-size: 14px;
         }
 
-        /* ===== TOAST ===== */
+        /* FILTER ROW */
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+        .filter-row .field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 140px;
+        }
+        .filter-row .field label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--ink-faint);
+        }
+        .filter-row .field input,
+        .filter-row .field select {
+            padding: 8px 10px;
+            font-size: 13px;
+            margin-top: 0;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(5, 19, 57, 0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            width: 700px;
+            max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 32px 28px 28px;
+            box-shadow: 0 30px 80px rgba(5, 19, 57, 0.35);
+            animation: loginIn .35s;
+        }
+        .modal-card .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--ink);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .modal-card .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+
+        /* TOAST */
         .toast {
             position: fixed;
             bottom: 28px;
@@ -733,15 +807,24 @@
             .grid {
                 grid-template-columns: 1fr;
             }
+            .filter-row {
+                flex-direction: column;
+            }
+            .filter-row .field {
+                min-width: 100%;
+            }
+            .modal-card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body class="light">
 
-    <!-- PARTÍCULAS DE FUNDO -->
+    <!-- PARTÍCULAS -->
     <canvas id="particlesCanvas"></canvas>
 
-    <!-- LOGIN OVERLAY -->
+    <!-- LOGIN -->
     <div class="login-overlay" id="loginOverlay">
         <video id="loginVideo" autoplay loop muted playsinline crossorigin="anonymous">
             <source src="7020018_Particle_Dot_3840x2160.mp4" type="video/mp4">
@@ -763,7 +846,7 @@
     <div class="sidebar">
         <div class="logo"><div class="mark">❤️</div><span>Doação</span></div>
         <div class="menu">
-            <a href="#" data-view="doacao" class="active"><span class="ic">📦</span><span class="label">Registro de Doação</span></a>
+            <a href="#" data-view="lancamentos" class="active"><span class="ic">📋</span><span class="label">Lançamentos</span></a>
         </div>
         <div class="footer">
             <div class="userbox" id="userBox" style="display:none;margin-bottom:14px">
@@ -779,63 +862,157 @@
     <!-- MAIN -->
     <div class="main">
         <div class="topbar">
-            <div><h3>Registro de Doação</h3><div class="sub">Adicione itens e salve a doação</div></div>
+            <div><h3 id="pageTitle">Lançamentos</h3><div class="sub" id="pageSub">Histórico de doações realizadas</div></div>
             <div style="display:flex;gap:10px;align-items:center">
                 <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌓</button>
             </div>
         </div>
 
-        <div class="content">
-            <!-- PAINEL DE DOAÇÃO -->
+        <!-- VIEW ÚNICA: LANÇAMENTOS -->
+        <div class="view active" id="viewLancamentos">
             <div class="donation-panel">
                 <div class="panel-head">
-                    <h4>➕ Novo Item</h4>
-                    <span class="sub" style="font-size:12px;color:var(--ink-faint)">Escaneie o EAN e informe a quantidade</span>
+                    <h4>📋 Lançamentos realizados</h4>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-sm" onclick="abrirModalExport()">📤 Exportar</button>
+                        <button class="btn btn-sm" onclick="abrirModalNovoLancamento()">➕ Novo Lançamento</button>
+                    </div>
                 </div>
                 <div class="panel-body">
-                    <div class="grid">
-                        <div class="field full ean-wrap">
-                            <label>EAN</label>
-                            <input type="text" id="doa_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
-                            <span class="ean-status" id="doaEanStatus"></span>
+                    <!-- Filtros -->
+                    <div class="filter-row">
+                        <div class="field">
+                            <label>Data Inicial</label>
+                            <input type="date" id="filtroDataIni">
+                        </div>
+                        <div class="field">
+                            <label>Data Final</label>
+                            <input type="date" id="filtroDataFim">
                         </div>
                         <div class="field">
                             <label>PLU</label>
-                            <input type="text" id="doa_plu" readonly>
+                            <input type="text" id="filtroPlu" placeholder="ex: 12345">
                         </div>
                         <div class="field">
                             <label>Produto</label>
-                            <input type="text" id="doa_produto" readonly>
+                            <input type="text" id="filtroProduto" placeholder="ex: arroz">
                         </div>
                         <div class="field">
-                            <label>Qtd Unidade</label>
-                            <input type="text" id="doa_qtd_unidade" inputmode="numeric" placeholder="Somente números">
+                            <label>Turno</label>
+                            <select id="filtroTurno">
+                                <option value="">Todos</option>
+                                <option value="1">1º Turno</option>
+                                <option value="2">2º Turno</option>
+                                <option value="3">3º Turno</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Gaiola</label>
+                            <input type="text" id="filtroGaiola" placeholder="ex: 5">
+                        </div>
+                        <div class="field" style="flex:0 0 auto">
+                            <button class="btn" onclick="carregarLancamentos()" style="padding:10px 20px;">🔎 Filtrar</button>
+                        </div>
+                        <div class="field" style="flex:0 0 auto">
+                            <button class="btn ghost" onclick="limparFiltrosLancamentos()" style="padding:10px 20px;">Limpar</button>
                         </div>
                     </div>
-                    <div style="margin-top:16px;display:flex;gap:10px">
-                        <button class="btn ghost" onclick="adicionarItemDoacao()">＋ Adicionar item à lista</button>
-                        <button class="btn danger" onclick="reiniciarDoacao()">↺ Limpar lista</button>
-                    </div>
 
-                    <!-- TABELA DE ITENS -->
-                    <div class="staged-table-wrap">
+                    <!-- Tabela -->
+                    <div class="table-wrap">
                         <table>
                             <thead>
-                                <tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Qtd Un</th><th></th></tr>
+                                <tr><th>Data/Hora</th><th>Gaiola</th><th>PLU</th><th>Produto</th><th>Qtd</th><th>Usuário</th><th>Turno</th></tr>
                             </thead>
-                            <tbody id="doaStagedTable">
-                                <tr><td colspan="5" class="staged-empty">Nenhum item adicionado ainda</td></tr>
+                            <tbody id="lancamentosTable">
+                                <tr><td colspan="7" class="empty-state">Carregando lançamentos...</td></tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- BOTÃO SALVAR -->
-                    <div style="margin-top:20px;display:flex;justify-content:flex-end">
-                        <button class="btn" id="btnSalvarDoacao" onclick="salvarDoacao()">
-                            💾 Salvar Doação (enviar tudo)
-                        </button>
-                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOVO LANÇAMENTO (com lista de itens) -->
+    <div class="modal-overlay" id="modalNovoLancamento">
+        <div class="modal-card">
+            <div class="modal-title">➕ Novo Lançamento — Gaiola <span id="gaiolaPreview">?</span></div>
+
+            <!-- Formulário de adição -->
+            <div class="grid" style="margin-bottom:12px;">
+                <div class="field full ean-wrap">
+                    <label>EAN</label>
+                    <input type="text" id="modal_ean" placeholder="Escaneie ou digite o EAN e pressione ENTER" autocomplete="off">
+                    <span class="ean-status" id="modalEanStatus"></span>
+                </div>
+                <div class="field">
+                    <label>PLU</label>
+                    <input type="text" id="modal_plu" readonly>
+                </div>
+                <div class="field">
+                    <label>Produto</label>
+                    <input type="text" id="modal_produto" readonly>
+                </div>
+                <div class="field">
+                    <label>Qtd Unidade</label>
+                    <input type="text" id="modal_qtd" inputmode="numeric" placeholder="Somente números">
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:16px;">
+                <button class="btn ghost" onclick="adicionarItemModal()">＋ Adicionar item à lista</button>
+                <button class="btn danger" onclick="limparListaModal()">↺ Limpar lista</button>
+            </div>
+
+            <!-- Tabela de itens adicionados -->
+            <div class="table-wrap" style="margin-top:0;">
+                <table>
+                    <thead><tr><th>EAN</th><th>PLU</th><th>Produto</th><th>Qtd</th><th></th></tr></thead>
+                    <tbody id="modalStagedTable">
+                        <tr><td colspan="5" class="empty-state">Nenhum item adicionado</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Ações do modal -->
+            <div class="modal-actions">
+                <button class="btn ghost" onclick="fecharModalNovoLancamento()">Cancelar</button>
+                <button class="btn" id="btnSalvarLote" onclick="salvarLote()">💾 Salvar Lote (enviar tudo)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EXPORTAR -->
+    <div class="modal-overlay" id="modalExport">
+        <div class="modal-card">
+            <div class="modal-title">📤 Exportar Lançamentos</div>
+            <div style="margin-bottom:16px;">
+                <div class="field" style="margin-bottom:12px;">
+                    <label>Formato</label>
+                    <select id="exportFormato">
+                        <option value="excel">Excel (.xlsx)</option>
+                        <option value="csv">CSV (.csv)</option>
+                        <option value="txt">TXT (.txt)</option>
+                    </select>
+                </div>
+                <div class="field" id="delimitadorGroup">
+                    <label>Delimitador (para TXT)</label>
+                    <select id="exportDelimitador">
+                        <option value=",">Vírgula ( , )</option>
+                        <option value=";">Ponto e vírgula ( ; )</option>
+                        <option value="&#9;">Tab ( \\t )</option>
+                        <option value="|">Pipe ( | )</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                    <input type="text" id="exportDelimitadorCustom" placeholder="Digite o delimitador" style="display:none;margin-top:8px;">
+                </div>
+                <div style="font-size:12px;color:var(--ink-faint);margin-top:6px;">
+                    Serão exportados os registros conforme os filtros aplicados.
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn ghost" onclick="fecharModalExport()">Cancelar</button>
+                <button class="btn" id="btnExportar" onclick="executarExport()">📥 Exportar</button>
             </div>
         </div>
     </div>
@@ -844,7 +1021,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        /* ========== PARTÍCULAS DE FUNDO ========== */
+        /* ========== PARTÍCULAS ========== */
         (function() {
             const canvas = document.getElementById('particlesCanvas');
             const ctx = canvas.getContext('2d');
@@ -894,7 +1071,7 @@
             animate();
         })();
 
-        /* ========== EFEITO MATRIX ========== */
+        /* ========== MATRIX EFFECT ========== */
         (function() {
             const canvas = document.getElementById('matrixCanvas');
             const ctx = canvas.getContext('2d');
@@ -962,7 +1139,7 @@
             });
         })();
 
-        /* ========== CONFIGURAÇÃO SUPABASE ========== */
+        /* ========== SUPABASE ========== */
         const SUPABASE_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
         const SUPABASE_KEY =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxdm12eGppa2JpdnVic3pvYXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NTQ2NDksImV4cCI6MjA5OTUzMDY0OX0.5EVtA9L0DoKR4kdr_4cP7YtqH-FqsHJc6vpeliUMjN8";
@@ -1035,6 +1212,7 @@
                 document.getElementById("loginOverlay").classList.add("fade-out");
                 setTimeout(() => {
                     document.getElementById("loginOverlay").style.display = "none";
+                    carregarLancamentos();
                 }, 500);
                 applyUserUI();
                 showToast("Bem-vindo, " + primeiroNome + "!");
@@ -1046,6 +1224,7 @@
                 btnText.textContent = "Entrar";
             }
         }
+
         function tentarLogin() { return doLogin(); }
         ["loginUser", "loginPass"].forEach(id => document.getElementById(id).addEventListener("keydown", e => {
             if (e.key === "Enter") { e.preventDefault();
@@ -1090,121 +1269,183 @@
             return (data && data.length) ? data[0] : null;
         }
 
-        /* ========== CARRINHO DE DOAÇÃO ========== */
-        let doacaoStaged = [];
+        /* ========== LANÇAMENTOS (HISTÓRICO) ========== */
+        async function carregarLancamentos() {
+            const tbody = document.getElementById("lancamentosTable");
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Carregando...</td></tr>';
 
-        function doacaoStorageKey() { return "tp_doacao_pending_" + (currentUser ? currentUser.user : "anon"); }
+            const dataIni = document.getElementById("filtroDataIni").value;
+            const dataFim = document.getElementById("filtroDataFim").value;
+            const plu = document.getElementById("filtroPlu").value.trim();
+            const produto = document.getElementById("filtroProduto").value.trim();
+            const turno = document.getElementById("filtroTurno").value;
+            const gaiola = document.getElementById("filtroGaiola").value.trim();
 
-        function salvarLocal() { localStorage.setItem(doacaoStorageKey(), JSON.stringify(doacaoStaged)); }
+            try {
+                let query = sb.from("BD_DOAÇÃO").select("*").order("DTA_HORA", { ascending: false }).limit(1000);
+                if (dataIni) query = query.gte("DTA_HORA", new Date(dataIni + "T00:00:00").toISOString());
+                if (dataFim) query = query.lte("DTA_HORA", new Date(dataFim + "T23:59:59").toISOString());
+                if (plu) {
+                    if (/^\d+$/.test(plu)) query = query.eq("PLU", Number(plu));
+                    else query = query.ilike("PLU", "%" + plu + "%");
+                }
+                if (produto) query = query.ilike("PRODUTO", "%" + produto + "%");
+                if (turno) query = query.eq("TURNO_LANC", Number(turno));
+                if (gaiola) {
+                    if (/^\d+$/.test(gaiola)) query = query.eq("GAIOLA_PET", Number(gaiola));
+                    else query = query.ilike("GAIOLA_PET", "%" + gaiola + "%");
+                }
 
-        function carregarLocal() {
-            try { return JSON.parse(localStorage.getItem(doacaoStorageKey()) || "[]"); } catch (e) { return []; }
-        }
+                const { data, error } = await query;
+                if (error) throw error;
 
-        function limparLocal() { localStorage.removeItem(doacaoStorageKey()); }
+                if (!data || !data.length) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum lançamento encontrado.</td></tr>';
+                    return;
+                }
 
-        function renderTabela() {
-            const tbody = document.getElementById("doaStagedTable");
-            if (!doacaoStaged.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="staged-empty">Nenhum item adicionado ainda</td></tr>';
-                return;
+                tbody.innerHTML = data.map(r => `
+                <tr>
+                    <td>${formatarDataHora(r.DTA_HORA)}</td>
+                    <td><span class="code">${r.GAIOLA_PET || "—"}</span></td>
+                    <td class="code">${r.PLU || "—"}</td>
+                    <td>${r.PRODUTO || "—"}</td>
+                    <td><b>${r.QTD_UN || 0}</b></td>
+                    <td>${r.USER || "—"}</td>
+                    <td>${r.TURNO_LANC || "—"}º Turno</td>
+                </tr>
+            `).join("");
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Erro: ${err.message}</td></tr>`;
+                showToast("Erro ao carregar lançamentos: " + err.message, true);
             }
-            tbody.innerHTML = doacaoStaged.map((it, idx) => `
-            <tr>
-              <td class="code">${it.ean}</td>
-              <td>${it.plu || "—"}</td>
-              <td>${it.produto || "—"}</td>
-              <td><b>${it.qtd}</b></td>
-              <td><button class="icon-btn" onclick="removerItem(${idx})" style="color:var(--red);border-color:var(--red)">🗑</button></td>
-            </tr>`).join("");
         }
 
-        function adicionarItemDoacao() {
-            if (!currentUser) { showToast("Faça login primeiro.", true); return; }
-            const ean = document.getElementById("doa_ean").value.trim();
-            const plu = document.getElementById("doa_plu").value.trim();
-            const produto = document.getElementById("doa_produto").value.trim();
-            const qtdRaw = document.getElementById("doa_qtd_unidade").value.trim();
+        function formatarDataHora(iso) {
+            if (!iso) return "—";
+            const d = new Date(iso);
+            if (isNaN(d)) return iso;
+            return d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        }
 
-            if (!ean) { showToast("Escaneie ou digite o EAN.", true); return; }
+        function limparFiltrosLancamentos() {
+            ["filtroDataIni", "filtroDataFim", "filtroPlu", "filtroProduto", "filtroGaiola"].forEach(id => document
+                .getElementById(id).value = "");
+            document.getElementById("filtroTurno").value = "";
+            carregarLancamentos();
+        }
+
+        /* ========== MODAL NOVO LANÇAMENTO (com lista) ========== */
+        let itensModal = [];
+
+        function abrirModalNovoLancamento() {
+            if (!currentUser) { showToast("Faça login primeiro.", true); return; }
+            itensModal = [];
+            document.getElementById("modal_ean").value = "";
+            document.getElementById("modal_plu").value = "";
+            document.getElementById("modal_produto").value = "";
+            document.getElementById("modal_qtd").value = "";
+            document.getElementById("modalEanStatus").textContent = "";
+            document.getElementById("modalEanStatus").className = "ean-status";
+            renderModalStaged();
+            // Buscar próximo número de gaiola
+            buscarProximaGaiola();
+            document.getElementById("modalNovoLancamento").classList.add("active");
+            setTimeout(() => document.getElementById("modal_ean").focus(), 80);
+        }
+
+        function fecharModalNovoLancamento() {
+            document.getElementById("modalNovoLancamento").classList.remove("active");
+        }
+
+        async function buscarProximaGaiola() {
+            try {
+                const { data, error } = await sb.from("BD_DOAÇÃO").select("GAIOLA_PET").order("GAIOLA_PET", { ascending: false })
+                    .limit(1);
+                if (error) throw error;
+                let ultimo = 0;
+                if (data && data.length && data[0].GAIOLA_PET) {
+                    ultimo = Number(data[0].GAIOLA_PET);
+                }
+                const proximo = ultimo + 1;
+                document.getElementById("gaiolaPreview").textContent = proximo;
+            } catch (err) {
+                document.getElementById("gaiolaPreview").textContent = "?";
+                showToast("Erro ao buscar gaiola: " + err.message, true);
+            }
+        }
+
+        function adicionarItemModal() {
+            const ean = document.getElementById("modal_ean").value.trim();
+            const plu = document.getElementById("modal_plu").value.trim();
+            const produto = document.getElementById("modal_produto").value.trim();
+            const qtdRaw = document.getElementById("modal_qtd").value.trim();
+
+            if (!ean) { showToast("Informe o EAN.", true); return; }
             if (!plu) { showToast("EAN não encontrado no cadastro.", true); return; }
             if (!qtdRaw || isNaN(qtdRaw) || Number(qtdRaw) <= 0) { showToast("Informe uma quantidade válida.", true); return; }
 
             const qtd = Number(qtdRaw);
-            doacaoStaged.push({ ean, plu, produto, qtd });
-            salvarLocal();
-            renderTabela();
-            // limpa campos
-            ["doa_ean", "doa_plu", "doa_produto", "doa_qtd_unidade"].forEach(id => document.getElementById(id).value =
-                "");
-            document.getElementById("doaEanStatus").textContent = "";
-            document.getElementById("doa_ean").focus();
+            itensModal.push({ ean, plu, produto, qtd });
+            renderModalStaged();
+            // Limpa campos
+            document.getElementById("modal_ean").value = "";
+            document.getElementById("modal_plu").value = "";
+            document.getElementById("modal_produto").value = "";
+            document.getElementById("modal_qtd").value = "";
+            document.getElementById("modalEanStatus").textContent = "";
+            document.getElementById("modal_ean").focus();
         }
 
-        function removerItem(idx) {
-            doacaoStaged.splice(idx, 1);
-            salvarLocal();
-            renderTabela();
+        function removerItemModal(idx) {
+            itensModal.splice(idx, 1);
+            renderModalStaged();
         }
 
-        function reiniciarDoacao() {
+        function limparListaModal() {
             if (!confirm("Apagar todos os itens da lista?")) return;
-            doacaoStaged = [];
-            limparLocal();
-            renderTabela();
-            showToast("Lista limpa.");
+            itensModal = [];
+            renderModalStaged();
         }
 
-        async function salvarDoacao() {
-            if (!currentUser) { showToast("Faça login primeiro.", true); return; }
-            if (!doacaoStaged.length) { showToast("Adicione pelo menos um item.", true); return; }
-            const btn = document.getElementById("btnSalvarDoacao");
-            btn.disabled = true;
-            btn.textContent = "Salvando...";
-            const turno = calcularTurno();
-            const registros = doacaoStaged.map(it => ({
-                DTA_HORA: new Date().toISOString(),
-                PLU: it.plu,
-                PRODUTO: it.produto,
-                QTD_UN: it.qtd,
-                USER: currentUser.user,
-                TURNO_LANC: turno
-            }));
-            try {
-                const { error } = await sb.from("BD_DOAÇÃO").insert(registros);
-                if (error) throw error;
-                showToast(`Doação salva com sucesso! ${doacaoStaged.length} item(ns).`);
-                doacaoStaged = [];
-                limparLocal();
-                renderTabela();
-            } catch (err) {
-                showToast("Erro ao salvar: " + err.message, true);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "💾 Salvar Doação (enviar tudo)";
+        function renderModalStaged() {
+            const tbody = document.getElementById("modalStagedTable");
+            if (!itensModal.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum item adicionado</td></tr>';
+                return;
             }
+            tbody.innerHTML = itensModal.map((it, idx) => `
+            <tr>
+                <td class="code">${it.ean}</td>
+                <td>${it.plu || "—"}</td>
+                <td>${it.produto || "—"}</td>
+                <td><b>${it.qtd}</b></td>
+                <td><button class="icon-btn" onclick="removerItemModal(${idx})" style="color:var(--red);border-color:var(--red)">🗑</button></td>
+            </tr>
+        `).join("");
         }
 
-        /* ========== EVENTO EAN ========== */
-        document.getElementById("doa_ean").addEventListener("keydown", async function(e) {
+        // Eventos EAN no modal
+        document.getElementById("modal_ean").addEventListener("keydown", async function(e) {
             if (e.key !== "Enter") return;
             e.preventDefault();
             const ean = this.value.trim();
-            const status = document.getElementById("doaEanStatus");
+            const status = document.getElementById("modalEanStatus");
             if (!ean) return;
             status.textContent = "Buscando...";
             status.className = "ean-status";
             try {
                 const p = await buscarCadastro(ean);
                 if (p) {
-                    document.getElementById("doa_plu").value = p.SEQPRODUTO || "";
-                    document.getElementById("doa_produto").value = p.DESCCOMPLETA || "";
+                    document.getElementById("modal_plu").value = p.SEQPRODUTO || "";
+                    document.getElementById("modal_produto").value = p.DESCCOMPLETA || "";
                     status.textContent = "✓ encontrado";
                     status.className = "ean-status found";
-                    document.getElementById("doa_qtd_unidade").focus();
+                    document.getElementById("modal_qtd").focus();
                 } else {
-                    document.getElementById("doa_plu").value = "";
-                    document.getElementById("doa_produto").value = "";
+                    document.getElementById("modal_plu").value = "";
+                    document.getElementById("modal_produto").value = "";
                     status.textContent = "não encontrado";
                     status.className = "ean-status notfound";
                 }
@@ -1214,15 +1455,186 @@
                 showToast("Erro ao buscar EAN: " + err.message, true);
             }
         });
-        document.getElementById("doa_qtd_unidade").addEventListener("input", e => {
+
+        document.getElementById("modal_qtd").addEventListener("input", function(e) {
             e.target.value = e.target.value.replace(/[^0-9]/g, "");
         });
-        document.getElementById("doa_qtd_unidade").addEventListener("keydown", function(e) {
+        document.getElementById("modal_qtd").addEventListener("keydown", function(e) {
             if (e.key === "Enter") {
                 e.preventDefault();
-                adicionarItemDoacao();
+                adicionarItemModal();
             }
         });
+
+        /* ========== SALVAR LOTE (com GAIOLA_PET) ========== */
+        async function salvarLote() {
+            if (!currentUser) { showToast("Faça login primeiro.", true); return; }
+            if (!itensModal.length) { showToast("Adicione pelo menos um item.", true); return; }
+
+            const btn = document.getElementById("btnSalvarLote");
+            btn.disabled = true;
+            btn.textContent = "Salvando...";
+
+            try {
+                // 1. Buscar o próximo número de gaiola novamente (para evitar concorrência)
+                const { data, error } = await sb.from("BD_DOAÇÃO").select("GAIOLA_PET").order("GAIOLA_PET", { ascending: false })
+                    .limit(1);
+                if (error) throw error;
+                let ultimo = 0;
+                if (data && data.length && data[0].GAIOLA_PET) {
+                    ultimo = Number(data[0].GAIOLA_PET);
+                }
+                const gaiola = ultimo + 1;
+
+                // 2. Montar registros
+                const turno = calcularTurno();
+                const agora = new Date().toISOString();
+                const registros = itensModal.map(item => ({
+                    DTA_HORA: agora,
+                    PLU: item.plu,
+                    PRODUTO: item.produto,
+                    QTD_UN: item.qtd,
+                    USER: currentUser.user,
+                    TURNO_LANC: turno,
+                    GAIOLA_PET: gaiola
+                }));
+
+                // 3. Inserir
+                const { error: insertError } = await sb.from("BD_DOAÇÃO").insert(registros);
+                if (insertError) throw insertError;
+
+                showToast(`Lote salvo com sucesso! ${registros.length} item(ns) na gaiola ${gaiola}.`);
+                fecharModalNovoLancamento();
+                // Atualizar lista
+                if (document.getElementById("viewLancamentos").classList.contains("active")) {
+                    carregarLancamentos();
+                }
+            } catch (err) {
+                showToast("Erro ao salvar lote: " + err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "💾 Salvar Lote (enviar tudo)";
+            }
+        }
+
+        /* ========== EXPORTAR ========== */
+        function abrirModalExport() {
+            if (!currentUser) { showToast("Faça login primeiro.", true); return; }
+            document.getElementById("exportFormato").value = "excel";
+            document.getElementById("exportDelimitador").value = ",";
+            document.getElementById("exportDelimitadorCustom").style.display = "none";
+            document.getElementById("exportDelimitadorCustom").value = "";
+            document.getElementById("modalExport").classList.add("active");
+        }
+
+        function fecharModalExport() {
+            document.getElementById("modalExport").classList.remove("active");
+        }
+
+        document.getElementById("exportDelimitador").addEventListener("change", function() {
+            const custom = document.getElementById("exportDelimitadorCustom");
+            if (this.value === "custom") {
+                custom.style.display = "block";
+                custom.focus();
+            } else {
+                custom.style.display = "none";
+            }
+        });
+
+        async function executarExport() {
+            const btn = document.getElementById("btnExportar");
+            btn.disabled = true;
+            btn.textContent = "Gerando...";
+
+            try {
+                const dataIni = document.getElementById("filtroDataIni").value;
+                const dataFim = document.getElementById("filtroDataFim").value;
+                const plu = document.getElementById("filtroPlu").value.trim();
+                const produto = document.getElementById("filtroProduto").value.trim();
+                const turno = document.getElementById("filtroTurno").value;
+                const gaiola = document.getElementById("filtroGaiola").value.trim();
+
+                let query = sb.from("BD_DOAÇÃO").select("*").order("DTA_HORA", { ascending: false }).limit(10000);
+                if (dataIni) query = query.gte("DTA_HORA", new Date(dataIni + "T00:00:00").toISOString());
+                if (dataFim) query = query.lte("DTA_HORA", new Date(dataFim + "T23:59:59").toISOString());
+                if (plu) {
+                    if (/^\d+$/.test(plu)) query = query.eq("PLU", Number(plu));
+                    else query = query.ilike("PLU", "%" + plu + "%");
+                }
+                if (produto) query = query.ilike("PRODUTO", "%" + produto + "%");
+                if (turno) query = query.eq("TURNO_LANC", Number(turno));
+                if (gaiola) {
+                    if (/^\d+$/.test(gaiola)) query = query.eq("GAIOLA_PET", Number(gaiola));
+                    else query = query.ilike("GAIOLA_PET", "%" + gaiola + "%");
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+                if (!data || !data.length) {
+                    showToast("Nenhum dado para exportar.", true);
+                    btn.disabled = false;
+                    btn.textContent = "📥 Exportar";
+                    return;
+                }
+
+                const headers = ["Data/Hora", "Gaiola", "PLU", "Produto", "Quantidade", "Usuário", "Turno"];
+                const rows = data.map(r => [
+                    formatarDataHora(r.DTA_HORA),
+                    r.GAIOLA_PET || "",
+                    r.PLU || "",
+                    r.PRODUTO || "",
+                    r.QTD_UN || 0,
+                    r.USER || "",
+                    (r.TURNO_LANC || "") + "º Turno"
+                ]);
+
+                const formato = document.getElementById("exportFormato").value;
+                let blob, filename;
+
+                if (formato === "excel") {
+                    const wb = XLSX.utils.book_new();
+                    const wsData = [headers, ...rows];
+                    const ws = XLSX.utils.aoa_to_sheet(wsData);
+                    XLSX.utils.book_append_sheet(wb, ws, "Lançamentos");
+                    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+                    blob = new Blob([wbout], { type: "application/octet-stream" });
+                    filename = "lancamentos.xlsx";
+                } else {
+                    let delim = ",";
+                    if (formato === "txt") {
+                        const delimSelect = document.getElementById("exportDelimitador");
+                        if (delimSelect.value === "custom") {
+                            delim = document.getElementById("exportDelimitadorCustom").value || ",";
+                        } else {
+                            delim = delimSelect.value;
+                            if (delim === "&#9;") delim = "\t";
+                        }
+                    }
+                    const headerLine = headers.join(delim);
+                    const dataLines = rows.map(row => row.join(delim));
+                    const content = [headerLine, ...dataLines].join("\n");
+                    blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+                    filename = "lancamentos." + (formato === "csv" ? "csv" : "txt");
+                }
+
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showToast(`Exportado ${data.length} registros como ${filename}`);
+                fecharModalExport();
+            } catch (err) {
+                showToast("Erro ao exportar: " + err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "📥 Exportar";
+            }
+        }
 
         /* ========== TEMA ========== */
         function toggleTheme() {
@@ -1231,10 +1643,10 @@
         }
         if (localStorage.getItem('tp_theme') === 'dark') document.body.classList.add('dark');
 
-        /* ========== RESTAURAR CARRINHO LOCAL ========== */
+        /* ========== INICIALIZAÇÃO ========== */
+        // Se já estiver logado (mantido pela sessão), carregar dados
         if (currentUser) {
-            doacaoStaged = carregarLocal();
-            renderTabela();
+            carregarLancamentos();
         }
     </script>
 </body>
