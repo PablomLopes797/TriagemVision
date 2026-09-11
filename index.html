@@ -2679,6 +2679,19 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 #sidebarVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;transform:scale(1.35);transform-origin:center;filter:saturate(1.15) contrast(1.08) brightness(.78)}
 .sidebar-video-wrap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,9,35,.10),rgba(2,9,35,.48));pointer-events:none}.sidebar-video-caption{position:absolute;left:10px;bottom:8px;z-index:2;font-size:8px;letter-spacing:1.5px;color:#d9f4ff;font-weight:800;text-shadow:0 1px 8px #000}
 
+/* ===== CROSS-FILTER (estilo Power BI) ===== */
+.dash-cross-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;margin-bottom:14px;border:1px solid var(--blue-100);border-radius:10px;background:linear-gradient(100deg,rgba(231,237,255,.75),rgba(255,255,255,.95));font-size:12px;color:var(--ink-soft);font-weight:600;box-shadow:0 4px 12px rgba(15,23,55,.04)}
+.dash-cross-bar.empty{display:none}
+.dash-cross-bar .dash-cross-title{font-weight:800;color:var(--ink);text-transform:uppercase;font-size:11px;letter-spacing:.5px;margin-right:4px}
+#dashCrossBadges{display:inline-flex;flex-wrap:wrap;gap:6px}
+.dash-cross-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 12px;border-radius:99px;background:linear-gradient(100deg,var(--blue-600),#287dff);color:#fff;font-size:11px;font-weight:700;box-shadow:0 4px 12px rgba(27,87,230,.28)}
+.dash-cross-badge .dim{opacity:.75;font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.5px}
+.dash-cross-badge .x{cursor:pointer;font-weight:900;padding:0 3px;border-radius:50%;transition:var(--transition)}
+.dash-cross-badge .x:hover{background:rgba(255,255,255,.25)}
+.dash-cross-clear{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;color:var(--ink-soft);transition:var(--transition)}
+.dash-cross-clear:hover{background:var(--surface);color:var(--ink);border-color:var(--blue-500)}
+.chart-panel-body canvas{cursor:pointer}
+
 </style>
 </head>
 <body class="light">
@@ -2811,6 +2824,11 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <table><thead><tr><th>Produto</th><th>Validade</th><th>Dias Restantes</th><th>Qtd. Unidade</th></tr></thead>
 <tbody id="dashFefoTable"><tr><td class="empty" colspan="4">Carregando…</td></tr></tbody></table>
 </div>
+</div>
+<div class="dash-cross-bar empty" id="dashCrossBar">
+  <span class="dash-cross-title">Filtros cruzados:</span>
+  <span id="dashCrossBadges"></span>
+  <button class="dash-cross-clear" onclick="limparCrossFilters()">Limpar tudo</button>
 </div>
 <div id="chartsGrid"></div>
 </div>
@@ -2968,7 +2986,7 @@ input[readonly]{background:var(--bg);color:var(--ink-soft)}
 <p>O QR Code contém um objeto com sistema, tipo, número, loja, categoria e a lista completa de itens com ordem, EAN, PLU, produto, categoria e quantidade. A segunda etapa é uma impressão A4 vertical com os itens organizados em tabela. Cada página repete os dados da gaiola e informa <b>PÁGINA X DE Y</b>. A última página não recebe quebra adicional para evitar folha em branco.</p>
 
 <h4>11. DASHBOARD E FEFO</h4>
-<p>O <b>DASHBOARD</b> apresenta total de unidades, unidades do dia, pendências de cadastro, categorias distintas, produtos distintos, usuários ativos, média diária e média por lançamento. Também possui filtros por tipo, turno, data, usuário, categoria, motivo, origem, rua, dono e CD, além de gráficos por turno, usuário, item, motivo, origem, categoria, rua, dono e distribuição por CD.</p>
+<p>O <b>DASHBOARD</b> apresenta total de unidades, unidades do dia, pendências de cadastro, categorias distintas, produtos distintos, usuários ativos, média diária e média por lançamento. Também possui filtros por tipo, turno, data, usuário, categoria, motivo, origem, rua, dono e CD, além de gráficos por turno, usuário, item, motivo, origem, categoria, rua, dono e distribuição por CD. Os gráficos possuem filtro cruzado no estilo Power BI: clicar em uma barra filtra todos os outros gráficos, clicar de novo na mesma barra remove o filtro.</p>
 <p>O módulo <b>FEFO</b> lista produtos próximos da validade e permite alternar janelas de 7, 15, 30, 60 e 90 dias. Use <b>ATUALIZAR</b> para consultar novamente os registros.</p>
 
 <h4>12. EXPORTAÇÃO E RELATÓRIOS</h4>
@@ -4261,47 +4279,201 @@ function renderPermissoes(){
 async function confirmarFefo(tipo, id, eanEncoded, qtd) { if (!id) { showToast("Registro FEFO sem identificador.", true); return; } if (!await showConfirm("Confirmar OK? Este item será eliminado do FEFO e retirado do saldo.", "Confirmar FEFO", "Confirmar OK")) return; const ean = decodeURIComponent(eanEncoded || ""); const tabela = tipo === "Lançamento" ? "BD_LANC" : "BD_RETRABALHO"; try { await verificarSaldoSuficiente(ean, Number(qtd) || 0); await debitarSaldo(ean, Number(qtd) || 0); const { error } = await sb.from(tabela).delete().eq("id", id); if (error) { await adicionarSaldo(ean, null, null, Number(qtd) || 0); throw error; } showToast("Item FEFO eliminado e saldo atualizado."); loadFefo(); loadDashboard(); } catch (err) { showToast("Erro ao eliminar item FEFO: " + err.message, true); } }
 async function loadFefo() { const tbody = document.getElementById("fefoTable"); tbody.innerHTML = '<tr><td colspan="8" class="empty">Carregando…</td></tr>'; const dias = parseInt(document.getElementById("fefoRange").value); const hoje = new Date(); hoje.setHours(0, 0, 0, 0); const limite = new Date(hoje.getTime() + dias * 86400000); try { const [lanc, retra] = await Promise.all([sb.from("BD_LANC").select("*").not("VALIDADE", "is", null).limit(1000), sb.from("BD_RETRABALHO").select("*").not("VALIDADE", "is", null).limit(1000)]); let rows = []; (lanc.data || []).forEach(r => { const v = new Date(r.VALIDADE + "T00:00:00"); if (v >= hoje && v <= limite) rows.push({ ...r, TIPO: "Lançamento", dias: Math.round((v - hoje) / 86400000) }); }); (retra.data || []).forEach(r => { const v = new Date(r.VALIDADE + "T00:00:00"); if (v >= hoje && v <= limite) rows.push({ ...r, TIPO: "Retrabalho", dias: Math.round((v - hoje) / 86400000) }); }); rows.sort((a, b) => a.dias - b.dias); if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhum produto próximo do vencimento.</td></tr>'; return; } tbody.innerHTML = rows.map(r => `<tr><td>${fmtDate(r.DTA_HORA)}</td><td>${r.TIPO}</td><td class="code">${r.EAN || ""}</td><td>${r.PRODUTO || "—"}</td><td>${r.VALIDADE}</td><td>${r.dias} dias</td><td>${r.QTD_UNIDADE || ""}</td><td><button class="btn ghost" onclick="confirmarFefo('${r.TIPO}','${r.id}','${encodeURIComponent(r.EAN || "")}',${Number(r.QTD_UNIDADE) || 0})">OK</button></td></tr>`).join(""); } catch (e) { tbody.innerHTML = `<tr><td colspan="8" class="empty">Erro: ${e.message}</td></tr>`; } }
 
-/* ========== GRÁFICOS E DASHBOARD ========== */
+/* ========== GRÁFICOS E DASHBOARD (com cross-filter estilo Power BI) ========== */
 let chartInstances = {};
+
+// Estado dos filtros cruzados. null = dimensão sem filtro.
+let dashCrossFilter = {
+  TURNO_LANC: null,
+  TIPO: null,
+  USER: null,
+  PRODUTO: null,
+  MOTIVO: null,
+  ORIGEM: null,
+  CATEGORIA: null,
+  RUA: null,
+  DONO: null,
+  CD: null
+};
+
+// Quais dimensões cada gráfico "representa" (para excluir do filtro quando ele mesmo é redesenhado).
+const CHART_DIMENSIONS = {
+  chartTurnoTipo: ['TURNO_LANC', 'TIPO'],
+  chartTopUsuario: ['USER'],
+  chartTopItens: ['PRODUTO'],
+  chartTopMotivos: ['MOTIVO'],
+  chartTopOrigens: ['ORIGEM'],
+  chartCategoria: ['CATEGORIA'],
+  chartTopRuas: ['RUA'],
+  chartTopDonos: ['DONO'],
+  chartBrasil: ['CD']
+};
+
+const DIM_LABELS = {
+  TURNO_LANC: 'Turno',
+  TIPO: 'Tipo',
+  USER: 'Usuário',
+  PRODUTO: 'Produto',
+  MOTIVO: 'Motivo',
+  ORIGEM: 'Origem',
+  CATEGORIA: 'Categoria',
+  RUA: 'Rua',
+  DONO: 'Dono',
+  CD: 'CD'
+};
+
 function fmtNum(n) { return Math.round(n || 0).toLocaleString('pt-BR'); }
 function fmtPct(n, t) { return t > 0 ? ((n / t) * 100).toFixed(1).replace('.', ',') + '%' : '0%'; }
+
+function colorWithAlpha(hex, alpha) {
+  if (!hex) return `rgba(47,107,255,${alpha})`;
+  if (hex.indexOf('rgb') === 0) return hex;
+  const h = String(hex).replace('#', '');
+  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function sumQty(rows) { return (rows || []).reduce((s, r) => s + (Number(r.QTD_UNIDADE) || 0), 0); }
+
+function temAlgumCrossFilter() {
+  for (const k in dashCrossFilter) {
+    const v = dashCrossFilter[k];
+    if (v !== null && v !== undefined && v !== '') return true;
+  }
+  return false;
+}
+
+function limparCrossFilters() {
+  for (const k in dashCrossFilter) dashCrossFilter[k] = null;
+  aplicarFiltrosDashboard();
+}
+
+function limparCrossFilter(dim) {
+  if (dim === 'TURNO_LANC' || dim === 'TIPO') {
+    dashCrossFilter.TURNO_LANC = null;
+    dashCrossFilter.TIPO = null;
+  } else {
+    dashCrossFilter[dim] = null;
+  }
+  aplicarFiltrosDashboard();
+}
+
+function renderCrossFilterBadges() {
+  const bar = document.getElementById('dashCrossBar');
+  const container = document.getElementById('dashCrossBadges');
+  if (!bar || !container) return;
+
+  // Agrupa turno e tipo em um único badge "combo"
+  const ativos = [];
+  if (dashCrossFilter.TURNO_LANC || dashCrossFilter.TIPO) {
+    const partes = [];
+    if (dashCrossFilter.TURNO_LANC) partes.push(dashCrossFilter.TURNO_LANC + 'º Turno');
+    if (dashCrossFilter.TIPO) partes.push(dashCrossFilter.TIPO);
+    ativos.push({ chave: 'TURNO_LANC', label: 'Turno/Tipo', valor: partes.join(' + ') });
+  }
+  ['USER','PRODUTO','MOTIVO','ORIGEM','CATEGORIA','RUA','DONO','CD'].forEach(dim => {
+    const v = dashCrossFilter[dim];
+    if (v !== null && v !== undefined && v !== '') {
+      ativos.push({ chave: dim, label: DIM_LABELS[dim] || dim, valor: v });
+    }
+  });
+
+  if (!ativos.length) {
+    bar.classList.add('empty');
+    container.innerHTML = '';
+    return;
+  }
+  bar.classList.remove('empty');
+  container.innerHTML = ativos.map(a =>
+    '<span class="dash-cross-badge"><span class="dim">' + a.label + '</span>' + String(a.valor) +
+    '<span class="x" onclick="limparCrossFilter(\'' + a.chave + '\')">✕</span></span>'
+  ).join('');
+}
+
+function handleCrossFilterClick(chartId, value, tipo) {
+  if (!CHART_DIMENSIONS[chartId]) return;
+  if (value === null || value === undefined || value === '' || value === 'Sem dados') return;
+
+  if (chartId === 'chartTurnoTipo') {
+    const mesmo = String(dashCrossFilter.TURNO_LANC) === String(value)
+               && String(dashCrossFilter.TIPO) === String(tipo);
+    if (mesmo) {
+      dashCrossFilter.TURNO_LANC = null;
+      dashCrossFilter.TIPO = null;
+    } else {
+      dashCrossFilter.TURNO_LANC = value;
+      dashCrossFilter.TIPO = tipo;
+    }
+  } else {
+    const dim = CHART_DIMENSIONS[chartId][0];
+    if (String(dashCrossFilter[dim]) === String(value)) {
+      dashCrossFilter[dim] = null;
+    } else {
+      dashCrossFilter[dim] = value;
+    }
+  }
+  aplicarFiltrosDashboard();
+}
+
+function applyCrossFiltersToRows(rows, excludeDims) {
+  const excl = excludeDims || [];
+  return (rows || []).filter(r => {
+    for (const dim in dashCrossFilter) {
+      const val = dashCrossFilter[dim];
+      if (val === null || val === undefined || val === '') continue;
+      if (excl.indexOf(dim) !== -1) continue;
+
+      if (dim === 'CD') {
+        const cd = extractCd(r.APANHA || '');
+        if (String(cd) !== String(val)) return false;
+      } else if (dim === 'TURNO_LANC') {
+        if (String(r.TURNO_LANC || '') !== String(val)) return false;
+      } else if (dim === 'TIPO') {
+        if (String(r.TIPO || '') !== String(val)) return false;
+      } else {
+        if (String(r[dim] === undefined || r[dim] === null ? '' : r[dim]) !== String(val)) return false;
+      }
+    }
+    return true;
+  });
+}
+
 function criarPainelGrafico(id, titulo) { return `<div class="panel"><div class="panel-head"><h4>${titulo}</h4><button class="icon-btn" title="Exportar PNG" onclick="exportarGraficoPNG('${id}')">📷</button></div><div class="panel-body chart-panel-body"><canvas id="${id}"></canvas></div></div>`; }
 function exportarGraficoPNG(id) { const c = document.getElementById(id); if (!c) { showToast("Gráfico não encontrado.", true); return; } const u = c.toDataURL("image/png", 1); const a = document.createElement("a"); a.href = u; a.download = id + "_" + Date.now() + ".png"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
 function montarChartsGrid() { const g = document.getElementById("chartsGrid"); if (g.dataset.montado) return; g.innerHTML = [criarPainelGrafico("chartTurnoTipo","Lançamentos por Turno e Tipo"),criarPainelGrafico("chartTopUsuario","Top 10 Lançamentos por Usuário"),criarPainelGrafico("chartTopItens","Top 10 Itens Mais Lançados"),criarPainelGrafico("chartTopMotivos","Top 10 Motivos Mais Lançados"),criarPainelGrafico("chartTopOrigens","Top Origens Mais Lançadas"),criarPainelGrafico("chartCategoria","Top 10 Categorias Mais Lançadas"),criarPainelGrafico("chartTopRuas","Top 10 Ruas Mais Lançadas"),criarPainelGrafico("chartTopDonos","Top 10 Donos Mais Lançados"),criarPainelGrafico("chartBrasil","Distribuição por CD")].join(""); g.dataset.montado = "1"; }
 
-/* ========== GRÁFICO DE BARRAS GENÉRICO ==========
-   CORRIGIDO: o eixo de categoria (lado esquerdo quando horizontal,
-   lado inferior quando vertical) agora EXIBE O NOME da categoria
-   (motivo, rua, dono, usuário, categoria, origem, item, CD) em vez
-   do índice 0,1,2,3…
-   Isso vale para TODOS os gráficos do Dashboard que usam esta função. */
+// Gráfico de barras genérico, com suporte a clique (cross-filter) e destaque visual
 function renderBarChart(id, labels, valores, total, horiz, cor) {
   const ctx = document.getElementById(id);
   if (!ctx) return;
   if (chartInstances[id]) chartInstances[id].destroy();
 
   const bgColor = cor || "#2f6bff";
-  const labelsUsar = (Array.isArray(labels) && labels.length) ? labels : ["Sem dados"];
-  const valoresUsar = (Array.isArray(valores) && valores.length) ? valores : [0];
+  const labelsUsar = (Array.isArray(labels) && labels.length) ? labels.slice() : ["Sem dados"];
+  const valoresUsar = (Array.isArray(valores) && valores.length) ? valores.slice() : [0];
 
-  // Configuração de escalas por orientação.
-  // IMPORTANTE: nunca passar `callback: undefined` — isso desliga os labels
-  // de categoria do Chart.js e faz aparecer 0,1,2,3… no eixo.
+  // Destaca a barra selecionada; esmaece as demais
+  const dim = CHART_DIMENSIONS[id] ? CHART_DIMENSIONS[id][0] : null;
+  const filterAtivo = dim ? dashCrossFilter[dim] : null;
+  let bgColors;
+  if (filterAtivo !== null && filterAtivo !== undefined && filterAtivo !== '') {
+    bgColors = labelsUsar.map(l => String(l) === String(filterAtivo) ? bgColor : colorWithAlpha(bgColor, 0.25));
+  } else {
+    bgColors = bgColor;
+  }
+
   const scalesOpts = horiz
     ? {
-        x: {
-          ticks: { callback: v => fmtNum(v) },
-          grid: { drawBorder: false }
-        },
+        x: { ticks: { callback: v => fmtNum(v) }, grid: { drawBorder: false } },
         y: {
           ticks: {
             autoSkip: false,
             font: { size: 11, weight: "600" },
             color: "#111629",
-            // Garante que o texto do motivo/rua/dono/categoria apareça no eixo.
-            callback: function(value, index) {
-              return this.getLabelForValue(value);
-            }
+            callback: function(value) { return this.getLabelForValue(value); }
           },
           grid: { display: false }
         }
@@ -4311,30 +4483,28 @@ function renderBarChart(id, labels, valores, total, horiz, cor) {
           ticks: {
             autoSkip: false,
             font: { size: 10 },
-            callback: function(value, index) {
-              return this.getLabelForValue(value);
-            }
+            callback: function(value) { return this.getLabelForValue(value); }
           }
         },
-        y: {
-          ticks: { callback: v => fmtNum(v) }
-        }
+        y: { ticks: { callback: v => fmtNum(v) } }
       };
 
   chartInstances[id] = new Chart(ctx, {
     type: "bar",
     data: {
       labels: labelsUsar,
-      datasets: [{
-        data: valoresUsar,
-        backgroundColor: bgColor,
-        borderRadius: 6
-      }]
+      datasets: [{ data: valoresUsar, backgroundColor: bgColors, borderRadius: 6 }]
     },
     options: {
       indexAxis: horiz ? "y" : "x",
       responsive: true,
       maintainAspectRatio: false,
+      onClick: (event, elements) => {
+        if (!elements || !elements.length) return;
+        const idx = elements[0].index;
+        const label = labelsUsar[idx];
+        handleCrossFilterClick(id, label);
+      },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -4359,12 +4529,195 @@ function renderBarChart(id, labels, valores, total, horiz, cor) {
     plugins: [window.ChartDataLabels]
   });
 }
-function renderTurnoTipoChart(rows, total) { const turnos = ["1","2","3"]; const tipos = ["Lançamento","Retrabalho","Descarte","Gaiola"]; const cores = { "Lançamento": "#2f6bff", "Retrabalho": "#e5972a", "Descarte": "#d64545", "Gaiola": "#7c3aed" }; const datasets = tipos.map(t => ({ label: t, data: turnos.map(tu => rows.filter(r => String(r.TURNO_LANC) === tu && r.TIPO === t).reduce((s, r) => s + (Number(r.QTD_UNIDADE) || 0), 0)), backgroundColor: cores[t], borderRadius: 5 })); const id = "chartTurnoTipo"; if (chartInstances[id]) chartInstances[id].destroy(); chartInstances[id] = new Chart(document.getElementById(id), { type: "bar", data: { labels: ["1 Turno","2 Turno","3 Turno"], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" }, datalabels: { formatter: v => v > 0 ? (fmtNum(v) + " (" + fmtPct(v, total) + ")") : "", color: "#111629", font: { size: 9, weight: "700" } } }, scales: { y: { ticks: { callback: v => fmtNum(v) } } } }, plugins: [window.ChartDataLabels] }); }
+
+// Gráfico Turno x Tipo (barras agrupadas) com cross-filter de duas dimensões
+function renderTurnoTipoChart(rows, total) {
+  const turnos = ["1","2","3"];
+  const tipos = ["Lançamento","Retrabalho","Descarte","Gaiola"];
+  const cores = { "Lançamento": "#2f6bff", "Retrabalho": "#e5972a", "Descarte": "#d64545", "Gaiola": "#7c3aed" };
+
+  const filterTurno = dashCrossFilter.TURNO_LANC;
+  const filterTipo = dashCrossFilter.TIPO;
+
+  const datasets = tipos.map(t => {
+    const bg = cores[t];
+    const bgList = turnos.map(tu => {
+      const bateTurno = filterTurno === null || filterTurno === undefined || filterTurno === '' || String(tu) === String(filterTurno);
+      const bateTipo = filterTipo === null || filterTipo === undefined || filterTipo === '' || t === filterTipo;
+      return (bateTurno && bateTipo) ? bg : colorWithAlpha(bg, 0.22);
+    });
+    return {
+      label: t,
+      data: turnos.map(tu => rows.filter(r => String(r.TURNO_LANC) === tu && r.TIPO === t).reduce((s, r) => s + (Number(r.QTD_UNIDADE) || 0), 0)),
+      backgroundColor: bgList,
+      borderRadius: 5
+    };
+  });
+
+  const id = "chartTurnoTipo";
+  if (chartInstances[id]) chartInstances[id].destroy();
+  chartInstances[id] = new Chart(document.getElementById(id), {
+    type: "bar",
+    data: { labels: ["1 Turno","2 Turno","3 Turno"], datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: (event, elements) => {
+        if (!elements || !elements.length) return;
+        const el = elements[0];
+        const turno = turnos[el.index];
+        const tipo = tipos[el.datasetIndex];
+        handleCrossFilterClick('chartTurnoTipo', turno, tipo);
+      },
+      plugins: {
+        legend: { position: "bottom" },
+        tooltip: {
+          callbacks: {
+            label: (item) => item.dataset.label + ': ' + fmtNum(item.parsed.y) + ' (' + fmtPct(item.parsed.y, total) + ')'
+          }
+        },
+        datalabels: {
+          formatter: v => v > 0 ? (fmtNum(v) + " (" + fmtPct(v, total) + ")") : "",
+          color: "#111629",
+          font: { size: 9, weight: "700" }
+        }
+      },
+      scales: { y: { ticks: { callback: v => fmtNum(v) } } }
+    },
+    plugins: [window.ChartDataLabels]
+  });
+}
+
 function agruparSoma(rows, campo, topN) { const m = {}; rows.forEach(r => { const c = (r[campo] ?? "").toString().trim(); if (!c) return; m[c] = (m[c] || 0) + (Number(r.QTD_UNIDADE) || 0); }); let a = Object.entries(m).sort((a, b) => b[1] - a[1]); if (topN) a = a.slice(0, topN); return a; }
 function extractCd(apanha) { if (!apanha) return null; const parts = String(apanha).split(/[-\s]/); const first = parts[0]; return /^\d+$/.test(first) ? first : null; }
 async function fetchUnifiedData() { const [l, r, d, g] = await Promise.all([sb.from("BD_LANC").select("*").limit(5000),sb.from("BD_RETRABALHO").select("*").limit(5000),sb.from("BD_DESCARTE").select("*").limit(5000),sb.from("BD_GAIOLA").select("*").limit(5000)]); const rows = []; (l.data || []).forEach(r => rows.push({ ...r, TIPO: "Lançamento" })); (r.data || []).forEach(r => rows.push({ ...r, TIPO: "Retrabalho" })); (d.data || []).forEach(r => rows.push({ ...r, TIPO: "Descarte" })); (g.data || []).forEach(r => { const qtd = r["QTD UN"] || 0; const novaLinha = { ...r, QTD_UNIDADE: Number(qtd), TIPO: "Gaiola" }; if (r.DTA_HORA) novaLinha.TURNO_LANC = calcularTurno(new Date(r.DTA_HORA)); rows.push(novaLinha); }); return rows; }
 let dashDadosBrutos = [];
-function aplicarFiltrosDashboard() { const tipoGlobal = document.getElementById("globalTipoFiltro").value; let rows = dashDadosBrutos.filter(r => { if (tipoGlobal && r.TIPO !== tipoGlobal) return false; return true; }); const f = { turno: document.getElementById("dfTurno").value, dataIni: document.getElementById("dfDataIni").value, dataFim: document.getElementById("dfDataFim").value, usuario: document.getElementById("dfUsuario").value.trim(), categoria: document.getElementById("dfCategoria").value.trim(), motivo: document.getElementById("dfMotivo").value.trim(), origem: document.getElementById("dfOrigem").value.trim(), rua: document.getElementById("dfRua").value.trim(), dono: document.getElementById("dfDono").value.trim() }; rows = rows.filter(r => { if (f.turno && String(r.TURNO_LANC || "") !== String(f.turno)) return false; if (f.usuario && !String(r.USER || "").toLowerCase().includes(f.usuario.toLowerCase())) return false; if (f.categoria && !String(r.CATEGORIA || "").toLowerCase().includes(f.categoria.toLowerCase())) return false; if (f.motivo && !String(r.MOTIVO || "").toLowerCase().includes(f.motivo.toLowerCase())) return false; if (f.origem && !String(r.ORIGEM || "").toLowerCase().includes(f.origem.toLowerCase())) return false; if (f.rua && !String(r.RUA || "").toLowerCase().includes(f.rua.toLowerCase())) return false; if (f.dono && !String(r.DONO || "").toLowerCase().includes(f.dono.toLowerCase())) return false; if (f.dataIni || f.dataFim) { const d = new Date(r.DTA_HORA); if (isNaN(d)) return false; if (f.dataIni && d < new Date(f.dataIni + "T00:00:00")) return false; if (f.dataFim && d > new Date(f.dataFim + "T23:59:59")) return false; } return true; }); const cdFiltro = document.getElementById("dfCd").value; if (cdFiltro) { rows = rows.filter(r => { const cd = extractCd(r.APANHA || ''); return cd === cdFiltro; }); } const total = rows.reduce((s, r) => s + (Number(r.QTD_UNIDADE) || 0), 0); const hoje = new Date(); const hojeQtd = rows.filter(r => { const d = new Date(r.DTA_HORA); return !isNaN(d) && d.toDateString() === hoje.toDateString(); }).reduce((s, r) => s + (Number(r.QTD_UNIDADE) || 0), 0); document.getElementById("statTotal").textContent = fmtNum(total); document.getElementById("statHoje").textContent = fmtNum(hojeQtd); document.getElementById("statPend").textContent = fmtNum(rows.filter(r => r.TIPO === "Lançamento" && !r.PRODUTO).length); const categorias = new Set(rows.map(r => r.CATEGORIA).filter(Boolean)); document.getElementById("statCat").textContent = categorias.size; const produtos = new Set(rows.map(r => r.PRODUTO).filter(Boolean)); document.getElementById("statProd").textContent = produtos.size; const usuariosAtivos = new Set(rows.map(r => r.USER).filter(Boolean)); document.getElementById("statUser").textContent = usuariosAtivos.size; const datasUnicas = new Set(rows.map(r => r.DTA_HORA?.split("T")[0]).filter(Boolean)); const dias = datasUnicas.size || 1; document.getElementById("statMediaDia").textContent = fmtNum(total / dias); const qtdLancamentos = rows.length || 1; document.getElementById("statMediaLanc").textContent = fmtNum(total / qtdLancamentos); renderTurnoTipoChart(rows, total); let t; t = agruparSoma(rows, "USER", 10); renderBarChart("chartTopUsuario", t.map(x => x[0]), t.map(x => x[1]), total, true, "#1b57e6"); t = agruparSoma(rows, "PRODUTO", 10); renderBarChart("chartTopItens", t.map(x => x[0]), t.map(x => x[1]), total, true, "#0f9d58"); t = agruparSoma(rows, "MOTIVO", 10); renderBarChart("chartTopMotivos", t.map(x => x[0]), t.map(x => x[1]), total, true, "#e5972a"); t = agruparSoma(rows, "ORIGEM", 10); renderBarChart("chartTopOrigens", t.map(x => x[0]), t.map(x => x[1]), total, true, "#7c3aed"); t = agruparSoma(rows, "CATEGORIA", 10); renderBarChart("chartCategoria", t.map(x => x[0]), t.map(x => x[1]), total, true, "#d64545"); t = agruparSoma(rows, "RUA", 10); renderBarChart("chartTopRuas", t.map(x => x[0]), t.map(x => x[1]), total, true, "#2f6bff"); t = agruparSoma(rows, "DONO", 10); renderBarChart("chartTopDonos", t.map(x => x[0]), t.map(x => x[1]), total, true, "#0f9d58"); const cdMap = {}; rows.forEach(r => { const cd = extractCd(r.APANHA || ''); if (cd) cdMap[cd] = (cdMap[cd] || 0) + (Number(r.QTD_UNIDADE) || 0); }); let cdEntries = Object.entries(cdMap).sort((a, b) => b[1] - a[1]).slice(0, 10); if (cdEntries.length === 0) cdEntries = [["Sem CD", 0]]; const idCD = "chartBrasil"; if (chartInstances[idCD]) chartInstances[idCD].destroy(); chartInstances[idCD] = new Chart(document.getElementById(idCD), { type: "bar", data: { labels: cdEntries.map(x => "CD " + x[0]), datasets: [{ label: "Unidades", data: cdEntries.map(x => x[1]), backgroundColor: "#0f9d58", borderRadius: 6 }] }, options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: "end", align: "right", formatter: v => fmtNum(v) + " (" + fmtPct(v, total) + ")", color: "#111629", font: { weight: "700", size: 10 } } }, scales: { x: { ticks: { callback: v => fmtNum(v) } }, y: { ticks: { autoSkip: false, callback: function(value) { return this.getLabelForValue(value); } } } } }, plugins: [window.ChartDataLabels] }); const hojeFefo = new Date(); hojeFefo.setHours(0,0,0,0); const limiteFefo = new Date(hojeFefo.getTime() + 30 * 86400000); const fefoItens = []; rows.forEach(r => { if (!r.VALIDADE) return; const v = new Date(r.VALIDADE + "T00:00:00"); if (isNaN(v)) return; const diasRest = Math.round((v - hojeFefo) / 86400000); if (diasRest >= 0 && diasRest <= 30) { fefoItens.push({ produto: r.PRODUTO || r.EAN, validade: r.VALIDADE, dias: diasRest, qtd: Number(r.QTD_UNIDADE) || 0 }); } }); fefoItens.sort((a, b) => a.dias - b.dias); const tbodyFefo = document.getElementById("dashFefoTable"); if (fefoItens.length === 0) { tbodyFefo.innerHTML = '<tr><td colspan="4" class="empty">Nenhum produto próximo do vencimento (30 dias).</td></tr>'; } else { tbodyFefo.innerHTML = fefoItens.map(it => `<tr><td>${it.produto}</td><td>${it.validade}</td><td>${it.dias} dias</td><td>${it.qtd}</td></tr>`).join(""); } }
+
+// Aplica apenas os filtros da barra superior (não os cruzados)
+function aplicarToolbarFilters() {
+  const tipoGlobal = document.getElementById("globalTipoFiltro").value;
+  let rows = dashDadosBrutos.filter(r => !tipoGlobal || r.TIPO === tipoGlobal);
+
+  const f = {
+    turno: document.getElementById("dfTurno").value,
+    dataIni: document.getElementById("dfDataIni").value,
+    dataFim: document.getElementById("dfDataFim").value,
+    usuario: document.getElementById("dfUsuario").value.trim(),
+    categoria: document.getElementById("dfCategoria").value.trim(),
+    motivo: document.getElementById("dfMotivo").value.trim(),
+    origem: document.getElementById("dfOrigem").value.trim(),
+    rua: document.getElementById("dfRua").value.trim(),
+    dono: document.getElementById("dfDono").value.trim()
+  };
+
+  rows = rows.filter(r => {
+    if (f.turno && String(r.TURNO_LANC || "") !== String(f.turno)) return false;
+    if (f.usuario && !String(r.USER || "").toLowerCase().includes(f.usuario.toLowerCase())) return false;
+    if (f.categoria && !String(r.CATEGORIA || "").toLowerCase().includes(f.categoria.toLowerCase())) return false;
+    if (f.motivo && !String(r.MOTIVO || "").toLowerCase().includes(f.motivo.toLowerCase())) return false;
+    if (f.origem && !String(r.ORIGEM || "").toLowerCase().includes(f.origem.toLowerCase())) return false;
+    if (f.rua && !String(r.RUA || "").toLowerCase().includes(f.rua.toLowerCase())) return false;
+    if (f.dono && !String(r.DONO || "").toLowerCase().includes(f.dono.toLowerCase())) return false;
+    if (f.dataIni || f.dataFim) {
+      const d = new Date(r.DTA_HORA);
+      if (isNaN(d)) return false;
+      if (f.dataIni && d < new Date(f.dataIni + "T00:00:00")) return false;
+      if (f.dataFim && d > new Date(f.dataFim + "T23:59:59")) return false;
+    }
+    return true;
+  });
+
+  const cdFiltro = document.getElementById("dfCd").value;
+  if (cdFiltro) {
+    rows = rows.filter(r => extractCd(r.APANHA || '') === cdFiltro);
+  }
+  return rows;
+}
+
+function aplicarFiltrosDashboard() {
+  const baseRows = aplicarToolbarFilters();
+
+  // KPIs e FEFO usam TODOS os filtros cruzados
+  const statsRows = applyCrossFiltersToRows(baseRows, []);
+  const total = sumQty(statsRows);
+
+  const hoje = new Date();
+  const hojeQtd = statsRows.filter(r => { const d = new Date(r.DTA_HORA); return !isNaN(d) && d.toDateString() === hoje.toDateString(); }).reduce((s, r) => s + (Number(r.QTD_UNIDADE) || 0), 0);
+  document.getElementById("statTotal").textContent = fmtNum(total);
+  document.getElementById("statHoje").textContent = fmtNum(hojeQtd);
+  document.getElementById("statPend").textContent = fmtNum(statsRows.filter(r => r.TIPO === "Lançamento" && !r.PRODUTO).length);
+  document.getElementById("statCat").textContent = new Set(statsRows.map(r => r.CATEGORIA).filter(Boolean)).size;
+  document.getElementById("statProd").textContent = new Set(statsRows.map(r => r.PRODUTO).filter(Boolean)).size;
+  document.getElementById("statUser").textContent = new Set(statsRows.map(r => r.USER).filter(Boolean)).size;
+  const datasUnicas = new Set(statsRows.map(r => (r.DTA_HORA || '').split("T")[0]).filter(Boolean));
+  document.getElementById("statMediaDia").textContent = fmtNum(total / (datasUnicas.size || 1));
+  document.getElementById("statMediaLanc").textContent = fmtNum(total / (statsRows.length || 1));
+
+  // Cada gráfico exclui a sua própria dimensão para permitir "desfazer clique"
+  let rows, t;
+
+  rows = applyCrossFiltersToRows(baseRows, ['TURNO_LANC', 'TIPO']);
+  renderTurnoTipoChart(rows, sumQty(rows));
+
+  rows = applyCrossFiltersToRows(baseRows, ['USER']);
+  t = agruparSoma(rows, "USER", 10);
+  renderBarChart("chartTopUsuario", t.map(x => x[0]), t.map(x => x[1]), sumQty(rows), true, "#1b57e6");
+
+  rows = applyCrossFiltersToRows(baseRows, ['PRODUTO']);
+  t = agruparSoma(rows, "PRODUTO", 10);
+  renderBarChart("chartTopItens", t.map(x => x[0]), t.map(x => x[1]), sumQty(rows), true, "#0f9d58");
+
+  rows = applyCrossFiltersToRows(baseRows, ['MOTIVO']);
+  t = agruparSoma(rows, "MOTIVO", 10);
+  renderBarChart("chartTopMotivos", t.map(x => x[0]), t.map(x => x[1]), sumQty(rows), true, "#e5972a");
+
+  rows = applyCrossFiltersToRows(baseRows, ['ORIGEM']);
+  t = agruparSoma(rows, "ORIGEM", 10);
+  renderBarChart("chartTopOrigens", t.map(x => x[0]), t.map(x => x[1]), sumQty(rows), true, "#7c3aed");
+
+  rows = applyCrossFiltersToRows(baseRows, ['CATEGORIA']);
+  t = agruparSoma(rows, "CATEGORIA", 10);
+  renderBarChart("chartCategoria", t.map(x => x[0]), t.map(x => x[1]), sumQty(rows), true, "#d64545");
+
+  rows = applyCrossFiltersToRows(baseRows, ['RUA']);
+  t = agruparSoma(rows, "RUA", 10);
+  renderBarChart("chartTopRuas", t.map(x => x[0]), t.map(x => x[1]), sumQty(rows), true, "#2f6bff");
+
+  rows = applyCrossFiltersToRows(baseRows, ['DONO']);
+  t = agruparSoma(rows, "DONO", 10);
+  renderBarChart("chartTopDonos", t.map(x => x[0]), t.map(x => x[1]), sumQty(rows), true, "#0f9d58");
+
+  // Distribuição por CD
+  rows = applyCrossFiltersToRows(baseRows, ['CD']);
+  const cdMap = {};
+  rows.forEach(r => { const cd = extractCd(r.APANHA || ''); if (cd) cdMap[cd] = (cdMap[cd] || 0) + (Number(r.QTD_UNIDADE) || 0); });
+  let cdEntries = Object.entries(cdMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  if (cdEntries.length === 0) cdEntries = [["Sem CD", 0]];
+  renderBarChart("chartBrasil", cdEntries.map(x => x[0]), cdEntries.map(x => x[1]), sumQty(rows), true, "#0f9d58");
+
+  // Tabela FEFO inferior — usa os MESMOS filtros dos KPIs (todos os cross-filters)
+  const hojeFefo = new Date(); hojeFefo.setHours(0,0,0,0);
+  const limiteFefo = new Date(hojeFefo.getTime() + 30 * 86400000);
+  const fefoItens = [];
+  statsRows.forEach(r => {
+    if (!r.VALIDADE) return;
+    const v = new Date(r.VALIDADE + "T00:00:00");
+    if (isNaN(v)) return;
+    const diasRest = Math.round((v - hojeFefo) / 86400000);
+    if (diasRest >= 0 && diasRest <= 30) {
+      fefoItens.push({ produto: r.PRODUTO || r.EAN, validade: r.VALIDADE, dias: diasRest, qtd: Number(r.QTD_UNIDADE) || 0 });
+    }
+  });
+  fefoItens.sort((a, b) => a.dias - b.dias);
+  const tbodyFefo = document.getElementById("dashFefoTable");
+  if (fefoItens.length === 0) {
+    tbodyFefo.innerHTML = '<tr><td colspan="4" class="empty">Nenhum produto próximo do vencimento (30 dias).</td></tr>';
+  } else {
+    tbodyFefo.innerHTML = fefoItens.map(it => `<tr><td>${it.produto}</td><td>${it.validade}</td><td>${it.dias} dias</td><td>${it.qtd}</td></tr>`).join("");
+  }
+
+  renderCrossFilterBadges();
+}
 function toggleDashFiltros() { const painel = document.getElementById("dashFiltrosPainel"); const label = document.getElementById("dashFiltroToggleLabel"); if (painel.style.display === "none") { painel.style.display = "block"; label.textContent = "Ocultar filtros"; } else { painel.style.display = "none"; label.textContent = "Mostrar filtros"; } }
 function cancelarFiltrosDashboard() { document.getElementById("dashFiltrosPainel").style.display = "none"; document.getElementById("dashFiltroToggleLabel").textContent = "Mostrar filtros"; }
 function limparFiltrosDashboard() { ["dfCd","dfTurno","dfDataIni","dfDataFim","dfUsuario","dfCategoria","dfMotivo","dfOrigem","dfRua","dfDono"].forEach(id => document.getElementById(id).value = ""); aplicarFiltrosDashboard(); }
@@ -4416,49 +4769,32 @@ async function exportData(type) {
 }
 function downloadBlob(blob, filename) { const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }
 
-/* ========== FORMATAÇÃO DE DATA (ROBUSTA) ==========
-   Sempre retorna "DD/MM/AAAA HH:MM" com zero à esquerda, sem segundos.
-   Aceita: ISO com/sem Z, com/sem ms, "YYYY-MM-DD HH:MM:SS", "DD/MM/AAAA HH:MM",
-   epoch (ms ou segundos) e objetos Date. Nunca devolve valor cru — em falha retorna "—". */
+/* ========== FORMATAÇÃO DE DATA (ROBUSTA) ========== */
 function fmtDate(valor) {
   if (valor === null || valor === undefined || valor === "") return "—";
-
   let d = null;
-
-  if (valor instanceof Date) {
-    d = valor;
-  } else if (typeof valor === "number") {
-    // epoch em ms ou segundos (heurística: < 1e12 = segundos)
-    d = new Date(valor < 1e12 ? valor * 1000 : valor);
-  } else {
+  if (valor instanceof Date) { d = valor; }
+  else if (typeof valor === "number") { d = new Date(valor < 1e12 ? valor * 1000 : valor); }
+  else {
     const s = String(valor).trim();
     if (!s) return "—";
-
-    // 1) Já está no formato brasileiro: "DD/MM/AAAA" ou "DD/MM/AAAA HH:MM[:SS]"
     const br = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
     if (br) {
       const dd = Number(br[1]), mm = Number(br[2]), yy = Number(br[3]);
       const hh = Number(br[4] || 0), mi = Number(br[5] || 0), ss = Number(br[6] || 0);
       d = new Date(yy, mm - 1, dd, hh, mi, ss);
     } else {
-      // 2) Formato ISO / "YYYY-MM-DD HH:MM:SS[.mmm][Z|±HH:MM]"
-      //    Substitui o espaço por T para o Safari/WebView antigo aceitar.
       let iso = s.replace(" ", "T");
       d = new Date(iso);
-
-      // 3) Fallback: limpa caracteres estranhos e tenta de novo
       if (isNaN(d.getTime())) {
         const limpo = s.replace(/[^\d\-T:.\/ ]/g, "").replace(" ", "T");
         d = new Date(limpo);
       }
     }
   }
-
   if (!d || isNaN(d.getTime())) return "—";
-
   const pad = n => String(n).padStart(2, "0");
-  return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear()
-       + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
 }
 
 /* ========== TEMA ========== */
@@ -4532,8 +4868,6 @@ async function carregarAdministracao(){
   tbody.innerHTML='<tr><td colspan="19" class="empty">Carregando…</td></tr>';adminSelectedIds.clear();sincronizarSelecaoAdministracao();
   let q=sb.from('BD_PREV_RELAT').select('*').order('DTA_HORA',{ascending:false}).limit(5000);
   const ini=document.getElementById('admDataIni').value,fim=document.getElementById('admDataFim').value,turno=document.getElementById('admTurno').value,status=document.getElementById('admStatus').value,plu=document.getElementById('admPlu').value.trim(),produto=document.getElementById('admProduto').value.trim(),adm=document.getElementById('admAdm').value.trim(),nf=document.getElementById('admNf').value.trim();
-  // Filtro de data robusto: envia a string local "YYYY-MM-DDTHH:MM:SS" sem converter para UTC.
-  // Isso evita o deslocamento de fuso que sumia com registros do começo/fim do dia.
   if(ini)q=q.gte('DTA_HORA',ini+'T00:00:00');
   if(fim)q=q.lte('DTA_HORA',fim+'T23:59:59.999');
   if(turno)q=q.eq('TURNO_LANC',Number(turno));
@@ -4546,7 +4880,6 @@ async function carregarAdministracao(){
     const result=await q;
     if(result.error)throw result.error;
     const dadosBrutos=result.data||[];
-    // Diagnóstico: mostra no console os filtros aplicados e quantas linhas voltaram.
     console.log('[ADM] Filtros aplicados →',{ini:ini||'(vazio)',fim:fim||'(vazio)',turno:turno||'(vazio)',status:status||'(vazio)',retornou_linhas:dadosBrutos.length});
     const admBusca=adm.toLocaleLowerCase();
     adminCache=dadosBrutos.filter(r=>!admBusca||String(r['ADM FATURAMENTO']??'').toLocaleLowerCase().includes(admBusca)||String(r['NAME ADM']??'').toLocaleLowerCase().includes(admBusca));
@@ -4909,8 +5242,6 @@ function switchView(name) {
   if (name === 'gaiolas-admin' && !podeConsultarGaiolas()) { showToast('Acesso negado para consultar gaiolas.', true); return; }
   if (name === 'administracao' && !canConsultarArea('administracao')) { showToast('Acesso negado ao menu Administração.', true); return; }
   if (name === 'mip' && !canConsultarArea('mip')) { showToast('Acesso negado ao menu MIP.', true); return; }
-  // O Report de Erro fica sempre liberado para qualquer usuário logado.
-  // Ao trocar de menu, sobe somente a área principal. A posição do sidebar é preservada.
   window.scrollTo({top:0,left:0,behavior:'auto'});
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
