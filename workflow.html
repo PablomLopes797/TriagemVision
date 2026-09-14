@@ -430,7 +430,6 @@ const NIVEL_LABELS = {
 /* ---------- Estado ---------- */
 let currentUser = null;
 let codeReader = null;
-let videoControls = null;
 let cameraStream = null;
 let scanLoopActive = false;
 let lastScanValue = "";
@@ -709,11 +708,11 @@ document.getElementById("f_qtd_un").addEventListener("input", e => {
 });
 
 /* =========================================================
-   CÂMERA + LEITURA (portrait-first, 4 rotações)
+   CÂMERA + LEITURA — versão corrigida (rápida e confiável)
    ========================================================= */
 async function openCamera(){
-  const modal = document.getElementById("cameraModal");
-  const hudMsg = document.getElementById("hudMsg");
+  const modal    = document.getElementById("cameraModal");
+  const hudMsg   = document.getElementById("hudMsg");
   const hudFrame = document.getElementById("hudFrame");
   hudMsg.className = "hud-msg";
   hudMsg.textContent = "Abrindo câmera…";
@@ -726,15 +725,13 @@ async function openCamera(){
     return;
   }
 
-  // ---------- 1) Stream: portrait 720x1280 primeiro, com fallbacks ----------
+  // ---------- 1) Stream: pede resolução moderada (720p) ----------
   const attempts = [
-    { video: { facingMode:{ideal:"environment"}, width:{ideal:720},  height:{ideal:1280}, aspectRatio:{ideal:9/16} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{ideal:1080}, height:{ideal:1920}, aspectRatio:{ideal:9/16} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{ideal:1280}, height:{ideal:720},  aspectRatio:{ideal:16/9} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{min:720},  height:{min:1280} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{min:1280}, height:{min:720} }, audio:false },
-    { video: { facingMode:"environment" }, audio:false },
-    { video: true, audio:false }
+    { video:{ facingMode:{ideal:"environment"}, width:{ideal:1280}, height:{ideal:720} }, audio:false },
+    { video:{ facingMode:{ideal:"environment"}, width:{ideal: 960}, height:{ideal:720} }, audio:false },
+    { video:{ facingMode:{ideal:"environment"}, width:{ideal: 640}, height:{ideal:480} }, audio:false },
+    { video:{ facingMode:{ideal:"environment"} }, audio:false },
+    { video:true, audio:false }
   ];
 
   let stream = null, lastErr = null;
@@ -746,9 +743,9 @@ async function openCamera(){
     hudMsg.className = "hud-msg err";
     const m = String((lastErr && lastErr.message) || lastErr || "");
     if (/Permission|NotAllowed|Denied/i.test(m))
-      hudMsg.textContent = "Permissão da câmera negada. Autorize o acesso nas configurações.";
+      hudMsg.textContent = "Permissão da câmera negada.";
     else if (/NotFound|Requested device not found/i.test(m))
-      hudMsg.textContent = "Nenhuma câmera encontrada neste dispositivo.";
+      hudMsg.textContent = "Nenhuma câmera encontrada.";
     else
       hudMsg.textContent = "Não foi possível abrir a câmera: " + m;
     beepErr();
@@ -762,15 +759,11 @@ async function openCamera(){
     try {
       const caps = (track.getCapabilities && track.getCapabilities()) || {};
       const advanced = [];
-      if (caps.focusMode && caps.focusMode.includes("continuous"))
-        advanced.push({ focusMode: "continuous" });
-      if (caps.exposureMode && caps.exposureMode.includes("continuous"))
-        advanced.push({ exposureMode: "continuous" });
-      if (caps.whiteBalanceMode && caps.whiteBalanceMode.includes("continuous"))
-        advanced.push({ whiteBalanceMode: "continuous" });
+      if (caps.focusMode        && caps.focusMode.includes("continuous"))        advanced.push({ focusMode:"continuous" });
+      if (caps.exposureMode     && caps.exposureMode.includes("continuous"))     advanced.push({ exposureMode:"continuous" });
+      if (caps.whiteBalanceMode && caps.whiteBalanceMode.includes("continuous")) advanced.push({ whiteBalanceMode:"continuous" });
       if (advanced.length) await track.applyConstraints({ advanced });
-      const s = track.getSettings();
-      console.log("[CAM] resolução real:", s.width, "x", s.height, "| facing:", s.facingMode);
+      console.log("[CAM] settings:", track.getSettings());
     } catch(e){ /* segue o jogo */ }
   }
 
@@ -781,74 +774,78 @@ async function openCamera(){
   video.muted = true;
   try { await video.play(); } catch(e){}
 
-  // ---------- 4) Reader ZXing ----------
+  // ---------- 4) Hints SIMPLES e RÁPIDOS ----------
+  // Regra de ouro: menos formatos = decode mais rápido.
+  // NÃO usar TRY_HARDER — ele multiplica o tempo por 5-10x.
   const hints = new Map();
   hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
     ZXing.BarcodeFormat.EAN_13,
     ZXing.BarcodeFormat.EAN_8,
     ZXing.BarcodeFormat.UPC_A,
     ZXing.BarcodeFormat.UPC_E,
-    ZXing.BarcodeFormat.CODE_128,
-    ZXing.BarcodeFormat.CODE_39,
-    ZXing.BarcodeFormat.ITF,
-    ZXing.BarcodeFormat.CODABAR,
-    ZXing.BarcodeFormat.QR_CODE
+    ZXing.BarcodeFormat.CODE_128
   ]);
-  hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
 
   const reader = new ZXing.BrowserMultiFormatReader(hints);
   codeReader = reader;
 
-  // ---------- 5) Loop próprio: canvas + 4 rotações ----------
+  // ---------- 5) Canvas com downscale ----------
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const ctx    = canvas.getContext("2d", { willReadFrequently:true });
 
   scanLoopActive = true;
   hudMsg.textContent = "Posicione o código dentro da área";
 
-  const tryDecodeCanvas = () => {
-    try {
-      const r = reader.decodeFromCanvas(canvas);
-      if (r && r.getText && r.getText()) return String(r.getText()).trim();
-    } catch(e){}
-    return null;
-  };
+  // Reduz o frame para no máximo 1000px no maior lado.
+  // Códigos de barras continuam legíveis e o decode fica ~4x mais rápido.
+  const MAX_SIDE = 1000;
 
   const drawRotated = (angleRad) => {
     const vw = video.videoWidth, vh = video.videoHeight;
     if (!vw || !vh) return;
-    if (angleRad === 0){
-      canvas.width = vw;  canvas.height = vh;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.drawImage(video, 0, 0, vw, vh);
-    } else if (angleRad === Math.PI){
-      canvas.width = vw;  canvas.height = vh;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.translate(vw/2, vh/2);
-      ctx.rotate(angleRad);
-      ctx.drawImage(video, -vw/2, -vh/2, vw, vh);
-    } else {
-      canvas.width = vh;  canvas.height = vw;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.translate(vh/2, vw/2);
-      ctx.rotate(angleRad);
-      ctx.drawImage(video, -vw/2, -vh/2, vw, vh);
-    }
+
+    const scale = Math.min(1, MAX_SIDE / Math.max(vw, vh));
+    const dw = Math.round(vw * scale);
+    const dh = Math.round(vh * scale);
+
+    const isRot = (angleRad !== 0 && angleRad !== Math.PI);
+    canvas.width  = isRot ? dh : dw;
+    canvas.height = isRot ? dw : dh;
+
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.translate(canvas.width/2, canvas.height/2);
+    if (angleRad) ctx.rotate(angleRad);
+    ctx.drawImage(video, -dw/2, -dh/2, dw, dh);
   };
 
+  const decodeCanvas = () => {
+    try {
+      const r = reader.decodeFromCanvas(canvas, hints);
+      if (r && typeof r.getText === "function"){
+        const t = String(r.getText()).trim();
+        if (t) return t;
+      }
+    } catch(e){
+      // NotFoundException é o normal quando não acha código
+    }
+    return null;
+  };
+
+  // ---------- 6) Loop de scan ----------
   const scanOnce = () => {
     if (!scanLoopActive) return;
-    if (video.readyState < 2 || !video.videoWidth){ setTimeout(scanOnce, 100); return; }
+    if (video.readyState < 2 || !video.videoWidth){
+      setTimeout(scanOnce, 120);
+      return;
+    }
 
-    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-    const angles = isPortrait
-      ? [ -Math.PI/2, Math.PI/2, 0, Math.PI ]
-      : [ 0, Math.PI, -Math.PI/2, Math.PI/2 ];
+    // Ordem: 0° primeiro (a maioria dos navegadores já entrega o frame "em pé")
+    const angles = [ 0, -Math.PI/2, Math.PI/2, Math.PI ];
 
     let text = null;
     for (const a of angles){
       drawRotated(a);
-      text = tryDecodeCanvas();
+      text = decodeCanvas();
       if (text) break;
     }
 
@@ -856,7 +853,7 @@ async function openCamera(){
       const now = Date.now();
       if (text !== lastScanValue || (now - lastScanAt) >= SCAN_COOLDOWN_MS){
         lastScanValue = text;
-        lastScanAt = now;
+        lastScanAt    = now;
 
         beepOk(); vibrate([80]);
         hudFrame.classList.remove("flash"); void hudFrame.offsetWidth; hudFrame.classList.add("flash");
@@ -867,10 +864,12 @@ async function openCamera(){
       }
     }
 
-    if (scanLoopActive) setTimeout(scanOnce, 90);
+    // 60ms ≈ 16 tentativas/s
+    if (scanLoopActive) setTimeout(scanOnce, 60);
   };
 
-  scanOnce();
+  // pequeno delay para o vídeo estabilizar
+  setTimeout(scanOnce, 300);
 }
 
 function closeCamera(){
