@@ -709,187 +709,108 @@ document.getElementById("f_qtd_un").addEventListener("input", e => {
 });
 
 /* =========================================================
-   CÂMERA + LEITURA (portrait-first, 4 rotações)
+   CÂMERA + LEITURA (câmera traseira + leitura contínua)
    ========================================================= */
+function setCameraMessage(message, kind = ""){
+  const hudMsg = document.getElementById("hudMsg");
+  hudMsg.className = "hud-msg" + (kind ? " " + kind : "");
+  hudMsg.textContent = message;
+}
+
+function cameraErrorMessage(error){
+  const value = String(error?.name || "") + " " + String(error?.message || error || "");
+  if (/NotAllowed|Permission|SecurityError|denied/i.test(value)) return "Permissão negada. Autorize a câmera nas configurações do navegador.";
+  if (/NotFound|DevicesNotFound/i.test(value)) return "Nenhuma câmera foi encontrada neste dispositivo.";
+  if (/NotReadable|TrackStart/i.test(value)) return "A câmera está sendo usada por outro aplicativo.";
+  if (/Overconstrained/i.test(value)) return "A câmera traseira não está disponível neste dispositivo.";
+  return "Não foi possível abrir a câmera. Verifique as permissões e tente novamente.";
+}
+
 async function openCamera(){
   const modal = document.getElementById("cameraModal");
-  const hudMsg = document.getElementById("hudMsg");
   const hudFrame = document.getElementById("hudFrame");
-  hudMsg.className = "hud-msg";
-  hudMsg.textContent = "Abrindo câmera…";
   hudFrame.classList.remove("flash");
   modal.classList.add("show");
+  setCameraMessage("Solicitando acesso à câmera…");
 
-  if (!window.ZXing || !ZXing.BrowserMultiFormatReader){
-    hudMsg.className = "hud-msg err";
-    hudMsg.textContent = "Biblioteca de leitura não disponível. Use a digitação manual.";
+  if (!window.isSecureContext && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
+    setCameraMessage("A câmera só funciona em HTTPS. Abra o endereço seguro no celular.", "err");
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia){
+    setCameraMessage("Este navegador não oferece acesso à câmera. Use Chrome ou Safari atualizado.", "err");
+    return;
+  }
+  if (!window.ZXing?.BrowserMultiFormatReader){
+    setCameraMessage("Biblioteca de leitura indisponível. Use a digitação manual.", "err");
     return;
   }
 
-  // ---------- 1) Stream: portrait 720x1280 primeiro, com fallbacks ----------
-  const attempts = [
-    { video: { facingMode:{ideal:"environment"}, width:{ideal:720},  height:{ideal:1280}, aspectRatio:{ideal:9/16} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{ideal:1080}, height:{ideal:1920}, aspectRatio:{ideal:9/16} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{ideal:1280}, height:{ideal:720},  aspectRatio:{ideal:16/9} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{min:720},  height:{min:1280} }, audio:false },
-    { video: { facingMode:{ideal:"environment"}, width:{min:1280}, height:{min:720} }, audio:false },
-    { video: { facingMode:"environment" }, audio:false },
-    { video: true, audio:false }
-  ];
-
-  let stream = null, lastErr = null;
-  for (const c of attempts){
-    try { stream = await navigator.mediaDevices.getUserMedia(c); break; }
-    catch(e){ lastErr = e; }
-  }
-  if (!stream){
-    hudMsg.className = "hud-msg err";
-    const m = String((lastErr && lastErr.message) || lastErr || "");
-    if (/Permission|NotAllowed|Denied/i.test(m))
-      hudMsg.textContent = "Permissão da câmera negada. Autorize o acesso nas configurações.";
-    else if (/NotFound|Requested device not found/i.test(m))
-      hudMsg.textContent = "Nenhuma câmera encontrada neste dispositivo.";
-    else
-      hudMsg.textContent = "Não foi possível abrir a câmera: " + m;
-    beepErr();
-    return;
-  }
-  cameraStream = stream;
-
-  // ---------- 2) Autofoco / exposição / WB contínuos ----------
-  const track = stream.getVideoTracks()[0];
-  if (track){
-    try {
-      const caps = (track.getCapabilities && track.getCapabilities()) || {};
-      const advanced = [];
-      if (caps.focusMode && caps.focusMode.includes("continuous"))
-        advanced.push({ focusMode: "continuous" });
-      if (caps.exposureMode && caps.exposureMode.includes("continuous"))
-        advanced.push({ exposureMode: "continuous" });
-      if (caps.whiteBalanceMode && caps.whiteBalanceMode.includes("continuous"))
-        advanced.push({ whiteBalanceMode: "continuous" });
-      if (advanced.length) await track.applyConstraints({ advanced });
-      const s = track.getSettings();
-      console.log("[CAM] resolução real:", s.width, "x", s.height, "| facing:", s.facingMode);
-    } catch(e){ /* segue o jogo */ }
-  }
-
-  // ---------- 3) Anexa no <video> e dá play ----------
+  closeCamera(false);
+  modal.classList.add("show");
+  setCameraMessage("Abrindo câmera traseira…");
   const video = document.getElementById("cameraVideo");
-  video.srcObject = stream;
   video.setAttribute("playsinline", "true");
+  video.setAttribute("autoplay", "true");
   video.muted = true;
-  try { await video.play(); } catch(e){}
 
-  // ---------- 4) Reader ZXing ----------
   const hints = new Map();
   hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-    ZXing.BarcodeFormat.EAN_13,
-    ZXing.BarcodeFormat.EAN_8,
-    ZXing.BarcodeFormat.UPC_A,
-    ZXing.BarcodeFormat.UPC_E,
-    ZXing.BarcodeFormat.CODE_128,
-    ZXing.BarcodeFormat.CODE_39,
-    ZXing.BarcodeFormat.ITF,
-    ZXing.BarcodeFormat.CODABAR,
+    ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
+    ZXing.BarcodeFormat.UPC_A, ZXing.BarcodeFormat.UPC_E,
+    ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+    ZXing.BarcodeFormat.ITF, ZXing.BarcodeFormat.CODABAR,
     ZXing.BarcodeFormat.QR_CODE
   ]);
   hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
 
-  const reader = new ZXing.BrowserMultiFormatReader(hints);
+  const reader = new ZXing.BrowserMultiFormatReader(hints, 250);
   codeReader = reader;
-
-  // ---------- 5) Loop próprio: canvas + 4 rotações ----------
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
   scanLoopActive = true;
-  hudMsg.textContent = "Posicione o código dentro da área";
-
-  const tryDecodeCanvas = () => {
-    try {
-      const r = reader.decodeFromCanvas(canvas);
-      if (r && r.getText && r.getText()) return String(r.getText()).trim();
-    } catch(e){}
-    return null;
+  const onDecode = (result) => {
+    if (!scanLoopActive || !result) return;
+    const text = String(result.getText?.() || result.text || "").trim();
+    if (!text) return;
+    const now = Date.now();
+    if (text === lastScanValue && now - lastScanAt < SCAN_COOLDOWN_MS) return;
+    lastScanValue = text;
+    lastScanAt = now;
+    beepOk(); vibrate([80]);
+    hudFrame.classList.remove("flash"); void hudFrame.offsetWidth; hudFrame.classList.add("flash");
+    setCameraMessage("✓ Código lido: " + text, "ok");
+    onBarcodeRead(text);
   };
 
-  const drawRotated = (angleRad) => {
-    const vw = video.videoWidth, vh = video.videoHeight;
-    if (!vw || !vh) return;
-    if (angleRad === 0){
-      canvas.width = vw;  canvas.height = vh;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.drawImage(video, 0, 0, vw, vh);
-    } else if (angleRad === Math.PI){
-      canvas.width = vw;  canvas.height = vh;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.translate(vw/2, vh/2);
-      ctx.rotate(angleRad);
-      ctx.drawImage(video, -vw/2, -vh/2, vw, vh);
+  try{
+    if (typeof reader.decodeFromConstraints === "function"){
+      videoControls = await reader.decodeFromConstraints(
+        { video: { facingMode: { ideal: "environment" } }, audio: false }, video, onDecode
+      );
     } else {
-      canvas.width = vh;  canvas.height = vw;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.translate(vh/2, vw/2);
-      ctx.rotate(angleRad);
-      ctx.drawImage(video, -vw/2, -vh/2, vw, vh);
+      videoControls = await reader.decodeFromVideoDevice("", video, onDecode);
     }
-  };
-
-  const scanOnce = () => {
-    if (!scanLoopActive) return;
-    if (video.readyState < 2 || !video.videoWidth){ setTimeout(scanOnce, 100); return; }
-
-    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-    const angles = isPortrait
-      ? [ -Math.PI/2, Math.PI/2, 0, Math.PI ]
-      : [ 0, Math.PI, -Math.PI/2, Math.PI/2 ];
-
-    let text = null;
-    for (const a of angles){
-      drawRotated(a);
-      text = tryDecodeCanvas();
-      if (text) break;
-    }
-
-    if (text){
-      const now = Date.now();
-      if (text !== lastScanValue || (now - lastScanAt) >= SCAN_COOLDOWN_MS){
-        lastScanValue = text;
-        lastScanAt = now;
-
-        beepOk(); vibrate([80]);
-        hudFrame.classList.remove("flash"); void hudFrame.offsetWidth; hudFrame.classList.add("flash");
-        hudMsg.className = "hud-msg ok";
-        hudMsg.textContent = "✓ Código lido: " + text;
-
-        onBarcodeRead(text);
-      }
-    }
-
-    if (scanLoopActive) setTimeout(scanOnce, 90);
-  };
-
-  scanOnce();
+    setCameraMessage("Posicione o código dentro da área");
+  } catch(error){
+    scanLoopActive = false;
+    try { reader.reset(); } catch(_e) {}
+    codeReader = null;
+    setCameraMessage(cameraErrorMessage(error), "err");
+    beepErr();
+  }
 }
 
-function closeCamera(){
+function closeCamera(hide = true){
   const modal = document.getElementById("cameraModal");
-  modal.classList.remove("show");
-
+  if (hide) modal.classList.remove("show");
   scanLoopActive = false;
-  try { if (codeReader && typeof codeReader.reset === "function") codeReader.reset(); } catch(e){}
+  try { if (videoControls?.stop) videoControls.stop(); } catch(_e) {}
+  videoControls = null;
+  try { if (codeReader?.reset) codeReader.reset(); } catch(_e) {}
   codeReader = null;
-
-  try {
-    if (cameraStream){
-      cameraStream.getTracks().forEach(t => t.stop());
-    }
-  } catch(e){}
+  try { if (cameraStream) cameraStream.getTracks().forEach(track => track.stop()); } catch(_e) {}
   cameraStream = null;
-
   const video = document.getElementById("cameraVideo");
-  video.srcObject = null;
+  if (video) { video.pause(); video.srcObject = null; }
 }
 
 async function onBarcodeRead(ean){
