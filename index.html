@@ -1700,7 +1700,167 @@ if(currentUser)applyUserUI();
 loadDashboard();
 </script>
 
-<style id="final-chat-fix">.report-list{position:relative;z-index:3;pointer-events:auto}.report-item{position:relative;z-index:5;pointer-events:auto!important;cursor:pointer}.report-chat{position:relative;z-index:1}.launcher-icon.t-workflow{background:#e8f5ee;color:var(--green)}</style>
+<!-- ============================================================
+     FIX FINAL — CHAT DE REPORT (SCROLL + NAVEGAÇÃO ENTRE CONVERSAS)
+     Corrige: barra de rolagem nas mensagens, barra de rolagem na
+     lista lateral de conversas, layout travado do grid.
+     ============================================================ -->
+<style id="final-chat-fix">
+/* ---------- Layout base do grid do chat ---------- */
+.report-layout{
+  display:grid;
+  grid-template-columns:320px minmax(0,1fr);
+  height:calc(100vh - 260px);
+  min-height:480px;
+  max-height:760px;
+  background:var(--surface);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+/* ---------- Lista lateral de conversas ---------- */
+.report-list{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  border-right:1px solid var(--line);
+  background:var(--bg);
+  overflow:hidden;
+  position:relative;
+  z-index:3;
+  pointer-events:auto;
+}
+.report-list-head{
+  position:static;
+  flex:0 0 auto;
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+}
+.report-list-head h4{font-size:13px;font-weight:800;margin-bottom:10px}
+.report-list-head input{
+  width:100%;
+  padding:9px 12px;
+  border:1px solid var(--line);
+  border-radius:99px;
+  background:var(--bg);
+  font-size:13px;
+  margin:0;
+}
+#reportLista{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(0,0,0,.28) transparent;
+}
+#reportLista::-webkit-scrollbar{width:8px}
+#reportLista::-webkit-scrollbar-track{background:transparent}
+#reportLista::-webkit-scrollbar-thumb{
+  background:rgba(0,0,0,.22);
+  border-radius:8px;
+  border:2px solid transparent;
+  background-clip:content-box;
+}
+#reportLista::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.4);background-clip:content-box}
+
+.report-item{
+  position:relative;
+  z-index:5;
+  pointer-events:auto !important;
+  cursor:pointer;
+}
+
+/* ---------- Área da conversa (coluna direita) ---------- */
+.report-chat{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  height:100%;
+  overflow:hidden;
+  background:#eaf0f6;
+  background-image:
+    radial-gradient(circle at 20% 10%,rgba(27,87,230,.05),transparent 40%),
+    radial-gradient(circle at 80% 80%,rgba(15,157,88,.04),transparent 40%);
+}
+.report-chat-head{
+  flex:0 0 auto;
+  padding:12px 20px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+/* ---------- Rolagem das mensagens (o ajuste principal) ---------- */
+.report-messages{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:22px 26px 30px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(0,0,0,.28) transparent;
+  scroll-behavior:smooth;
+}
+.report-messages::-webkit-scrollbar{width:10px}
+.report-messages::-webkit-scrollbar-track{background:transparent}
+.report-messages::-webkit-scrollbar-thumb{
+  background:rgba(0,0,0,.22);
+  border-radius:8px;
+  border:2px solid transparent;
+  background-clip:content-box;
+}
+.report-messages::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.42);background-clip:content-box}
+
+/* ---------- Bubbles: não estourar a largura ---------- */
+.report-bubble{
+  max-width:72%;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+/* ---------- Compose fixo no rodapé ---------- */
+.report-compose{
+  flex:0 0 auto;
+  padding:12px 16px;
+  border-top:1px solid var(--line);
+  background:var(--surface);
+  display:flex;
+  gap:10px;
+  align-items:flex-end;
+}
+
+/* ---------- Responsivo ---------- */
+@media(max-width:900px){
+  .report-layout{
+    grid-template-columns:1fr;
+    height:auto;
+    max-height:none;
+    min-height:0;
+  }
+  .report-list{
+    max-height:260px;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  .report-chat{height:auto}
+  .report-messages{
+    min-height:340px;
+    max-height:60vh;
+  }
+}
+
+/* Reforço no ícone do workflow */
+.launcher-icon.t-workflow{background:#e8f5ee;color:var(--green)}
+</style>
+
 <script id="final-chat-fix-js">(function(){function bind(){const l=document.getElementById('reportLista');if(!l||l.dataset.bound==='1')return;l.dataset.bound='1';l.addEventListener('click',function(e){const b=e.target.closest('[data-chat-user]');if(!b)return;e.preventDefault();e.stopPropagation();if(typeof window.selecionarChat==='function')window.selecionarChat(b.getAttribute('data-chat-user'));});}const r=window.renderListaReportes;if(typeof r==='function')window.renderListaReportes=function(){r.apply(this,arguments);bind();};document.addEventListener('DOMContentLoaded',bind);setTimeout(bind,300);})();</script>
 </body>
 </html>
