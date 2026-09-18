@@ -132,6 +132,50 @@ input[readonly]{background:#eef2f9;color:var(--ink-soft);cursor:not-allowed;bord
 .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-primary svg{width:30px;height:30px}
 
+/* ============== NOVO: BOTÃO ADICIONAR ITEM ============== */
+.btn-add{width:100%;padding:22px 20px;border:0;border-radius:18px;cursor:pointer;background:linear-gradient(135deg,var(--blue-600),var(--blue-500));color:#fff;font-size:19px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;box-shadow:0 16px 36px rgba(27,87,230,.38);transition:var(--transition);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:12px}
+.btn-add:active{transform:translateY(2px);box-shadow:0 10px 24px rgba(27,87,230,.38)}
+.btn-add:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-add svg{width:30px;height:30px}
+.btn-add .ic-save{display:none}
+.btn-add.save-mode{background:linear-gradient(135deg,#e5972a,#f0b145);box-shadow:0 16px 36px rgba(229,151,42,.4)}
+.btn-add.save-mode .ic-add{display:none}
+.btn-add.save-mode .ic-save{display:inline-block}
+
+.btn-secondary{width:100%;padding:16px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink-soft);font-weight:800;font-size:15px;letter-spacing:.6px;cursor:pointer;margin-top:10px;text-transform:uppercase;transition:var(--transition)}
+.btn-secondary:active{background:#f6f8fe}
+.btn-secondary:hover{border-color:var(--blue-500);color:var(--blue-600)}
+
+/* ============== NOVO: CARRINHO ============== */
+.cart-card{display:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-top:20px}
+.cart-card.show{display:block;animation:cartIn .28s cubic-bezier(.2,.9,.25,1)}
+@keyframes cartIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
+.cart-header h3{font-size:17px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+.cart-header h3 svg{width:22px;height:22px;color:var(--blue-600)}
+.cart-header .badge{background:var(--blue-100);color:var(--blue-600);font-size:12.5px;font-weight:800;padding:6px 12px;border-radius:99px;white-space:nowrap}
+.cart-item{border:2px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;background:#fafbff;transition:var(--transition);position:relative}
+.cart-item:last-child{margin-bottom:0}
+.cart-item.editing{border-color:var(--amber);background:#fff8ec;box-shadow:0 0 0 3px rgba(229,151,42,.16)}
+.cart-item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.cart-item-top .info{flex:1;min-width:0}
+.cart-item-top .desc{font-weight:800;font-size:15px;word-break:break-word;color:var(--ink);line-height:1.25}
+.cart-item-top .ean{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-top:3px;font-weight:700;letter-spacing:.4px}
+.cart-item-actions{display:flex;gap:6px;flex:0 0 auto}
+.cart-item-actions button{width:40px;height:40px;border-radius:11px;border:1.5px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);padding:0}
+.cart-item-actions button:active{transform:scale(.94)}
+.cart-item-actions button svg{width:19px;height:19px}
+.cart-item-actions .edit-btn{color:var(--blue-600);border-color:#cfdcff}
+.cart-item-actions .edit-btn:hover{background:var(--blue-100)}
+.cart-item-actions .edit-btn.active{background:var(--amber);color:#fff;border-color:var(--amber)}
+.cart-item-actions .del-btn{color:var(--red);border-color:#f3c1c1}
+.cart-item-actions .del-btn:hover{background:#fdecec}
+.cart-item-meta{display:flex;flex-wrap:wrap;gap:6px 8px;font-size:12.5px;color:var(--ink-soft)}
+.cart-item-meta .chip{background:#eef2f9;border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-weight:700}
+.cart-item-meta .chip b{color:var(--ink);font-weight:800}
+.cart-item-meta .chip.qtd{background:var(--blue-100);border-color:#cfdcff;color:var(--blue-600)}
+.cart-item-meta .chip.qtd b{color:var(--blue-600)}
+
 /* ============== CONSULTAR ============== */
 .cons-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
 .cons-header h3{font-size:20px;font-weight:800;color:var(--ink)}
@@ -192,6 +236,7 @@ tbody tr:active{background:#f6f8fe}
   .screen{padding:22px 26px;}
   .app-body{max-width:860px;margin:0 auto;width:100%}
   .btn-primary{font-size:24px;padding:28px}
+  .btn-add{font-size:20px;padding:24px}
 }
 </style>
 </head>
@@ -358,10 +403,39 @@ tbody tr:active{background:#f6f8fe}
         <p class="qtd-hint">Somente números · máximo 1000</p>
       </div>
 
-      <button class="btn-primary" id="btnLancar" onclick="salvarLancamento()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Lançar
+      <!-- BOTÃO ADICIONAR / SALVAR ITEM -->
+      <button class="btn-add" id="btnAddItem" onclick="adicionarItem()">
+        <svg class="ic-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <svg class="ic-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span id="btnAddItemText">Adicionar ao carrinho</span>
       </button>
+
+      <button class="btn-secondary" id="btnCancelarEdit" onclick="cancelarEdicao()" style="display:none">Cancelar edição</button>
+
+      <!-- CARRINHO -->
+      <div class="cart-card" id="cartCard">
+        <div class="cart-header">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            Carrinho
+          </h3>
+          <span class="badge" id="cartCount">0 itens</span>
+        </div>
+        <div id="cartList"></div>
+        <button class="btn-primary" id="btnLancarTudo" onclick="salvarTodosLancamentos()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="btnLancarTudoText">Lançar tudo</span>
+        </button>
+      </div>
 
     </section>
 
@@ -408,26 +482,21 @@ tbody tr:active{background:#f6f8fe}
 
 <script>
 /* =========================================================
-   TRIAGEM VISION · WORKFLOW
-   Módulo independente. Reaproveita login (BD_USER), cadastro
-   (BD_CADASTRO) e grava na tabela WORKFLOW.
+   TRIAGEM VISION · WORKFLOW  (com carrinho)
    ========================================================= */
 
-/* ---------- Supabase (mesma do index principal) ---------- */
 const DEFAULT_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
 const DEFAULT_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxdm12eGppa2JpdnVic3pvYXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NTQ2NDksImV4cCI6MjA5OTUzMDY0OX0.5EVtA9L0DoKR4kdr_4cP7YtqH-FqsHJc6vpeliUMjN8";
 const SUPA_URL = localStorage.getItem("tp_url") || DEFAULT_URL;
 const SUPA_KEY = localStorage.getItem("tp_key") || DEFAULT_KEY;
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
-/* ---------- Nomes bonitos para os níveis (iguais ao index) ---------- */
 const NIVEL_LABELS = {
   1:"Acesso Total",2:"Lançar",3:"Editar Lançamentos",4:"Atualizar Base",
   5:"Relatório Prevenção",6:"Somente Consulta",7:"Lançar e Editar",
   8:"Lançar e Exportar",9:"Administração"
 };
 
-/* ---------- Estado ---------- */
 let currentUser = null;
 let codeReader = null;
 let videoControls = null;
@@ -438,12 +507,15 @@ let lastScanAt = 0;
 const SCAN_COOLDOWN_MS = 1500;
 let cadastroCache = null;
 
+/* ---------- Estado do carrinho ---------- */
+let carrinho = [];          // array de itens
+let editandoIndex = null;   // índice em edição (null = novo item)
+
 /* =========================================================
    HELPERS
    ========================================================= */
 function pad2(n){ return String(n).padStart(2, "0"); }
 
-/* Formato: "DD/MM/AAAA HH:MM" */
 function formatarDtaHr(date){
   const d = date || new Date();
   return pad2(d.getDate()) + "/" + pad2(d.getMonth()+1) + "/" + d.getFullYear()
@@ -491,6 +563,10 @@ function beep(freq, duration){
 function beepOk(){ beep(1050, 0.13); setTimeout(() => beep(1400, 0.10), 70); }
 function beepErr(){ beep(380, 0.22); }
 function vibrate(p){ try { navigator.vibrate && navigator.vibrate(p || [60]); } catch(e){} }
+
+function gerarIdCarrinho(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
 
 /* =========================================================
    LOGIN
@@ -570,6 +646,11 @@ function logout(){
   sessionStorage.removeItem("tv_workflow_user");
   currentUser = null;
   closeCamera();
+  // limpa carrinho
+  carrinho = [];
+  editandoIndex = null;
+  renderCarrinho();
+  updateAddButtonMode();
   document.getElementById("app").classList.remove("ready");
   document.getElementById("loginOverlay").style.display = "flex";
   document.getElementById("loginOverlay").classList.remove("fade-out");
@@ -620,7 +701,7 @@ function switchScreen(name){
 }
 
 function goHome(){ closeCamera(); switchScreen("home"); }
-function goLancar(){ resetFormLancar(true); switchScreen("lancar"); }
+function goLancar(){ resetFormLancar(true); editandoIndex = null; updateAddButtonMode(); renderCarrinho(); switchScreen("lancar"); }
 function goConsultar(){ switchScreen("consultar"); }
 
 /* =========================================================
@@ -709,7 +790,7 @@ document.getElementById("f_qtd_un").addEventListener("input", e => {
 });
 
 /* =========================================================
-   CÂMERA + LEITURA (câmera traseira + leitura contínua)
+   CÂMERA + LEITURA
    ========================================================= */
 function setCameraMessage(message, kind = ""){
   const hudMsg = document.getElementById("hudMsg");
@@ -825,54 +906,230 @@ window.addEventListener("popstate", () => {
 });
 
 /* =========================================================
-   LANÇAR — grava em WORKFLOW
+   CARRINHO — adicionar / editar / remover / render
    ========================================================= */
-async function salvarLancamento(){
-  const btn = document.getElementById("btnLancar");
+function adicionarItem(){
   const ean = document.getElementById("f_ean").value.trim();
   const motivo = document.getElementById("f_motivo").value;
   const origem = document.getElementById("f_origem").value;
   const qtdRaw = document.getElementById("f_qtd_un").value.trim();
   const qtd = Number(qtdRaw);
 
-  if (!currentUser){ showToast("Sessão expirada. Faça login novamente.", "err"); return; }
   if (!ean){ showToast("Informe o EAN.", "err"); document.getElementById("f_ean").focus(); return; }
   if (!motivo){ showToast("Selecione o Motivo.", "err"); document.getElementById("f_motivo").focus(); return; }
   if (!origem){ showToast("Selecione a Origem.", "err"); document.getElementById("f_origem").focus(); return; }
   if (!qtdRaw || isNaN(qtd) || qtd <= 0){ showToast("Quantidade deve ser maior que zero.", "err"); document.getElementById("f_qtd_un").focus(); return; }
   if (qtd > 1000){ showToast("Quantidade máxima é 1000.", "err"); document.getElementById("f_qtd_un").focus(); return; }
 
-  btn.disabled = true;
+  const plu = document.getElementById("f_plu").value.trim();
+  const descricao = document.getElementById("f_descricao").value.trim();
 
-  let p = cadastroCache;
-  if (!p || String(p.CODACESSO) !== String(ean)){
-    try { p = await buscarCadastro(ean); cadastroCache = p; } catch(e){ p = null; }
+  if (editandoIndex !== null && carrinho[editandoIndex]){
+    // Atualiza item em edição (mantém o ID e a DTA_HR originais)
+    const orig = carrinho[editandoIndex];
+    carrinho[editandoIndex] = {
+      id: orig.id,
+      dtaHr: orig.dtaHr,
+      ean, plu, descricao, motivo, origem, qtdUn: qtd
+    };
+    showToast("Item atualizado.", "ok");
+    beepOk(); vibrate([50]);
+    editandoIndex = null;
+    resetFormLancar(true);
+  } else {
+    // Novo item
+    carrinho.push({
+      id: gerarIdCarrinho(),
+      dtaHr: formatarDtaHr(new Date()),
+      ean, plu, descricao, motivo, origem, qtdUn: qtd
+    });
+    showToast("Item adicionado ao carrinho.", "ok");
+    beepOk(); vibrate([50]);
+    // limpa só os campos do produto, mantém motivo/origem para agilizar
+    resetFormLancar(false);
   }
 
-  const payload = {
-    "DTA_HR":   formatarDtaHr(new Date()),
-    "EAN":      ean,
-    "PLU":      p ? (p.SEQPRODUTO || null) : null,
-    "DESCRIÇÃO": p ? (p.DESCCOMPLETA || null) : null,
-    "MOTIVO":   motivo,
-    "ORIGEM":   origem,
-    "QTD_UN":   qtd,
+  updateAddButtonMode();
+  renderCarrinho();
+
+  const screen = document.getElementById("screen-lancar");
+  document.getElementById("f_ean").focus();
+}
+
+function editarItem(index){
+  const item = carrinho[index];
+  if (!item) return;
+
+  editandoIndex = index;
+
+  document.getElementById("f_ean").value = item.ean;
+  document.getElementById("f_ean").classList.add("filled");
+  document.getElementById("f_plu").value = item.plu || "";
+  document.getElementById("f_descricao").value = item.descricao || "";
+  document.getElementById("f_motivo").value = item.motivo;
+  document.getElementById("f_origem").value = item.origem;
+  document.getElementById("f_qtd_un").value = String(item.qtdUn);
+
+  // Reconstroi bloco de info do produto
+  const el = document.getElementById("productInfo");
+  if (item.descricao || item.plu){
+    el.className = "product-info ok";
+    el.innerHTML =
+      '<div style="display:flex;flex-direction:column;gap:2px;width:100%">' +
+        '<div><b>' + escapeHtml(item.descricao || "(sem descrição)") + '</b></div>' +
+        '<div style="font-size:12px;color:#4c5468">PLU ' + escapeHtml(item.plu || "—") + '</div>' +
+      '</div>';
+  } else {
+    el.className = "product-info";
+    el.textContent = "Nenhum produto consultado.";
+  }
+
+  cadastroCache = null; // força nova busca caso o EAN seja trocado
+
+  updateAddButtonMode();
+  renderCarrinho();
+
+  // rola pro topo do form
+  const screen = document.getElementById("screen-lancar");
+  screen.scrollTo({ top: 0, behavior: "smooth" });
+  showToast("Editando item " + (index + 1) + " do carrinho.", "");
+}
+
+function removerItem(index){
+  if (index < 0 || index >= carrinho.length) return;
+
+  const eraEdicao = (editandoIndex === index);
+  carrinho.splice(index, 1);
+
+  if (eraEdicao){
+    editandoIndex = null;
+    resetFormLancar(true);
+    updateAddButtonMode();
+  } else if (editandoIndex !== null && editandoIndex > index){
+    editandoIndex--;
+  }
+
+  renderCarrinho();
+  showToast("Item removido.", "");
+}
+
+function cancelarEdicao(){
+  editandoIndex = null;
+  resetFormLancar(true);
+  updateAddButtonMode();
+  renderCarrinho();
+  document.getElementById("f_ean").focus();
+}
+
+function renderCarrinho(){
+  const card = document.getElementById("cartCard");
+  const list = document.getElementById("cartList");
+  const count = document.getElementById("cartCount");
+  const btnText = document.getElementById("btnLancarTudoText");
+
+  const n = carrinho.length;
+
+  if (n === 0){
+    card.classList.remove("show");
+    btnText.textContent = "Lançar tudo";
+    return;
+  }
+
+  card.classList.add("show");
+  count.textContent = n + (n === 1 ? " item" : " itens");
+  btnText.textContent = (n === 1) ? "Lançar 1 item" : ("Lançar " + n + " itens");
+
+  list.innerHTML = carrinho.map((item, i) => {
+    const editing = (i === editandoIndex);
+    const desc = item.descricao || "(sem descrição)";
+    return (
+      '<div class="cart-item' + (editing ? ' editing' : '') + '">' +
+        '<div class="cart-item-top">' +
+          '<div class="info">' +
+            '<div class="desc">' + escapeHtml(desc) + '</div>' +
+            '<div class="ean">EAN ' + escapeHtml(item.ean) +
+              (item.plu ? ' · PLU ' + escapeHtml(item.plu) : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="cart-item-actions">' +
+            '<button class="edit-btn' + (editing ? ' active' : '') + '" onclick="editarItem(' + i + ')" title="Editar">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M12 20h9"/>' +
+                '<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/>' +
+              '</svg>' +
+            '</button>' +
+            '<button class="del-btn" onclick="removerItem(' + i + ')" title="Remover">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+                '<polyline points="3 6 5 6 21 6"/>' +
+                '<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>' +
+                '<path d="M10 11v6M14 11v6"/>' +
+                '<path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>' +
+              '</svg>' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cart-item-meta">' +
+          '<span class="chip">Motivo: <b>' + escapeHtml(item.motivo) + '</b></span>' +
+          '<span class="chip">Origem: <b>' + escapeHtml(item.origem) + '</b></span>' +
+          '<span class="chip qtd">Qtd: <b>' + escapeHtml(String(item.qtdUn)) + '</b></span>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join("");
+}
+
+function updateAddButtonMode(){
+  const btn = document.getElementById("btnAddItem");
+  const txt = document.getElementById("btnAddItemText");
+  const cancel = document.getElementById("btnCancelarEdit");
+  if (editandoIndex !== null){
+    btn.classList.add("save-mode");
+    txt.textContent = "Salvar alterações";
+    cancel.style.display = "block";
+  } else {
+    btn.classList.remove("save-mode");
+    txt.textContent = "Adicionar ao carrinho";
+    cancel.style.display = "none";
+  }
+}
+
+/* =========================================================
+   LANÇAR TUDO — envia o carrinho em lote para WORKFLOW
+   ========================================================= */
+async function salvarTodosLancamentos(){
+  const btn = document.getElementById("btnLancarTudo");
+
+  if (!currentUser){ showToast("Sessão expirada. Faça login novamente.", "err"); return; }
+  if (!carrinho.length){ showToast("Adicione pelo menos um item ao carrinho.", "err"); return; }
+
+  btn.disabled = true;
+
+  const payloads = carrinho.map(item => ({
+    "DTA_HR":   item.dtaHr,
+    "EAN":      item.ean,
+    "PLU":      item.plu || null,
+    "DESCRIÇÃO": item.descricao || null,
+    "MOTIVO":   item.motivo,
+    "ORIGEM":   item.origem,
+    "QTD_UN":   item.qtdUn,
     "USER":     currentUser.user
-  };
+  }));
 
   try{
-    const { error } = await sb.from("WORKFLOW").insert(payload);
+    const { error } = await sb.from("WORKFLOW").insert(payloads);
     if (error) throw error;
 
     beepOk();
-    vibrate([60,40,60]);
-    showToast("Lançamento realizado · " + qtd + " un.", "ok");
+    vibrate([60,40,60,40,60]);
+    const n = payloads.length;
+    showToast((n === 1 ? "1 item lançado!" : (n + " itens lançados!")), "ok");
 
-    const motivoAtual = document.getElementById("f_motivo").value;
-    const origemAtual = document.getElementById("f_origem").value;
-    resetFormLancar(false);
-    document.getElementById("f_motivo").value = motivoAtual;
-    document.getElementById("f_origem").value = origemAtual;
+    // limpa tudo
+    carrinho = [];
+    editandoIndex = null;
+    resetFormLancar(true);
+    updateAddButtonMode();
+    renderCarrinho();
     document.getElementById("f_ean").focus();
   } catch(e){
     beepErr(); vibrate([140,80,140]);
@@ -900,7 +1157,7 @@ function resetFormLancar(resetMotivoOrigem){
 }
 
 /* =========================================================
-   CONSULTAR — lista os lançamentos do usuário logado
+   CONSULTAR
    ========================================================= */
 async function carregarConsultar(){
   const container = document.getElementById("consContent");
@@ -1020,6 +1277,8 @@ document.addEventListener("keydown", e => {
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
   if (!currentUser) setTimeout(() => document.getElementById("loginUser").focus(), 100);
+  updateAddButtonMode();
+  renderCarrinho();
 });
 
 /* Expor para o HTML */
@@ -1030,7 +1289,11 @@ window.goLancar = goLancar;
 window.goConsultar = goConsultar;
 window.openCamera = openCamera;
 window.closeCamera = closeCamera;
-window.salvarLancamento = salvarLancamento;
+window.adicionarItem = adicionarItem;
+window.editarItem = editarItem;
+window.removerItem = removerItem;
+window.cancelarEdicao = cancelarEdicao;
+window.salvarTodosLancamentos = salvarTodosLancamentos;
 window.alterarQtd = alterarQtd;
 </script>
 </body>
