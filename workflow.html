@@ -132,7 +132,7 @@ input[readonly]{background:#eef2f9;color:var(--ink-soft);cursor:not-allowed;bord
 .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-primary svg{width:30px;height:30px}
 
-/* ============== NOVO: BOTÃO ADICIONAR ITEM ============== */
+/* ============== BOTÃO ADICIONAR ITEM ============== */
 .btn-add{width:100%;padding:22px 20px;border:0;border-radius:18px;cursor:pointer;background:linear-gradient(135deg,var(--blue-600),var(--blue-500));color:#fff;font-size:19px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;box-shadow:0 16px 36px rgba(27,87,230,.38);transition:var(--transition);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:12px}
 .btn-add:active{transform:translateY(2px);box-shadow:0 10px 24px rgba(27,87,230,.38)}
 .btn-add:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
@@ -146,7 +146,7 @@ input[readonly]{background:#eef2f9;color:var(--ink-soft);cursor:not-allowed;bord
 .btn-secondary:active{background:#f6f8fe}
 .btn-secondary:hover{border-color:var(--blue-500);color:var(--blue-600)}
 
-/* ============== NOVO: CARRINHO ============== */
+/* ============== CARRINHO ============== */
 .cart-card{display:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-top:20px}
 .cart-card.show{display:block;animation:cartIn .28s cubic-bezier(.2,.9,.25,1)}
 @keyframes cartIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -208,21 +208,69 @@ tbody tr:active{background:#f6f8fe}
 .camera-close{position:absolute;top:14px;right:14px;z-index:5;top:calc(14px + env(safe-area-inset-top));width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.24);background:rgba(0,0,0,.55);color:#fff;font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 .camera-video-wrap{flex:1;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
 #cameraVideo{width:100%;height:100%;object-fit:contain;display:block;background:#000}
-.camera-hud{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 18px 140px}
-.hud-frame{position:relative;width:min(90vw,560px);aspect-ratio:1.7/1;max-height:55%}
+
+/* ============== HUD VERTICAL (deite o dispositivo) ============== */
+.camera-hud{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:96px 18px 132px}
+
+.hud-frame{
+  position:relative;
+  /* Vertical: mais alta que larga — sinaliza ao usuário que o dispositivo deve ser deitado */
+  width:min(56vw,250px);
+  height:min(52vh,440px);
+  animation:hudPulse 3s ease-in-out infinite;
+}
+@keyframes hudPulse{0%,100%{filter:drop-shadow(0 0 0 rgba(94,198,255,0))}50%{filter:drop-shadow(0 0 12px rgba(94,198,255,.55))}}
+
 .hud-frame::before{content:"";position:absolute;inset:-2px;border-radius:18px;background:rgba(0,0,0,.32);box-shadow:0 0 0 9999px rgba(0,0,0,.42);z-index:-1}
-.corner{position:absolute;width:52px;height:52px;border:5px solid #5ec6ff;border-radius:8px}
+
+.corner{position:absolute;width:46px;height:46px;border:5px solid #5ec6ff;border-radius:8px}
 .corner.tl{top:-2px;left:-2px;border-right:0;border-bottom:0;border-top-left-radius:16px}
 .corner.tr{top:-2px;right:-2px;border-left:0;border-bottom:0;border-top-right-radius:16px}
 .corner.bl{bottom:-2px;left:-2px;border-right:0;border-top:0;border-bottom-left-radius:16px}
 .corner.br{bottom:-2px;right:-2px;border-left:0;border-top:0;border-bottom-right-radius:16px}
-.laser{position:absolute;left:8px;right:8px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#5ec6ff,transparent);box-shadow:0 0 14px 3px rgba(94,198,255,.85);animation:scanLine 2.2s ease-in-out infinite;top:50%}
-@keyframes scanLine{0%,100%{top:12%}50%{top:88%}}
-.hud-msg{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom));left:16px;right:16px;text-align:center;color:#fff;font-size:15.5px;font-weight:700;letter-spacing:.3px;text-shadow:0 2px 12px rgba(0,0,0,.8);padding:14px 18px;background:rgba(0,0,0,.6);border-radius:14px;border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(6px)}
+
+.laser{position:absolute;left:10px;right:10px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#5ec6ff,transparent);box-shadow:0 0 14px 3px rgba(94,198,255,.85);animation:scanLine 2.2s ease-in-out infinite;top:50%}
+@keyframes scanLine{0%,100%{top:8%}50%{top:92%}}
+
+.hud-frame.flash::after{content:"";position:absolute;inset:-2px;border-radius:18px;background:rgba(74,222,128,.55);animation:flashOk .45s ease-out forwards;z-index:2}
+@keyframes flashOk{from{opacity:1}to{opacity:0}}
+
+/* Aviso "deite o dispositivo" abaixo do quadro */
+.hud-hint-rotate{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:#fff;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  padding:10px 18px;
+  background:rgba(27,87,230,.42);
+  border:1px solid rgba(94,198,255,.7);
+  border-radius:99px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  text-shadow:0 1px 6px rgba(0,0,0,.65);
+  box-shadow:0 8px 24px rgba(47,107,255,.35);
+  animation:hintFade 2.6s ease-in-out infinite;
+  white-space:nowrap;
+}
+@keyframes hintFade{0%,100%{opacity:1}50%{opacity:.78}}
+.hud-hint-rotate svg{
+  width:20px;
+  height:20px;
+  flex:0 0 auto;
+  animation:rotateHint 1.8s ease-in-out infinite;
+}
+@keyframes rotateHint{
+  0%,30%{transform:rotate(0deg)}
+  55%,100%{transform:rotate(-90deg)}
+}
+
+.hud-msg{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom));left:16px;right:16px;text-align:center;color:#fff;font-size:15px;font-weight:700;letter-spacing:.3px;text-shadow:0 2px 12px rgba(0,0,0,.8);padding:14px 18px;background:rgba(0,0,0,.6);border-radius:14px;border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(6px)}
 .hud-msg.ok{background:rgba(15,157,88,.78);border-color:rgba(74,222,128,.5)}
 .hud-msg.err{background:rgba(214,69,69,.8);border-color:rgba(248,113,113,.55)}
-.hud-frame.flash::after{content:"";position:absolute;inset:-2px;border-radius:18px;background:rgba(74,222,128,.55);animation:flashOk .45s ease-out forwards}
-@keyframes flashOk{from{opacity:1}to{opacity:0}}
 
 /* ============== TOAST ============== */
 .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(20px + env(safe-area-inset-bottom));z-index:1100;max-width:min(560px,94vw);padding:16px 22px;border-radius:14px;font-size:15.5px;font-weight:700;background:var(--navy-800);color:#fff;box-shadow:0 18px 40px rgba(5,19,57,.42);opacity:0;pointer-events:none;transition:var(--transition);display:flex;align-items:center;gap:10px}
@@ -403,7 +451,6 @@ tbody tr:active{background:#f6f8fe}
         <p class="qtd-hint">Somente números · máximo 1000</p>
       </div>
 
-      <!-- BOTÃO ADICIONAR / SALVAR ITEM -->
       <button class="btn-add" id="btnAddItem" onclick="adicionarItem()">
         <svg class="ic-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"/>
@@ -417,7 +464,6 @@ tbody tr:active{background:#f6f8fe}
 
       <button class="btn-secondary" id="btnCancelarEdit" onclick="cancelarEdicao()" style="display:none">Cancelar edição</button>
 
-      <!-- CARRINHO -->
       <div class="cart-card" id="cartCard">
         <div class="cart-header">
           <h3>
@@ -472,8 +518,15 @@ tbody tr:active{background:#f6f8fe}
         <span class="corner br"></span>
         <div class="laser"></div>
       </div>
+      <div class="hud-hint-rotate" id="hudHintRotate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 1 1-3-6.7"/>
+          <polyline points="21 3 21 9 15 9"/>
+        </svg>
+        <span>Deite o dispositivo</span>
+      </div>
     </div>
-    <div class="hud-msg" id="hudMsg">Posicione o código dentro da área</div>
+    <div class="hud-msg" id="hudMsg">Deite o dispositivo e centralize o código</div>
   </div>
 </div>
 
@@ -482,7 +535,7 @@ tbody tr:active{background:#f6f8fe}
 
 <script>
 /* =========================================================
-   TRIAGEM VISION · WORKFLOW  (com carrinho)
+   TRIAGEM VISION · WORKFLOW  (HUD vertical)
    ========================================================= */
 
 const DEFAULT_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
@@ -508,8 +561,8 @@ const SCAN_COOLDOWN_MS = 1500;
 let cadastroCache = null;
 
 /* ---------- Estado do carrinho ---------- */
-let carrinho = [];          // array de itens
-let editandoIndex = null;   // índice em edição (null = novo item)
+let carrinho = [];
+let editandoIndex = null;
 
 /* =========================================================
    HELPERS
@@ -646,7 +699,6 @@ function logout(){
   sessionStorage.removeItem("tv_workflow_user");
   currentUser = null;
   closeCamera();
-  // limpa carrinho
   carrinho = [];
   editandoIndex = null;
   renderCarrinho();
@@ -705,7 +757,7 @@ function goLancar(){ resetFormLancar(true); editandoIndex = null; updateAddButto
 function goConsultar(){ switchScreen("consultar"); }
 
 /* =========================================================
-   EAN — consulta cadastro (BD_CADASTRO)
+   EAN
    ========================================================= */
 async function buscarCadastro(ean){
   const { data, error } = await sb.from("BD_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
@@ -770,7 +822,7 @@ document.getElementById("f_ean").addEventListener("keydown", async e => {
 });
 
 /* =========================================================
-   QTD_UN (máx 1000)
+   QTD_UN
    ========================================================= */
 function alterarQtd(delta){
   const inp = document.getElementById("f_qtd_un");
@@ -790,12 +842,19 @@ document.getElementById("f_qtd_un").addEventListener("input", e => {
 });
 
 /* =========================================================
-   CÂMERA + LEITURA
+   CÂMERA
    ========================================================= */
 function setCameraMessage(message, kind = ""){
   const hudMsg = document.getElementById("hudMsg");
   hudMsg.className = "hud-msg" + (kind ? " " + kind : "");
   hudMsg.textContent = message;
+}
+
+/* Controla visibilidade do aviso "Deite o dispositivo" */
+function setHintVisible(visible){
+  const hint = document.getElementById("hudHintRotate");
+  if (!hint) return;
+  hint.style.display = visible ? "flex" : "none";
 }
 
 function cameraErrorMessage(error){
@@ -812,23 +871,28 @@ async function openCamera(){
   const hudFrame = document.getElementById("hudFrame");
   hudFrame.classList.remove("flash");
   modal.classList.add("show");
+  setHintVisible(true);
   setCameraMessage("Solicitando acesso à câmera…");
 
   if (!window.isSecureContext && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
     setCameraMessage("A câmera só funciona em HTTPS. Abra o endereço seguro no celular.", "err");
+    setHintVisible(false);
     return;
   }
   if (!navigator.mediaDevices?.getUserMedia){
     setCameraMessage("Este navegador não oferece acesso à câmera. Use Chrome ou Safari atualizado.", "err");
+    setHintVisible(false);
     return;
   }
   if (!window.ZXing?.BrowserMultiFormatReader){
     setCameraMessage("Biblioteca de leitura indisponível. Use a digitação manual.", "err");
+    setHintVisible(false);
     return;
   }
 
   closeCamera(false);
   modal.classList.add("show");
+  setHintVisible(true);
   setCameraMessage("Abrindo câmera traseira…");
   const video = document.getElementById("cameraVideo");
   video.setAttribute("playsinline", "true");
@@ -858,6 +922,7 @@ async function openCamera(){
     lastScanAt = now;
     beepOk(); vibrate([80]);
     hudFrame.classList.remove("flash"); void hudFrame.offsetWidth; hudFrame.classList.add("flash");
+    setHintVisible(false);
     setCameraMessage("✓ Código lido: " + text, "ok");
     onBarcodeRead(text);
   };
@@ -870,11 +935,13 @@ async function openCamera(){
     } else {
       videoControls = await reader.decodeFromVideoDevice("", video, onDecode);
     }
-    setCameraMessage("Posicione o código dentro da área");
+    setHintVisible(true);
+    setCameraMessage("Deite o dispositivo e centralize o código");
   } catch(error){
     scanLoopActive = false;
     try { reader.reset(); } catch(_e) {}
     codeReader = null;
+    setHintVisible(false);
     setCameraMessage(cameraErrorMessage(error), "err");
     beepErr();
   }
@@ -892,6 +959,7 @@ function closeCamera(hide = true){
   cameraStream = null;
   const video = document.getElementById("cameraVideo");
   if (video) { video.pause(); video.srcObject = null; }
+  setHintVisible(true);
 }
 
 async function onBarcodeRead(ean){
@@ -906,7 +974,7 @@ window.addEventListener("popstate", () => {
 });
 
 /* =========================================================
-   CARRINHO — adicionar / editar / remover / render
+   CARRINHO
    ========================================================= */
 function adicionarItem(){
   const ean = document.getElementById("f_ean").value.trim();
@@ -925,7 +993,6 @@ function adicionarItem(){
   const descricao = document.getElementById("f_descricao").value.trim();
 
   if (editandoIndex !== null && carrinho[editandoIndex]){
-    // Atualiza item em edição (mantém o ID e a DTA_HR originais)
     const orig = carrinho[editandoIndex];
     carrinho[editandoIndex] = {
       id: orig.id,
@@ -937,7 +1004,6 @@ function adicionarItem(){
     editandoIndex = null;
     resetFormLancar(true);
   } else {
-    // Novo item
     carrinho.push({
       id: gerarIdCarrinho(),
       dtaHr: formatarDtaHr(new Date()),
@@ -945,14 +1011,11 @@ function adicionarItem(){
     });
     showToast("Item adicionado ao carrinho.", "ok");
     beepOk(); vibrate([50]);
-    // limpa só os campos do produto, mantém motivo/origem para agilizar
     resetFormLancar(false);
   }
 
   updateAddButtonMode();
   renderCarrinho();
-
-  const screen = document.getElementById("screen-lancar");
   document.getElementById("f_ean").focus();
 }
 
@@ -970,7 +1033,6 @@ function editarItem(index){
   document.getElementById("f_origem").value = item.origem;
   document.getElementById("f_qtd_un").value = String(item.qtdUn);
 
-  // Reconstroi bloco de info do produto
   const el = document.getElementById("productInfo");
   if (item.descricao || item.plu){
     el.className = "product-info ok";
@@ -984,12 +1046,10 @@ function editarItem(index){
     el.textContent = "Nenhum produto consultado.";
   }
 
-  cadastroCache = null; // força nova busca caso o EAN seja trocado
-
+  cadastroCache = null;
   updateAddButtonMode();
   renderCarrinho();
 
-  // rola pro topo do form
   const screen = document.getElementById("screen-lancar");
   screen.scrollTo({ top: 0, behavior: "smooth" });
   showToast("Editando item " + (index + 1) + " do carrinho.", "");
@@ -1094,7 +1154,7 @@ function updateAddButtonMode(){
 }
 
 /* =========================================================
-   LANÇAR TUDO — envia o carrinho em lote para WORKFLOW
+   LANÇAR TUDO
    ========================================================= */
 async function salvarTodosLancamentos(){
   const btn = document.getElementById("btnLancarTudo");
@@ -1124,7 +1184,6 @@ async function salvarTodosLancamentos(){
     const n = payloads.length;
     showToast((n === 1 ? "1 item lançado!" : (n + " itens lançados!")), "ok");
 
-    // limpa tudo
     carrinho = [];
     editandoIndex = null;
     resetFormLancar(true);
@@ -1281,7 +1340,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCarrinho();
 });
 
-/* Expor para o HTML */
 window.doLogin = doLogin;
 window.logout = logout;
 window.goHome = goHome;
