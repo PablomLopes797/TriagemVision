@@ -1180,7 +1180,7 @@
             btn.disabled = true;
             btnText.innerHTML = '<span class="spinner"></span>';
             try {
-                const { data, error } = await sb.from("BD_USER").select("*").ilike("USER", usuario).limit(1);
+                const { data, error } = await sb.from("TRIAGEM_USER").select("*").ilike("USER", usuario).limit(1);
                 if (error) throw error;
                 if (!data || !data.length) {
                     errText.textContent = "Usuário não encontrado.";
@@ -1264,7 +1264,7 @@
 
         /* ========== BUSCA CADASTRO ========== */
         async function buscarCadastro(ean) {
-            const { data, error } = await sb.from("BD_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
+            const { data, error } = await sb.from("TRIAGEM_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
             if (error) throw error;
             return (data && data.length) ? data[0] : null;
         }
@@ -1282,7 +1282,7 @@
             const gaiola = document.getElementById("filtroGaiola").value.trim();
 
             try {
-                let query = sb.from("BD_DOAÇÃO").select("*").order("DTA_HORA", { ascending: false }).limit(1000);
+                let query = sb.from("TRIAGEM_DOAÇÃO").select("*").order("DTA_HORA", { ascending: false }).limit(1000);
                 if (dataIni) query = query.gte("DTA_HORA", new Date(dataIni + "T00:00:00").toISOString());
                 if (dataFim) query = query.lte("DTA_HORA", new Date(dataFim + "T23:59:59").toISOString());
                 if (plu) {
@@ -1361,7 +1361,7 @@
 
         async function buscarProximaGaiola() {
             try {
-                const { data, error } = await sb.from("BD_DOAÇÃO").select("GAIOLA_PET").order("GAIOLA_PET", { ascending: false })
+                const { data, error } = await sb.from("TRIAGEM_DOAÇÃO").select("GAIOLA_PET").order("GAIOLA_PET", { ascending: false })
                     .limit(1);
                 if (error) throw error;
                 let ultimo = 0;
@@ -1477,7 +1477,7 @@
 
             try {
                 // 1. Buscar o próximo número de gaiola novamente (para evitar concorrência)
-                const { data, error } = await sb.from("BD_DOAÇÃO").select("GAIOLA_PET").order("GAIOLA_PET", { ascending: false })
+                const { data, error } = await sb.from("TRIAGEM_DOAÇÃO").select("GAIOLA_PET").order("GAIOLA_PET", { ascending: false })
                     .limit(1);
                 if (error) throw error;
                 let ultimo = 0;
@@ -1500,7 +1500,7 @@
                 }));
 
                 // 3. Inserir
-                const { error: insertError } = await sb.from("BD_DOAÇÃO").insert(registros);
+                const { error: insertError } = await sb.from("TRIAGEM_DOAÇÃO").insert(registros);
                 if (insertError) throw insertError;
 
                 showToast(`Lote salvo com sucesso! ${registros.length} item(ns) na gaiola ${gaiola}.`);
@@ -1554,7 +1554,7 @@
                 const turno = document.getElementById("filtroTurno").value;
                 const gaiola = document.getElementById("filtroGaiola").value.trim();
 
-                let query = sb.from("BD_DOAÇÃO").select("*").order("DTA_HORA", { ascending: false }).limit(10000);
+                let query = sb.from("TRIAGEM_DOAÇÃO").select("*").order("DTA_HORA", { ascending: false }).limit(10000);
                 if (dataIni) query = query.gte("DTA_HORA", new Date(dataIni + "T00:00:00").toISOString());
                 if (dataFim) query = query.lte("DTA_HORA", new Date(dataFim + "T23:59:59").toISOString());
                 if (plu) {
