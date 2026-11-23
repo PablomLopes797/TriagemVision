@@ -332,7 +332,7 @@
     <div class="modal-card" id="cardGestorOperacional">
         <div class="modal-mark">✓</div>
         <div class="modal-title">Confirmar gestor operacional</div>
-        <div class="modal-sub">Informe a matrícula e valide a senha do gestor antes de lançar no BD_PREV_RELAT.</div>
+        <div class="modal-sub">Informe a matrícula e valide a senha do gestor antes de lançar no TRIAGEM_PREV_RELAT.</div>
         <div class="modal-field">
             <label for="gestorMatricula">Matrícula do gestor operacional</label>
             <input type="text" id="gestorMatricula" inputmode="numeric" autocomplete="off" placeholder="Digite a matrícula" oninput="buscarGestorOperacional()">
@@ -358,8 +358,8 @@
 
 <script>
 (function() {
-    const SUPABASE_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxdm12eGppa2JpdnVic3pvYXRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NTQ2NDksImV4cCI6MjA5OTUzMDY0OX0.5EVtA9L0DoKR4kdr_4cP7YtqH-FqsHJc6vpeliUMjN8";
+    const SUPABASE_URL = "https://tvrfetjhqxvxorzytpci.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_scc1UJAUVN-m0dk1NFpR-A_9LmNzHsF";
     let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentUser = null;
     let prevDataCache = [];
@@ -411,7 +411,7 @@
         if(!usuario||!senha){ errText.textContent='Informe usuário e senha.'; errBox.classList.add('show'); card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'),400); return; }
         btn.disabled=true; btnText.innerHTML='<span class="spinner"></span>';
         try{
-            const {data,error} = await sb.from('BD_USER').select('*').ilike('USER',usuario).limit(1);
+            const {data,error} = await sb.from('TRIAGEM_USER').select('*').ilike('USER',usuario).limit(1);
             if(error) throw error;
             if(!data||!data.length){ errText.textContent='Usuário não encontrado.'; errBox.classList.add('show'); card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'),400); if(typeof setMatrixRed==='function') setMatrixRed(); return; }
             const userRow=data[0];
@@ -457,7 +457,7 @@
         const dataIni=document.getElementById('filtroDataIni').value, dataFim=document.getElementById('filtroDataFim').value, turno=document.getElementById('filtroTurno').value;
         const user=document.getElementById('filtroUser').value.trim(), ean=document.getElementById('filtroEan').value.trim(), plu=document.getElementById('filtroPlu').value.trim(), produto=document.getElementById('filtroProduto').value.trim(), categoria=document.getElementById('filtroCategoria').value.trim();
         try{
-            let query = sb.from('BD_DESCARTE').select('DTA_HORA,TURNO_LANC,USER,EAN,PLU,PRODUTO,CATEGORIA,QTD_UNIDADE').order('DTA_HORA',{ascending:false}).limit(5000);
+            let query = sb.from('TRIAGEM_DESCARTE').select('DTA_HORA,TURNO_LANC,USER,EAN,PLU,PRODUTO,CATEGORIA,QTD_UNIDADE').order('DTA_HORA',{ascending:false}).limit(5000);
             if(dataIni) query=query.gte('DTA_HORA',new Date(dataIni+'T00:00:00').toISOString());
             if(dataFim) query=query.lte('DTA_HORA',new Date(dataFim+'T23:59:59').toISOString());
             if(turno) query=query.eq('TURNO_LANC',Number(turno));
@@ -572,7 +572,7 @@
             if(!matricula)return;
             status.textContent='Buscando gestor…';
             try{
-                const {data,error}=await sb.from('BD_USER').select('USER,NAME_USER,PASSWORD,STATE').ilike('USER',matricula).limit(1);
+                const {data,error}=await sb.from('TRIAGEM_USER').select('USER,NAME_USER,PASSWORD,STATE').ilike('USER',matricula).limit(1);
                 if(error)throw error;
                 const gestor=data&&data[0];
                 if(!gestor||String(gestor.STATE??'1')!=='1'){status.textContent='Matrícula não encontrada ou gestor inativo.';status.className='bad';return;}
@@ -648,14 +648,14 @@
         console.log('📦 Payload a enviar (com mesma data/hora):', JSON.stringify(payloads, null, 2));
 
         try{
-            const {data, error} = await sb.from('BD_PREV_RELAT').insert(payloads);
+            const {data, error} = await sb.from('TRIAGEM_PREV_RELAT').insert(payloads);
             console.log('✅ Resposta Supabase:', {data, error});
             if(error) throw error;
 
             relatorioSalvo = true;
             document.getElementById('btnImprimir').disabled = false;
             document.getElementById('btnSalvar').disabled = true;
-            showToast(payloads.length+' registro(s) salvo(s) no BD_PREV_RELAT.');
+            showToast(payloads.length+' registro(s) salvo(s) no TRIAGEM_PREV_RELAT.');
             fecharModalGestorOperacional();
             linhasParaSalvar=[];
 
