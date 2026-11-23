@@ -535,7 +535,7 @@ tbody tr:active{background:#f6f8fe}
 
 <script>
 /* =========================================================
-   TRIAGEM VISION · WORKFLOW  (HUD vertical)
+   TRIAGEM VISION · TRIAGEM_WORKFLOW  (HUD vertical)
    ========================================================= */
 
 const DEFAULT_URL = "https://jqvmvxjikbivubszoatc.supabase.co";
@@ -646,7 +646,7 @@ async function doLogin(){
   btnTxt.innerHTML = '<span class="spinner"></span>';
 
   try{
-    const { data, error } = await sb.from("BD_USER").select("*").ilike("USER", usuario).limit(1);
+    const { data, error } = await sb.from("TRIAGEM_USER").select("*").ilike("USER", usuario).limit(1);
     if (error) throw error;
     if (!data || !data.length){ errTxt.textContent = "Usuário não encontrado."; throw new Error("__x"); }
     if (String(data[0].PASSWORD ?? "").trim() !== senha.trim()){ errTxt.textContent = "Senha incorreta."; throw new Error("__x"); }
@@ -760,7 +760,7 @@ function goConsultar(){ switchScreen("consultar"); }
    EAN
    ========================================================= */
 async function buscarCadastro(ean){
-  const { data, error } = await sb.from("BD_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
+  const { data, error } = await sb.from("TRIAGEM_CADASTRO").select("*").eq("CODACESSO", ean).limit(1);
   if (error) throw error;
   return (data && data.length) ? data[0] : null;
 }
@@ -782,7 +782,7 @@ async function preencherCadastroPorEan(ean){
     const p = await buscarCadastro(ean);
     if (!p){
       el.className = "product-info bad";
-      el.innerHTML = '<b>EAN ' + escapeHtml(ean) + '</b> · não encontrado em BD_CADASTRO.';
+      el.innerHTML = '<b>EAN ' + escapeHtml(ean) + '</b> · não encontrado em TRIAGEM_CADASTRO.';
       beepErr();
       vibrate([140]);
       return false;
@@ -1176,7 +1176,7 @@ async function salvarTodosLancamentos(){
   }));
 
   try{
-    const { error } = await sb.from("WORKFLOW").insert(payloads);
+    const { error } = await sb.from("TRIAGEM_WORKFLOW").insert(payloads);
     if (error) throw error;
 
     beepOk();
@@ -1231,7 +1231,7 @@ async function carregarConsultar(){
 
   try{
     const { data, error } = await sb
-      .from("WORKFLOW")
+      .from("TRIAGEM_WORKFLOW")
       .select("*")
       .eq("USER", currentUser.user)
       .limit(5000);
@@ -1312,7 +1312,7 @@ async function carregarConsultar(){
         '<b>Erro ao carregar</b>' +
         '<p>' + escapeHtml(e.message) + '</p>' +
       '</div>';
-    showToast("Erro ao consultar WORKFLOW: " + e.message, "err");
+    showToast("Erro ao consultar TRIAGEM_WORKFLOW: " + e.message, "err");
   }
 }
 
